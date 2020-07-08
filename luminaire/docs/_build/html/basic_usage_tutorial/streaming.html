@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <title>Anomaly Detection for Streaming data</title>
+    
+
+    <link rel="stylesheet" href="../_static/css/redactor.css" type="text/css" />
+    
+    
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="luminaire 0.1 documentation" href="../index.html"/>
+    <link rel="up" title="Tutorials" href="tutorials.html"/>
+    <link rel="next" title="User Guide" href="../user_guide/user_guide.html"/>
+    <link rel="prev" title="Outlier Detection" href="outlier_batch.html"/> 
+</head>
+
+<body role="document">
+     
+
+    
+<a href="#" id="js-navigation-toggle" class="navigation-toggle">
+    <i class="mdi mdi-menu"></i><i class="mdi mdi-close"></i>
+</a>
+
+<section class="site-sidebar">
+
+<nav>
+
+
+    <a href="../index.html" class="branding-link">
+    
+        luminaire
+    
+    
+    
+        
+        
+    
+    </a>
+
+    
+<section role="search">
+    <form action="../search.html" method="get" class="site-searchform">
+        <input type="text" name="q" placeholder="Search docs" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+</section>
+
+
+
+    <section class="site-nav">
+    
+    
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="dataprofiling.html">Data Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html">Configuration Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outlier_batch.html">Outlier Detection</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Anomaly Detection for Streaming data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#anomaly-detection-pre-configured-settings">Anomaly Detection: Pre-Configured Settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#anomaly-detection-manual-configuration">Anomaly Detection: Manual Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/user_guide.html">User Guide</a></li>
+</ul>
+
+    
+    </section>
+
+</nav>
+
+</section>
+
+    <main class="site-main" role="main">
+        
+
+
+
+
+
+
+
+
+
+
+
+<nav class="site-breadcrumbs">
+    <ul>
+    
+        <li>
+            <a href="../index.html">Docs</a> /
+        </li>
+        
+        <li>
+            <a href="tutorials.html">Tutorials</a> /
+        </li>
+        
+        <li class="site-breadcrumbs__leaf">Anomaly Detection for Streaming data</li>
+    
+    </ul>
+</nav>
+        <section class="site-content">
+            <div class="container">
+                
+  <div class="section" id="anomaly-detection-for-streaming-data">
+<h1>Anomaly Detection for Streaming data<a class="headerlink" href="#anomaly-detection-for-streaming-data" title="Permalink to this headline">¶</a></h1>
+<p>Luminaire <em>WindowDensityModel</em> implements the idea of monitoring data over comparable windows instead of seeing them for every single data points to track outliers. This essentialy the core for tracking anomalies over streaming data. Time series data tend to show high noise if observed too frequently. Hence, tracking for anomalies over streaming data essesntially means tracking for any sustained fluctuations.</p>
+<a class="reference internal image-reference" href="../_images/windows.png"><img alt="../_images/windows.png" src="../_images/windows.png" style="width: 704.0px; height: 291.2px;" /></a>
+<p>Although <em>WindowDensityModel</em> is designed to track anomalies over streaming data, it can be used to track for any sustained fluctuations over a window for any frequency. It is suggested to use this detection type for upto hourly frequency.</p>
+<div class="section" id="anomaly-detection-pre-configured-settings">
+<h2>Anomaly Detection: Pre-Configured Settings<a class="headerlink" href="#anomaly-detection-pre-configured-settings" title="Permalink to this headline">¶</a></h2>
+<p>Luminaire provides full capability to configure the modeling parameters based on the frequency that the data has been observed and the methods that can be applied (please refer to the Window density Model user guide for detailed configurations). Although, Luminaire settings for window density model is already pre-configured for some typical pandas frequency types and settings for any other frequency types should be configured manually (see the user guide for more information).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">                         raw  interpolated</span>
+<span class="go">index</span>
+<span class="go">2020-05-25 00:00:00  10585.0       10585.0</span>
+<span class="go">2020-05-25 00:01:00  10996.0       10996.0</span>
+<span class="go">2020-05-25 00:02:00  10466.0       10466.0</span>
+<span class="go">2020-05-25 00:03:00  10064.0       10064.0</span>
+<span class="go">2020-05-25 00:04:00  10221.0       10221.0</span>
+<span class="gp">... </span>                     <span class="o">...</span>           <span class="o">...</span>
+<span class="go">2020-06-16 23:55:00  11356.0       11356.0</span>
+<span class="go">2020-06-16 23:56:00  10852.0       10852.0</span>
+<span class="go">2020-06-16 23:57:00  11114.0       11114.0</span>
+<span class="go">2020-06-16 23:58:00  10663.0       10663.0</span>
+<span class="go">2020-06-16 23:59:00  11034.0       11034.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_params</span> <span class="o">=</span> <span class="n">WindowDensityHyperParams</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">params</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wdm_obj</span> <span class="o">=</span> <span class="n">WindowDensityModel</span><span class="p">(</span><span class="n">hyper_params</span><span class="o">=</span><span class="n">hyper_params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">success</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">wdm_obj</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="go">(True, &lt;luminaire_models.model.window_density.WindowDensityModel object at 0x7f8cda42dcc0&gt;)</span>
+</pre></div>
+</div>
+<p>The model object contains the data density structure over a pre-specified window given the frequency. Lumianire sets the following defaults for some typical pandas frequencies (any custom requirements can be updated in the hyperparameter object instance):</p>
+<ul class="simple">
+<li><p>‘S’: Hourly windows</p></li>
+<li><p>‘M’: Daily windows</p></li>
+<li><p>‘QM’: Weekly windows</p></li>
+<li><p>‘H’: 12 hours windows</p></li>
+<li><p>‘D’: 10 days windows</p></li>
+<li><p>‘custom’: User specified windows</p></li>
+</ul>
+<p>In order to score a new window innovation given the trained model object, we have to provide a equal sized window that representing a similar time interval (For example, we each of the window in the training data represents a 24 hours window between 9 AM to 8:59:59 AM for last few days, the scoring data should represent the same interval of a different day and should have the same window size).</p>
+<a class="reference internal image-reference" href="../_images/window_train_score_auto.png"><img alt="../_images/window_train_score_auto.png" src="../_images/window_train_score_auto.png" style="width: 703.8000000000001px; height: 395.1px;" /></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">scoring_data</span>
+<span class="go">                        raw interpolated</span>
+<span class="go">index</span>
+<span class="go">2020-06-17 00:00:00  1121.0       1121.0</span>
+<span class="go">2020-06-17 00:01:00  1091.0       1091.0</span>
+<span class="go">2020-06-17 00:02:00  1063.0       1063.0</span>
+<span class="go">2020-06-17 00:03:00  1085.0       1085.0</span>
+<span class="go">2020-06-17 00:04:00  1063.0       1063.0</span>
+<span class="gp">... </span>                    <span class="o">...</span>          <span class="o">...</span>
+<span class="go">2020-06-17 23:55:00   968.0        968.0</span>
+<span class="go">2020-06-17 23:56:00   995.0        995.0</span>
+<span class="go">2020-06-17 23:57:00   963.0        963.0</span>
+<span class="go">2020-06-17 23:58:00   968.0        968.0</span>
+<span class="go">2020-06-17 23:59:00   920.0        920.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scores</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">scoring_data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+<span class="go">{&#39;Success&#39;: True, &#39;ConfLevel&#39;: 99.9, &#39;IsAnomaly&#39;: False, &#39;AnomalyProbability&#39;: 0.6956745734841678}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="anomaly-detection-manual-configuration">
+<h2>Anomaly Detection: Manual Configuration<a class="headerlink" href="#anomaly-detection-manual-configuration" title="Permalink to this headline">¶</a></h2>
+<p>There are several options in the <em>WindowDensityHyperParams</em> class that can be manually configured. User should pick the configuration mostly depending on the frequency that the data has been observed.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">                             raw interpolated</span>
+<span class="go">index</span>
+<span class="go">2020-05-20 00:03:00  6393.451190  6393.451190</span>
+<span class="go">2020-05-20 00:13:00  6491.426190  6491.426190</span>
+<span class="go">2020-05-20 00:23:00  6770.469444  6770.469444</span>
+<span class="go">2020-05-20 00:33:00  6490.798810  6490.798810</span>
+<span class="go">2020-05-20 00:43:00  6273.786508  6273.786508</span>
+<span class="gp">... </span>                         <span class="o">...</span>          <span class="o">...</span>
+<span class="go">2020-06-09 23:13:00  5619.341270  5619.341270</span>
+<span class="go">2020-06-09 23:23:00  5573.001190  5573.001190</span>
+<span class="go">2020-06-09 23:33:00  5745.400000  5745.400000</span>
+<span class="go">2020-06-09 23:43:00  5761.355556  5761.355556</span>
+<span class="go">2020-06-09 23:53:00  5558.577778  5558.577778</span>
+<span class="go">&gt;&gt;&gt;hyper_params = WindowDensityHyperParams(freq=&#39;custom&#39;,</span>
+<span class="go">                                            detection_method=&#39;kldiv&#39;,</span>
+<span class="go">                                            baseline_type=&quot;last_window&quot;,</span>
+<span class="go">                                            min_window_length=6*12,</span>
+<span class="go">                                            max_window_length=6*24*84,</span>
+<span class="go">                                            window_length=6*24,</span>
+<span class="go">                                            ma_window_length=24,</span>
+<span class="go">                                            ).params</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wdm_obj</span> <span class="o">=</span> <span class="n">WindowDensityModel</span><span class="p">(</span><span class="n">hyper_params</span><span class="o">=</span><span class="n">hyper_params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">success</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">wdm_obj</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="go">(True, &lt;luminaire_models.model.window_density.WindowDensityModel object at 0x7f8d5f1a6940&gt;)</span>
+</pre></div>
+</div>
+<p>The trained model object can be used to score data representing the same interval from a different day and having the same window size.</p>
+<a class="reference internal image-reference" href="../_images/window_train_score_manual.png"><img alt="../_images/window_train_score_manual.png" src="../_images/window_train_score_manual.png" style="width: 700.2px; height: 395.1px;" /></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">scoring_data</span>
+<span class="go">                             raw interpolated</span>
+<span class="go">index</span>
+<span class="go">2020-06-10 00:00:00  5532.556746  5532.556746</span>
+<span class="go">2020-06-10 00:10:00  5640.711905  5640.711905</span>
+<span class="go">2020-06-10 00:20:00  5880.368254  5880.368254</span>
+<span class="go">2020-06-10 00:30:00  5842.397222  5842.397222</span>
+<span class="go">2020-06-10 00:40:00  5827.231746  5827.231746</span>
+<span class="gp">... </span>                         <span class="o">...</span>          <span class="o">...</span>
+<span class="go">2020-06-10 23:10:00  7210.905952  7210.905952</span>
+<span class="go">2020-06-10 23:20:00  5739.459524  5739.459524</span>
+<span class="go">2020-06-10 23:30:00  5590.413889  5590.413889</span>
+<span class="go">2020-06-10 23:40:00  5608.291270  5608.291270</span>
+<span class="go">2020-06-10 23:50:00  5753.794444  5753.794444</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scores</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">scoring_data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+<span class="go">{&#39;Success&#39;: True, &#39;ConfLevel&#39;: 99.9, &#39;IsAnomaly&#39;: True, &#39;AnomalyProbability&#39;: 0.9999999851834622}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            </div>
+
+        </section>
+
+        
+            <nav class="site-bottom-navigation" role="navigation">
+            
+                <a href="../user_guide/user_guide.html" class="btn btn--primary btn--next right"
+                    title="User Guide" accesskey="n">
+                    Next
+                </a>
+            
+            
+                <a href="outlier_batch.html" class="btn btn--primary btn--prev"
+                    title="Outlier Detection" accesskey="p">
+                    Previous
+                </a>
+            
+            </nav>
+        
+
+        
+            <div class="source-link">
+            
+                
+                    <a href="../_sources/basic_usage_tutorial/streaming.rst.txt" rel="nofollow">
+                        <i class="mdi mdi-code-tags"></i>
+                        View page source
+                    </a>
+                
+            
+            </div>
+        
+
+
+
+    </main>
+
+    <footer class="site-footer">
+<div class="container">
+
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright 2020, Zillow Group Inc..
+        </p>
+    </div>
+        <p>Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+        <a href="https://github.com/testthedocs/sphinx_ttd_theme">theme</a>
+        provided by <a href="https://testthedocs">TestTheDocs</a>. 
+
+</div>
+</footer>
+
+    
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/js/theme-min.js"></script> 
+</body>
+</html>
