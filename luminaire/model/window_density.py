@@ -146,7 +146,7 @@ class WindowDensityModel(BaseModel):
         :rtype: int
         """
         import numpy as np
-        from luminaire.external.bayesian_changepoint import offline_changepoint_detection as offcd
+        from bayesian_changepoint_detection import offline_changepoint_detection as offcd
         from functools import partial
 
         # Volume shift detection over the means of the training window
