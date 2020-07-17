@@ -40,7 +40,7 @@ index
 >>>print(pre_prc)
 None
 
-In order to get the data profiling information, the impute only option should be disabled (that is the default option). Disabling the imputr only option allows Luminaire to impute missing data along with detecting all the trend changes and the change points in the input time series. 
+In order to get the data profiling information, the impute only option should be disabled (that is the default option). Disabling the impute only option allows Luminaire to impute missing data along with detecting all the trend changes and the change points in the input time series.
 
 The key utility of Luminaire data profiling is this being a pre-processing step for outlier detection model training. Hence, the user can enable several option to prepare the time series before ingested by the training process. For example, the log transformation option can be enabled for exponential modeling during training. User can also check for the fill rate to constrain the proportion of missing data upto some threshold. Moreover, the pre processed data can also be truncated if there is any change points (data shift) observed.
 

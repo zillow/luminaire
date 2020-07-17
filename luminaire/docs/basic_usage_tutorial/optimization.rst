@@ -1,7 +1,7 @@
 Configuration Optimization
 ==========================
 
-Luminaire *HyperparameterOptimization* allows user to auto-select the best data preprocessing configuration and the outlier detection model training configuration with respect to the input time series. This option enables Luminaire to work as a hands-off system where the user only has to provide the innovation frequency for the input data along with the data itself. This option should be used if the user wants avoid any manual configuration and should be used upstream of the data pre-processing and training steps.
+Luminaire *HyperparameterOptimization* performs auto-selection of the best data preprocessing configuration and the outlier detection model training configuration with respect to the input time series. This option enables Luminaire to work as a hands-off system where the user only has to provide the input data along with its frequency. This option should be used if the user wants avoid any manual configuration and should be called prior to the data pre-processing and training steps.
 
 >>> print(data)
                raw
@@ -25,7 +25,7 @@ index
 Fully Automatic Outlier Detection
 -------------------------------------
 
-Since the optimized configuration contains all the parameters required for data pre-processing and training, that can be used downstream for performing the data pre-processing and training.
+Since the optimized configuration contains all the parameters required for data pre-processing and training, this can be used downstream for performing the data pre-processing and training.
 
 >>> de_obj = DataExploration(freq='D', **opt_config)
 >>> training_data, pre_prc = de_obj.profile(data)
@@ -58,7 +58,7 @@ Since, we have to optimal model class along with other optimal configurations, w
 >>> print(success, model_date, trained_model)
 (True, '2020-06-07 00:00:00', <luminaire_models.model.lad_structural.LADStructuralModel object at 0x7fe2b47a7978>)
 
-This trained model is now ready to be used for scoring any future data innovation.
+This trained model is now ready to be used for scoring future data points.
 
 >>> trained_model.score(2000, '2020-06-08')
 {'Success': True, 'IsLogTransformed': 1, 'LogTransformedAdjustedActual': 7.601402334583733, 'LogTransformedPrediction': 7.529710533463001, 'LogTransformedStdErr': 0.06217883425408564, 'LogTransformedCILower': 7.422390543346913, 'LogTransformedCIUpper': 7.62662106869458, 'AdjustedActual': 2000.000000000015, 'Prediction': 1861.566274906425, 'StdErr': 110.9167321105633, 'CILower': 1672.028177505716, 'CIUpper': 2051.104372307134, 'ConfLevel': 90.0, 'ExogenousHolidays': 0, 'IsAnomaly': False, 'IsAnomalyExtreme': False, 'AnomalyProbability': 0.7545715087682185, 'DownAnomalyProbability': 0.12271424561589073, 'UpAnomalyProbability': 0.8772857543841093, 'ModelFreshness': 0.1}
