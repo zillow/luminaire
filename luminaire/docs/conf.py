@@ -34,6 +34,7 @@ extensions = [
 'sphinx.ext.autodoc',
 'rinoh.frontend.sphinx',
 'sphinx_rtd_theme',
+'rst2pdf.pdfbuilder'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -57,3 +58,7 @@ html_theme_path = [sphinx_redactor_theme.get_html_theme_path()]
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+pdf_documents = [
+('index', u'rst2pdf', u'Luminaire: A hands-off Anomaly Detection Library', u'Zillow Group Data Governance team'),
+]
