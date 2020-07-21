@@ -12,7 +12,7 @@ class DataExploration(object):
     """
     This is a general class for time series data exploration and pre-processing.
 
-    :param str freq: The frequency of the time-series.
+    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
     :param float sig_level: The significance level to use for any statistical test withing data profile. This should be
         a number between 0 and 1.
     :param min_ts_mean: The minimum mean value of the time series required for the model to run. For data that
@@ -41,6 +41,8 @@ class DataExploration(object):
     :type min_changepoint_padding_length: bool, optional
     :param change_point_threshold: Minimum threshold (a value > 0) to flag change points based on KL divergence.
     :type change_point_threshold: float, optional
+
+    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
     """
     __version__ = "0.1"
 
