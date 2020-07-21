@@ -1133,7 +1133,7 @@ endobj
 endobj
 173 0 obj
 <<
-/Author () /CreationDate (D:20200720173457+08'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20200720173457+08'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
+/Author () /CreationDate (D:20200720214322+08'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20200720214322+08'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
   /Subject (\(unspecified\)) /Title () /Trapped /False
 >>
 endobj
@@ -2551,7 +2551,7 @@ endstream
 endobj
 211 0 obj
 <<
-/Length 8847
+/Length 8813
 >>
 stream
 1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
@@ -2701,7 +2701,7 @@ Q
 q
 1 0 0 1 40.01575 307.4394 cm
 q
-BT 1 0 0 1 0 50 Tm 1.632273 Tw 12 TL /F1 10 Tf 0 0 0 rg (Luminaire allows some data-specific information to be added during the training process of the structural model) Tj T* 0 Tw 2.965341 Tw (through ) Tj /F4 10 Tf (preprocessing_parameters) Tj /F1 10 Tf (. The ) Tj /F4 10 Tf (preprocessing_parameters) Tj /F1 10 Tf ( can either be specified by the user if the) Tj T* 0 Tw 11.21855 Tw (data-specific information is available through external sources OR can be obtained using) Tj T* 0 Tw 1.464262 Tw 1 0 0 rg (`luminaire_models.exploration.data_exploration.DataExploration`_) Tj 0 0 0 rg ( . The data-specific information includes a list of) Tj T* 0 Tw (trend changes, change points \(data shifts\), and start and end of the input time series.) Tj T* ET
+BT 1 0 0 1 0 50 Tm 1.632273 Tw 12 TL /F1 10 Tf 0 0 0 rg (Luminaire allows some data-specific information to be added during the training process of the structural model) Tj T* 0 Tw 2.965341 Tw (through ) Tj /F4 10 Tf (preprocessing_parameters) Tj /F1 10 Tf (. The ) Tj /F4 10 Tf (preprocessing_parameters) Tj /F1 10 Tf ( can either be specified by the user if the) Tj T* 0 Tw .001853 Tw (data-specific information is available through external sources OR can be obtained using ) Tj /F4 10 Tf (Luminaire DataExploration) Tj /F1 10 Tf (.) Tj T* 0 Tw .709116 Tw (The data-specific information includes a list of trend changes, change points \(data shifts\), and start and end of the) Tj T* 0 Tw (input time series.) Tj T* ET
 Q
 Q
 q
@@ -8274,56 +8274,56 @@ xref
 0001744820 00000 n 
 0001748082 00000 n 
 0001753337 00000 n 
-0001762237 00000 n 
-0001766632 00000 n 
-0001772601 00000 n 
-0001778379 00000 n 
-0001782243 00000 n 
-0001786321 00000 n 
-0001797333 00000 n 
-0001804379 00000 n 
-0001814151 00000 n 
-0001821465 00000 n 
-0001832333 00000 n 
-0001837243 00000 n 
-0001845052 00000 n 
-0001854833 00000 n 
-0001861558 00000 n 
-0001864349 00000 n 
-0001873503 00000 n 
-0001873629 00000 n 
-0001875004 00000 n 
-0001875339 00000 n 
-0001875374 00000 n 
-0001875409 00000 n 
-0001875444 00000 n 
-0001875479 00000 n 
-0001875514 00000 n 
-0001875549 00000 n 
-0001875584 00000 n 
-0001875619 00000 n 
-0001875654 00000 n 
-0001875689 00000 n 
-0001875724 00000 n 
-0001875759 00000 n 
-0001875794 00000 n 
-0001875830 00000 n 
-0001875866 00000 n 
-0001875902 00000 n 
-0001875938 00000 n 
-0001875974 00000 n 
-0001876010 00000 n 
-0001876046 00000 n 
-0001876082 00000 n 
-0001876118 00000 n 
-0001876154 00000 n 
-0001876190 00000 n 
-0001876226 00000 n 
-0001876262 00000 n 
+0001762203 00000 n 
+0001766598 00000 n 
+0001772567 00000 n 
+0001778345 00000 n 
+0001782209 00000 n 
+0001786287 00000 n 
+0001797299 00000 n 
+0001804345 00000 n 
+0001814117 00000 n 
+0001821431 00000 n 
+0001832299 00000 n 
+0001837209 00000 n 
+0001845018 00000 n 
+0001854799 00000 n 
+0001861524 00000 n 
+0001864315 00000 n 
+0001873469 00000 n 
+0001873595 00000 n 
+0001874970 00000 n 
+0001875305 00000 n 
+0001875340 00000 n 
+0001875375 00000 n 
+0001875410 00000 n 
+0001875445 00000 n 
+0001875480 00000 n 
+0001875515 00000 n 
+0001875550 00000 n 
+0001875585 00000 n 
+0001875620 00000 n 
+0001875655 00000 n 
+0001875690 00000 n 
+0001875725 00000 n 
+0001875760 00000 n 
+0001875796 00000 n 
+0001875832 00000 n 
+0001875868 00000 n 
+0001875904 00000 n 
+0001875940 00000 n 
+0001875976 00000 n 
+0001876012 00000 n 
+0001876048 00000 n 
+0001876084 00000 n 
+0001876120 00000 n 
+0001876156 00000 n 
+0001876192 00000 n 
+0001876228 00000 n 
 trailer
 <<
 /ID 
-[<8aadc73c6bdc13de46b7ae05fbd880af><8aadc73c6bdc13de46b7ae05fbd880af>]
+[<449c8bf997302c3eaa5ea0e5c402417d><449c8bf997302c3eaa5ea0e5c402417d>]
 % ReportLab generated PDF document -- digest (http://www.reportlab.com)
 
 /Info 173 0 R
@@ -8331,5 +8331,5 @@ trailer
 /Size 258
 >>
 startxref
-1876298
+1876264
 %%EOF

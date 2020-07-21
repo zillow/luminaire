@@ -12,7 +12,7 @@ class DataExploration(object):
     """
     This is a general class for time series data exploration and pre-processing.
 
-    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
+    :param str freq: The frequency of the time-series.
     :param float sig_level: The significance level to use for any statistical test withing data profile. This should be
         a number between 0 and 1.
     :param min_ts_mean: The minimum mean value of the time series required for the model to run. For data that

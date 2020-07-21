@@ -18,7 +18,7 @@ Luminaire provides the full capability to have user-specified configuration for 
 >>> print(lad_struct_obj)
 <luminaire_models.model.lad_structural.LADStructuralModel object at 0x7fc91882bb38>
 
-Luminaire allows some data-specific information to be added during the training process of the structural model through *preprocessing_parameters*. The *preprocessing_parameters* can either be specified by the user if the data-specific information is available through external sources OR can be obtained using `luminaire_models.exploration.data_exploration.DataExploration`_ . The data-specific information includes a list of trend changes, change points (data shifts), and start and end of the input time series.
+Luminaire allows some data-specific information to be added during the training process of the structural model through *preprocessing_parameters*. The *preprocessing_parameters* can either be specified by the user if the data-specific information is available through external sources OR can be obtained using *Luminaire DataExploration*. The data-specific information includes a list of trend changes, change points (data shifts), and start and end of the input time series.
 
 >>> de_obj = DataExploration(freq='D', data_shift_truncate=False, is_log_transformed=True, fill_rate=0.9)
 >>> data, pre_prc = de_obj.profile(data)

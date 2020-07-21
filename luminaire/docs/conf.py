@@ -60,5 +60,5 @@ html_theme_path = [sphinx_redactor_theme.get_html_theme_path()]
 html_static_path = ['_static']
 
 pdf_documents = [
-('index', u'rst2pdf', u'Luminaire: A hands-off Anomaly Detection Library', u'Zillow Group Data Governance team'),
+('index', u'luminaire_docs', u'Luminaire: A hands-off Anomaly Detection Library', u'Zillow Group Data Governance team'),
 ]

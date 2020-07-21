@@ -9,7 +9,7 @@ class HyperparameterOptimization(object):
     """
     Hyperparameter optimization for LAD outlier detection configuration for batch data.
 
-    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
+    :param str freq: The frequency of the time-series.
     :param str detection_type: Luminaire anomaly detection type. Only Outlier detection for batch data is currently
         supported.
     :type detection_type: str, optional
