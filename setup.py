@@ -3,28 +3,34 @@ from setuptools import setup, find_packages
 
 setup(
     name='luminaire',
-    version='0.0.1.dev1',
+    version='0.1.0',
 
-    # license='',
+    license='Apache License 2.0',
 
-    description='Luminaire is an internal data quality service within Zillow Group that provides an ML driven solution '
-                'for monitoring time series data',
-    long_description='Luminaire provides several anomaly detection / forecasting capabilities that incorporates any '
-                     'correlational / seasonal pattern in the data over time and also incorporates the '
-                     'uncontrollable variations. ',
-    author='Luminaire Dev, Data Governance Team, ZillowGroup',
-    author_email='luminiare-dev@zillowgrooup.com',
+    description='Luminaire is a python package that provides ML driven solutions for monitoring time series data',
+    long_description='Luminaire provides several anomaly detection and forecasting capabilities that incorporate '
+                     'correlational and seasonal patterns in the data over time as well as uncontrollable variations.',
 
-    # url='',
+    author='Zillow Group A.I. team',
+    author_email='luminiare-dev@zillowgroup.com',
 
     python_requires='>=3.6',
     packages=find_packages(),
-    # install_requires=[''],
 
-    # classifiers=[
-    # ],
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python :: 3.6',
+        'Operating System :: OS Independent',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+    ],
 
-    # keywords='',
+    keywords='AnomalyDetection AutoML Batch Streaming',
+
+    # url='',  # this is where the github pages url will go.
 
     # project_urls={
     # }
