@@ -2,6 +2,15 @@
 
 ![Luminaire Logo](https://github.com/zillow/luminaire/blob/docs/documentation_update/luminaire_logo.svg)
 
+**Table of contents**
+
+- [What is Luminaire](#what-is-luminaire)
+- [Quick Start](#quick-start)
+- [Anomaly Detection Flow](#anomaly-detection-flow)
+- [Contributing](#contributing)
+- [Development Team](#development-team)
+
+
 ## What is Luminaire
 
 Luminaire is a python package that provides ML driven solutions for monitoring time series data. Luminaire provides 
@@ -50,20 +59,13 @@ the user needs to provide almost no configuration for any type of time series da
 the preprocessing and modeling for any auto configured anomaly detection use case. See [fully automatic outlier detection](https://github.com/zillow/luminaire/blob/docs/_build/html/basic_usage_tutorial/optimization.html#fully-automatic-outlier-detection)
 for a detailed walkthrough. 
 
+## Contributing
+
+Want to help improve Luminaire? Check out our [contributing documentation](CONTRIBUTING.rst).
+
+
 ## Development Team
 
 Luminaire is developped and maintained by [Sayan Chakraborty](https://github.com/sayanchk), [Smit Shah](https://github.com/shahsmit14), 
 Kiumars Soltani, Luyao Yang, [Anna Swigart](https://github.com/annaswigart), Kyle Buckingham and many other contributors
 from the Zillow Group A.I. team.
-
-
-
-
-
-
-
-
-
-
-
-

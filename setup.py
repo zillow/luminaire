@@ -12,7 +12,7 @@ setup(
                      'correlational and seasonal patterns in the data over time as well as uncontrollable variations.',
 
     author='Zillow Group A.I. team',
-    author_email='luminiare-dev@zillowgroup.com',
+    author_email='luminaire-dev-oss@zillowgroup.com',
 
     python_requires='>=3.6',
     packages=find_packages(),
