@@ -1,6 +1,6 @@
 # Luminaire: A hands-off Anomaly Detection Library
 
-![Luminaire Logo](https://github.com/zillow/luminaire/blob/docs/documentation_update/luminaire_logo.svg)
+![Luminaire Logo](luminaire_logo.svg)
 
 **Table of contents**
 
@@ -17,7 +17,7 @@ Luminaire is a python package that provides ML driven solutions for monitoring t
 several anomaly detection and forecasting capabilities that incorporate correlational and seasonal 
 patterns in the data over time as well as uncontrollable variations.
 
-Please see the [full Luminaire documentation](https://github.com/zillow/luminaire/blob/docs/_build/html/Introduction.html) 
+Please see the [full Luminaire documentation](luminaire/docs/_build/html/Introduction.html) 
 for detailed descriptions of the methods.
 
 ## Quick Start
@@ -29,7 +29,7 @@ pip install luminaire
 ```
 
 ## Anomaly Detection Flow
-![Luminaire Flow](https://github.com/zillow/luminaire/blob/docs/documentation_update/luminaire_flow.gif)
+![Luminaire Flow](luminaire_flow.gif)
 
 Luminaire anomaly detection workflow can be divided into 3 major components.
 
@@ -47,7 +47,7 @@ can be used to monitor irregular longer term swings or data drifts.
 
 This components performs time series model training based on the user specified configuration OR optimized configuration 
 (see Luminaire hyperparameter optimization). Luminaire model training is integrated with different structural time series
-models as well as filtering based models. See [Luminaire outlier detection](https://github.com/zillow/luminaire/blob/docs/_build/html/basic_usage_tutorial/outlier_batch.html)
+models as well as filtering based models. See [Luminaire outlier detection](luminaire/docs/_build/html/basic_usage_tutorial/outlier_batch.html)
 for more information.
  
 Luminaire modeling step can be called after the data preprocessing and profiling step to perform necessary data preparation before training.
@@ -56,7 +56,7 @@ Luminaire modeling step can be called after the data preprocessing and profiling
  
 Luminaire is integrated with configuration optimization capability for the hands-off anomaly detection approach where
 the user needs to provide almost no configuration for any type of time series data. This step can be combined with
-the preprocessing and modeling for any auto configured anomaly detection use case. See [fully automatic outlier detection](https://github.com/zillow/luminaire/blob/docs/_build/html/basic_usage_tutorial/optimization.html#fully-automatic-outlier-detection)
+the preprocessing and modeling for any auto configured anomaly detection use case. See [fully automatic outlier detection](luminaire/docs/_build/html/basic_usage_tutorial/optimization.html#fully-automatic-outlier-detection)
 for a detailed walkthrough. 
 
 ## Contributing
