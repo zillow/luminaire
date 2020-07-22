@@ -8,6 +8,7 @@
 - [Quick Start](#quick-start)
 - [Anomaly Detection Flow](#anomaly-detection-flow)
 - [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
 - [Development Team](#development-team)
 
 
