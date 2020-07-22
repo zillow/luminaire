@@ -63,9 +63,15 @@ for a detailed walkthrough.
 
 Want to help improve Luminaire? Check out our [contributing documentation](CONTRIBUTING.rst).
 
+## Acknowledgements
+
+This project has leveraged methods described in the following scientific publications:
+
+1. Soule, Augustin, Kavé Salamatian, and Nina Taft. "Combining filtering and statistical methods for anomaly detection." Proceedings of the 5th ACM SIGCOMM conference on Internet Measurement. 2005.
+
 
 ## Development Team
 
 Luminaire is developped and maintained by [Sayan Chakraborty](https://github.com/sayanchk), [Smit Shah](https://github.com/shahsmit14), 
-Kiumars Soltani, Luyao Yang, [Anna Swigart](https://github.com/annaswigart), Kyle Buckingham and many other contributors
-from the Zillow Group A.I. team.
+[Kiumars Soltani](https://github.com/kiumarss), [Luyao Yang]( https://github.com/snazzyfox), [Anna Swigart](https://github.com/annaswigart), 
+[Kyle Buckingham](https://github.com/kylebuckingham) and many other contributors from the Zillow Group A.I. team.
