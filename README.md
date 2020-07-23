@@ -29,10 +29,10 @@ Luminaire can be installed from PyPI.
 pip install luminaire
 ```
 
-## Anomaly Detection Flow
+## Time Series Outlier Detection Workflow
 ![Luminaire Flow](luminaire_flow.gif)
 
-Luminaire anomaly detection workflow can be divided into 3 major components.
+Luminaire outlier detection workflow can be divided into 3 major components.
 
 ### Data Preprocessing and Profiling Component
 
@@ -59,6 +59,13 @@ Luminaire is integrated with configuration optimization capability for the hands
 the user needs to provide almost no configuration for any type of time series data. This step can be combined with
 the preprocessing and modeling for any auto configured anomaly detection use case. See [fully automatic outlier detection](luminaire/docs/_build/html/basic_usage_tutorial/optimization.html#fully-automatic-outlier-detection)
 for a detailed walkthrough. 
+
+## Anomaly Detection for High Frequency Time Series
+
+Luminaire can monitor  a set of data points over windows instead of tracking individual. This approach becomes relevant
+for streaming use cases where individual fluctuations is not of a concern but the data is monitored for more sustained 
+fluctuations. See [anomaly detection for streaming data](/luminaire/docs/_build/html/basic_usage_tutorial/streaming.html)
+for detailed information.
 
 ## Contributing
 
