@@ -1147,7 +1147,7 @@ endobj
 endobj
 175 0 obj
 <<
-/Author () /CreationDate (D:20200721091513+08'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20200721091513+08'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
+/Author () /CreationDate (D:20200724133245+08'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20200724133245+08'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
   /Subject (\(unspecified\)) /Title () /Trapped /False
 >>
 endobj
@@ -1355,7 +1355,7 @@ q
 1 0 0 1 40.01575 524.1606 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 2.4 Tm /F1 12 Tf 14.4 TL 221.934 0 Td (July 21, 2020) Tj T* -221.934 0 Td ET
+BT 1 0 0 1 0 2.4 Tm /F1 12 Tf 14.4 TL 221.934 0 Td (July 24, 2020) Tj T* -221.934 0 Td ET
 Q
 Q
 q
@@ -1780,7 +1780,7 @@ endstream
 endobj
 209 0 obj
 <<
-/Length 7394
+/Length 7357
 >>
 stream
 1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
@@ -1819,7 +1819,7 @@ q
 1 0 0 1 40.01575 505.2394 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 38 Tm /F1 10 Tf 12 TL .853182 Tw (Luminaire is an internal data quality service within Zillow Group that provides an ML driven solution for monitoring) Tj T* 0 Tw 3.337008 Tw (time series data. Luminaire provides several anomaly detection and forecasting capabilities that incorporate) Tj T* 0 Tw .261606 Tw (correlational and seasonal patterns in the data over time as well as uncontrollable variations. Specifically, Luminaire) Tj T* 0 Tw (is equipped with the following key features:) Tj T* ET
+BT 1 0 0 1 0 38 Tm /F1 10 Tf 12 TL .210881 Tw (Luminaire is a python package that provides ML driven solutions for monitoring time series data. Luminaire provides) Tj T* 0 Tw 1.368007 Tw (several anomaly detection and forecasting capabilities that incorporate correlational and seasonal patterns in the) Tj T* 0 Tw 2.559606 Tw (data over time as well as uncontrollable variations. Specifically, Luminaire is equipped with the following key) Tj T* 0 Tw (features:) Tj T* ET
 Q
 Q
 q
@@ -2415,7 +2415,7 @@ endstream
 endobj
 212 0 obj
 <<
-/Length 5202
+/Length 5217
 >>
 stream
 1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
@@ -2514,7 +2514,7 @@ q
 n -4 0 514.4441 66 re B*
 Q
 q
-BT 1 0 0 1 0 50 Tm 12 TL /F5 10 Tf 0 0 0 rg (>) Tj (>) Tj (>) Tj ( model_type = opt_config['LuminaireModel']) Tj T* (>) Tj (>) Tj (>) Tj ( module = __import__\('luminaire.model', fromlist=['']\)) Tj T* (>) Tj (>) Tj (>) Tj ( model_class = getattr\(module, model_class_name\)) Tj T* (>) Tj (>) Tj (>) Tj ( print\(model_class\)) Tj T* (<) Tj (class 'luminaire_models.model.lad_structural.LADStructuralModel') Tj (>) Tj T* ET
+BT 1 0 0 1 0 50 Tm 12 TL /F5 10 Tf 0 0 0 rg (>) Tj (>) Tj (>) Tj ( model_class_name = opt_config['LuminaireModel']) Tj T* (>) Tj (>) Tj (>) Tj ( module = __import__\('luminaire.model', fromlist=['']\)) Tj T* (>) Tj (>) Tj (>) Tj ( model_class = getattr\(module, model_class_name\)) Tj T* (>) Tj (>) Tj (>) Tj ( print\(model_class\)) Tj T* (<) Tj (class 'luminaire_models.model.lad_structural.LADStructuralModel') Tj (>) Tj T* ET
 Q
 Q
 Q
@@ -2540,7 +2540,7 @@ q
 n -4 0 688 54 re B*
 Q
 q
-BT 1 0 0 1 0 38 Tm 12 TL /F5 10 Tf 0 0 0 rg (>) Tj (>) Tj (>) Tj ( model_object = model_class\(hyper_params=opt_config, freq='D'\)) Tj T* (>) Tj (>) Tj (>) Tj ( success, model_date, trained_model = model_object.train\(data=data, **pre_prc\)) Tj T* (>) Tj (>) Tj (>) Tj ( print\(success, model_date, trained_model\)) Tj T* (\(True, '2020-06-07 00:00:00', ) Tj (<) Tj (luminaire_models.model.lad_structural.LADStructuralModel object at 0x7fe2b47a7978) Tj (>) Tj (\)) Tj T* ET
+BT 1 0 0 1 0 38 Tm 12 TL /F5 10 Tf 0 0 0 rg (>) Tj (>) Tj (>) Tj ( model_object = model_class\(hyper_params=opt_config, freq='D'\)) Tj T* (>) Tj (>) Tj (>) Tj ( success, model_date, trained_model = model_object.train\(data=training_data, **pre_prc\)) Tj T* (>) Tj (>) Tj (>) Tj ( print\(success, model_date, trained_model\)) Tj T* (\(True, '2020-06-07 00:00:00', ) Tj (<) Tj (luminaire_models.model.lad_structural.LADStructuralModel object at 0x7fe2b47a7978) Tj (>) Tj (\)) Tj T* ET
 Q
 Q
 Q
@@ -8286,60 +8286,60 @@ xref
 0001726727 00000 n 
 0001733504 00000 n 
 0001733630 00000 n 
-0001741077 00000 n 
-0001745340 00000 n 
-0001748602 00000 n 
-0001753857 00000 n 
-0001762723 00000 n 
-0001767118 00000 n 
-0001773087 00000 n 
-0001778865 00000 n 
-0001782729 00000 n 
-0001786807 00000 n 
-0001797819 00000 n 
-0001804865 00000 n 
-0001814637 00000 n 
-0001821951 00000 n 
-0001832822 00000 n 
-0001837732 00000 n 
-0001845544 00000 n 
-0001855325 00000 n 
-0001862050 00000 n 
-0001864841 00000 n 
-0001873995 00000 n 
-0001874121 00000 n 
-0001875496 00000 n 
-0001875831 00000 n 
-0001875866 00000 n 
-0001875901 00000 n 
-0001875936 00000 n 
-0001875971 00000 n 
-0001876006 00000 n 
-0001876041 00000 n 
-0001876076 00000 n 
-0001876111 00000 n 
-0001876146 00000 n 
-0001876181 00000 n 
-0001876216 00000 n 
-0001876251 00000 n 
-0001876286 00000 n 
-0001876322 00000 n 
-0001876358 00000 n 
-0001876394 00000 n 
-0001876430 00000 n 
-0001876466 00000 n 
-0001876502 00000 n 
-0001876538 00000 n 
-0001876574 00000 n 
-0001876610 00000 n 
-0001876646 00000 n 
-0001876682 00000 n 
-0001876718 00000 n 
-0001876754 00000 n 
+0001741040 00000 n 
+0001745303 00000 n 
+0001748565 00000 n 
+0001753835 00000 n 
+0001762701 00000 n 
+0001767096 00000 n 
+0001773065 00000 n 
+0001778843 00000 n 
+0001782707 00000 n 
+0001786785 00000 n 
+0001797797 00000 n 
+0001804843 00000 n 
+0001814615 00000 n 
+0001821929 00000 n 
+0001832800 00000 n 
+0001837710 00000 n 
+0001845522 00000 n 
+0001855303 00000 n 
+0001862028 00000 n 
+0001864819 00000 n 
+0001873973 00000 n 
+0001874099 00000 n 
+0001875474 00000 n 
+0001875809 00000 n 
+0001875844 00000 n 
+0001875879 00000 n 
+0001875914 00000 n 
+0001875949 00000 n 
+0001875984 00000 n 
+0001876019 00000 n 
+0001876054 00000 n 
+0001876089 00000 n 
+0001876124 00000 n 
+0001876159 00000 n 
+0001876194 00000 n 
+0001876229 00000 n 
+0001876264 00000 n 
+0001876300 00000 n 
+0001876336 00000 n 
+0001876372 00000 n 
+0001876408 00000 n 
+0001876444 00000 n 
+0001876480 00000 n 
+0001876516 00000 n 
+0001876552 00000 n 
+0001876588 00000 n 
+0001876624 00000 n 
+0001876660 00000 n 
+0001876696 00000 n 
+0001876732 00000 n 
 trailer
 <<
 /ID 
-[<0cfa2eb9077151e830f35e12b01866b2><0cfa2eb9077151e830f35e12b01866b2>]
+[<dd1b426eec6ce9e7179e2a436ef2ed79><dd1b426eec6ce9e7179e2a436ef2ed79>]
 % ReportLab generated PDF document -- digest (http://www.reportlab.com)
 
 /Info 175 0 R
@@ -8347,5 +8347,5 @@ trailer
 /Size 260
 >>
 startxref
-1876790
+1876768
 %%EOF

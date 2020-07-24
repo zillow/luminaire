@@ -1,6 +1,6 @@
 # Luminaire: A hands-off Anomaly Detection Library
 
-![Luminaire Logo](luminaire_logo.svg)
+![Luminaire Logo](luminaire_logo.png)
 
 **Table of contents**
 

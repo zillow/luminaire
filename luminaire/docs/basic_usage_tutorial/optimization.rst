@@ -45,7 +45,7 @@ Since the optimized configuration contains all the parameters required for data 
 
 The above piece of code makes the data ready to be ingested for training. The only step left before training is to extract the luminaire outlier detection model object for the optimized configuration.
 
->>> model_type = opt_config['LuminaireModel']
+>>> model_class_name = opt_config['LuminaireModel']
 >>> module = __import__('luminaire.model', fromlist=[''])
 >>> model_class = getattr(module, model_class_name)
 >>> print(model_class)
@@ -54,7 +54,7 @@ The above piece of code makes the data ready to be ingested for training. The on
 Since, we have to optimal model class along with other optimal configurations, we can run training as follows:
 
 >>> model_object = model_class(hyper_params=opt_config, freq='D')
->>> success, model_date, trained_model = model_object.train(data=data, **pre_prc)
+>>> success, model_date, trained_model = model_object.train(data=training_data, **pre_prc)
 >>> print(success, model_date, trained_model)
 (True, '2020-06-07 00:00:00', <luminaire_models.model.lad_structural.LADStructuralModel object at 0x7fe2b47a7978>)
 
