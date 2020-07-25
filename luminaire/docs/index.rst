@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Luminaire: A Self-Aware Anomaly Detection Library
+Luminaire: A hands-off Anomaly Detection Library
 *************************************************
 
 .. toctree::

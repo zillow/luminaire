@@ -22,6 +22,8 @@ class HyperparameterOptimization(object):
     :type min_ts_length: int, optional
     :param int scoring_length: Number of innovations to be scored after training window with respect to the frequency.
     :type scoring_length: int, optional
+
+    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
     """
 
     def __init__(self,

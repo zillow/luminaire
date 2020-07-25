@@ -1,17 +1,17 @@
 Anomaly Detection for Streaming data
 ========
 
-Luminaire *WindowDensityModel* implements the idea of monitoring data over comparable windows instead of seeing them for every single data points to track outliers. This essentialy the core for tracking anomalies over streaming data. Time series data tend to show high noise if observed too frequently. Hence, tracking for anomalies over streaming data essesntially means tracking for any sustained fluctuations. 
+Luminaire *WindowDensityModel* implements the idea of monitoring data over comparable windows instead of tracking individual data points as outliers. This is a useful approach for tracking anomalies over high frequency data, which tends to show a higher level of noise. Hence, tracking anomalies over streaming data essesntially means tracking sustained fluctuations.
 
 .. image:: windows.png
    :scale: 40%
 
-Although *WindowDensityModel* is designed to track anomalies over streaming data, it can be used to track for any sustained fluctuations over a window for any frequency. It is suggested to use this detection type for upto hourly frequency.
+Although *WindowDensityModel* is designed to track anomalies over streaming data, it can be used to track any sustained fluctuations over a window for any frequency. This detection type is suggested for up to hourly data frequency.
 
 Anomaly Detection: Pre-Configured Settings
 ------------------------------------------
 
-Luminaire provides full capability to configure the modeling parameters based on the frequency that the data has been observed and the methods that can be applied (please refer to the Window density Model user guide for detailed configurations). Although, Luminaire settings for window density model is already pre-configured for some typical pandas frequency types and settings for any other frequency types should be configured manually (see the user guide for more information).
+Luminaire provides the capability to configure model parameters based on the frequency that the data has been observed and the methods that can be applied (please refer to the Window density Model user guide for detailed configuration options). Luminaire settings for the window density model are already pre-configured for some typical pandas frequency types and settings for any other frequency types should be configured manually (see the user guide for more information).
 
 >>> print(data)
                          raw  interpolated
@@ -33,7 +33,7 @@ index
 >>> print(success, model)
 (True, <luminaire_models.model.window_density.WindowDensityModel object at 0x7f8cda42dcc0>)
 
-The model object contains the data density structure over a pre-specified window given the frequency. Lumianire sets the following defaults for some typical pandas frequencies (any custom requirements can be updated in the hyperparameter object instance):
+The model object contains the data density structure over a pre-specified window, given the frequency. Lumianire sets the following defaults for some typical pandas frequencies (any custom requirements can be updated in the hyperparameter object instance):
 
 - 'S': Hourly windows
 - 'M': Daily windows
@@ -42,7 +42,7 @@ The model object contains the data density structure over a pre-specified window
 - 'D': 10 days windows
 - 'custom': User specified windows
 
-In order to score a new window innovation given the trained model object, we have to provide a equal sized window that representing a similar time interval (For example, we each of the window in the training data represents a 24 hours window between 9 AM to 8:59:59 AM for last few days, the scoring data should represent the same interval of a different day and should have the same window size).
+In order to score a new window innovation given the trained model object, we have to provide a equal sized window that represents a similar time interval. For example, if each of the windows in the training data represents a 24 hour window between 9 AM to 8:59:59 AM for last few days, the scoring data should represent the same interval of a different day and should have the same window size.
 
 .. image:: window_train_score_auto.png
    :scale: 45%
@@ -68,7 +68,7 @@ index
 Anomaly Detection: Manual Configuration
 ---------------------------------------
 
-There are several options in the *WindowDensityHyperParams* class that can be manually configured. User should pick the configuration mostly depending on the frequency that the data has been observed.
+There are several options in the *WindowDensityHyperParams* class that can be manually configured. The configuration should be selected mostly based on the frequency that the data has been observed.
 
 >>> print(data)
                              raw interpolated

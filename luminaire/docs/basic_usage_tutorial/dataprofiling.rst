@@ -24,7 +24,7 @@ index
 2020-06-07  1782.0
 >>> de_obj = DataExploration(freq='D')
 >>> imputed_data, pre_prc = de_obj.profile(data, impute_only=True)
->>> print(imputrd_data)
+>>> print(imputed_data)
                     raw
 2020-01-01  1326.000000
 2020-01-02  1552.000000
@@ -40,7 +40,7 @@ index
 >>>print(pre_prc)
 None
 
-In order to get the data profiling information, the impute only option should be disabled (that is the default option). Disabling the imputr only option allows Luminaire to impute missing data along with detecting all the trend changes and the change points in the input time series. 
+In order to get the data profiling information, the impute only option should be disabled (that is the default option). Disabling the impute only option allows Luminaire to impute missing data along with detecting all the trend changes and the change points in the input time series.
 
 The key utility of Luminaire data profiling is this being a pre-processing step for outlier detection model training. Hence, the user can enable several option to prepare the time series before ingested by the training process. For example, the log transformation option can be enabled for exponential modeling during training. User can also check for the fill rate to constrain the proportion of missing data upto some threshold. Moreover, the pre processed data can also be truncated if there is any change points (data shift) observed.
 

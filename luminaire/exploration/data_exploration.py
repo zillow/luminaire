@@ -41,6 +41,8 @@ class DataExploration(object):
     :type min_changepoint_padding_length: bool, optional
     :param change_point_threshold: Minimum threshold (a value > 0) to flag change points based on KL divergence.
     :type change_point_threshold: float, optional
+
+    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
     """
     __version__ = "0.1"
 
