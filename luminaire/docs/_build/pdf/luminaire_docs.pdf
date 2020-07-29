@@ -1147,7 +1147,7 @@ endobj
 endobj
 175 0 obj
 <<
-/Author () /CreationDate (D:20200724133245+08'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20200724133245+08'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
+/Author () /CreationDate (D:20200729151706+08'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20200729151706+08'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
   /Subject (\(unspecified\)) /Title () /Trapped /False
 >>
 endobj
@@ -1355,7 +1355,7 @@ q
 1 0 0 1 40.01575 524.1606 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 2.4 Tm /F1 12 Tf 14.4 TL 221.934 0 Td (July 24, 2020) Tj T* -221.934 0 Td ET
+BT 1 0 0 1 0 2.4 Tm /F1 12 Tf 14.4 TL 221.934 0 Td (July 29, 2020) Tj T* -221.934 0 Td ET
 Q
 Q
 q
@@ -2308,7 +2308,7 @@ q
 n -4 0 514.4441 258 re B*
 Q
 q
-BT 1 0 0 1 0 242 Tm 12 TL /F5 10 Tf 0 0 0 rg (>) Tj (>) Tj (>) Tj ( data) Tj T* (               raw) Tj T* (index) Tj T* (2020-01-01  1326.0) Tj T* (2020-01-02  1552.0) Tj T* (2020-01-03  1432.0) Tj T* (2020-01-04  1470.0) Tj T* (2020-01-05  1565.0) Tj T* (...            ...) Tj T* (2020-06-03  1934.0) Tj T* (2020-06-04  1873.0) Tj T* (2020-06-05     NaN) Tj T* (2020-06-06  1747.0) Tj T* (2020-06-07  1782.0) Tj T* (>) Tj (>) Tj (>) Tj ( de_obj = DataExploration\(freq='D'\)) Tj T* (>) Tj (>) Tj (>) Tj ( imputed_data, pre_prc = de_obj.profile\(data, impute_only=True\)) Tj T* (>) Tj (>) Tj (>) Tj ( print\(imputrd_data\)) Tj T* (                    raw) Tj T* (2020-01-01  1326.000000) Tj T* (2020-01-02  1552.000000) Tj T* (2020-01-03  1432.000000) Tj T* ET
+BT 1 0 0 1 0 242 Tm 12 TL /F5 10 Tf 0 0 0 rg (>) Tj (>) Tj (>) Tj ( data) Tj T* (               raw) Tj T* (index) Tj T* (2020-01-01  1326.0) Tj T* (2020-01-02  1552.0) Tj T* (2020-01-03  1432.0) Tj T* (2020-01-04  1470.0) Tj T* (2020-01-05  1565.0) Tj T* (...            ...) Tj T* (2020-06-03  1934.0) Tj T* (2020-06-04  1873.0) Tj T* (2020-06-05     NaN) Tj T* (2020-06-06  1747.0) Tj T* (2020-06-07  1782.0) Tj T* (>) Tj (>) Tj (>) Tj ( de_obj = DataExploration\(freq='D'\)) Tj T* (>) Tj (>) Tj (>) Tj ( imputed_data, pre_prc = de_obj.profile\(data, impute_only=True\)) Tj T* (>) Tj (>) Tj (>) Tj ( print\(imputed_data\)) Tj T* (                    raw) Tj T* (2020-01-01  1326.000000) Tj T* (2020-01-02  1552.000000) Tj T* (2020-01-03  1432.000000) Tj T* ET
 Q
 Q
 Q
@@ -8339,7 +8339,7 @@ xref
 trailer
 <<
 /ID 
-[<dd1b426eec6ce9e7179e2a436ef2ed79><dd1b426eec6ce9e7179e2a436ef2ed79>]
+[<33c3bae2ab1ae2d002afa048727eb4c8><33c3bae2ab1ae2d002afa048727eb4c8>]
 % ReportLab generated PDF document -- digest (http://www.reportlab.com)
 
 /Info 175 0 R

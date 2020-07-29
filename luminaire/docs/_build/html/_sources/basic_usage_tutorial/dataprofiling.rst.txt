@@ -24,7 +24,7 @@ index
 2020-06-07  1782.0
 >>> de_obj = DataExploration(freq='D')
 >>> imputed_data, pre_prc = de_obj.profile(data, impute_only=True)
->>> print(imputrd_data)
+>>> print(imputed_data)
                     raw
 2020-01-01  1326.000000
 2020-01-02  1552.000000

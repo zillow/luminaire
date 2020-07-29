@@ -738,6 +738,35 @@ class DataExploration(object):
 
         return is_anomaly
 
+    def _truncate_by_data_gaps(self, df, target_metric):
+        """
+        This function truncates time series after large data gaps.
+
+        :param pandas.DataFrame df: Input time series in pandas data frame
+        :param str target_metric: Target value column in the input data frame
+        :return: Pandas dataframe with truncated pandas data frame
+        :rtype: pandas.DataFrame
+        """
+
+        import numpy as np
+
+        max_data_gap = abs(self.min_ts_length / 3.0)
+
+        gap_len = 0
+        last_avl_idx = None
+        for row in df[::-1].iterrows():
+            if np.isnan(row[1][target_metric]) or row[1][target_metric] is None:
+                gap_len = gap_len + 1
+            else:
+                gap_len = 0
+                last_avl_idx = row[0]
+
+            if gap_len >= max_data_gap and last_avl_idx:
+                truncated_df = df[last_avl_idx:]
+                return truncated_df
+
+        return df
+
 
     def profile(self, df, impute_only=False, **kwargs):
         """
@@ -808,6 +837,8 @@ class DataExploration(object):
             df = self.add_missing_index(df=df, freq=self.freq)
 
             df = df.iloc[-min(max_ts_length, len(df)):]
+
+            df = self._truncate_by_data_gaps(df=df, target_metric=target_metric)
 
             df = self._kalman_smoothing_imputation(df=df, target_metric=target_metric, imputed_metric=imputed_metric,
                                                    impute_only=impute_only)
