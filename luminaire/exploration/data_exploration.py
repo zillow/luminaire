@@ -840,6 +840,10 @@ class DataExploration(object):
 
             df = self._truncate_by_data_gaps(df=df, target_metric=target_metric)
 
+            if len(df) < min_ts_length:
+                raise ValueError("The training data observed continuous missing data near the end. Require more stable "
+                                 "data to train")
+
             df = self._kalman_smoothing_imputation(df=df, target_metric=target_metric, imputed_metric=imputed_metric,
                                                    impute_only=impute_only)
 
