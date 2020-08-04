@@ -190,7 +190,7 @@ class HyperparameterOptimization(object):
                 # LAD structural training and scoring
                 hyper_params = LADStructuralHyperParams(is_log_transformed=is_log_transformed, max_ft_freq=max_ft_freq,
                                                 include_holidays_exog=include_holidays_exog,
-                                                p=p, q=q, data_shift_truncate=data_shift_truncate)
+                                                p=p, q=q)
                 lad_struct = LADStructuralModel(hyper_params.params, max_ts_length=max_ts_length,
                                                 min_ts_length=min_ts_length, freq=freq)
                 success, model_date, model = lad_struct.train(data=training_data, optimize=True, **preprocess_summary)
@@ -218,8 +218,7 @@ class HyperparameterOptimization(object):
                 mdape = self._mdape(obs, preds)
             elif args[3]['model'] == 'LADFilteringModel':
                 # LAD filtering training and scoring
-                hyper_params = LADFilteringHyperParams(is_log_transformed=is_log_transformed,
-                                                     data_shift_truncate=data_shift_truncate)
+                hyper_params = LADFilteringHyperParams(is_log_transformed=is_log_transformed)
                 lad_filtering = LADFilteringModel(hyper_params.params, max_ts_length=max_ts_length,
                                                   min_ts_length=min_ts_length, freq=freq)
 
