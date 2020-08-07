@@ -115,7 +115,7 @@ class WindowDensityModel(BaseModel):
     (for low frequency data).
 
     :param dict hyper_params: Hyper parameters for Luminaire window density model.
-        See `luminaire.model.window_density.WindowDensityHyperParams`_ for detailed information.
+        See :class:`luminaire.model.window_density.WindowDensityHyperParams` for detailed information.
     :return: Anomaly probability for the execution window and other related model outputs
     :rtype: list[dict]
     """

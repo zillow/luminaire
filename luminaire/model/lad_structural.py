@@ -56,7 +56,7 @@ class LADStructuralModel(BaseModel):
     A LAD structural time series model.
 
     :param dict hyper_params: Hyper parameters for Luminaire structural modeling.
-        See `luminaire.optimization.hyperparameter_optimization.HyperparameterOptimization`_ for detailed
+        See :class:`luminaire.optimization.hyperparameter_optimization.HyperparameterOptimization` for detailed
         information.
     :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
     :param min_ts_length: The minimum required length of the time series for training.
