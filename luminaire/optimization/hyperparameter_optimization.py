@@ -140,7 +140,7 @@ class HyperparameterOptimization(object):
 
         import numpy as np
         import pandas as pd
-        from sklearn.metrics import roc_auc_score
+        from sklearn.metrics import log_loss
         import copy
 
         is_log_transformed = args[0]
@@ -247,10 +247,9 @@ class HyperparameterOptimization(object):
 
             weights = ((1 - np.array(labels)) + 1) / float(len(labels))
             if args[3]['model'] == 'LADStructuralModel' and mdape:
-                cost = (0.5 * mdape) \
-                       + (0.5 * (1 - roc_auc_score(labels, probs, average='weighted', sample_weight=weights)))
+                cost = (0.5 * mdape) + (0.5 * log_loss(labels, probs, sample_weight=weights))
             else:
-                cost = 1 - roc_auc_score(labels, probs, average='weighted', sample_weight=weights)
+                cost = log_loss(labels, probs, sample_weight=weights)
 
         except Exception as e:
             return {'loss': 1, 'status': STATUS_OK}
