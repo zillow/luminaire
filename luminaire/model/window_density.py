@@ -593,14 +593,14 @@ class WindowDensityModel(BaseModel):
             prob_of_anomaly = st.norm.cdf(current_anomaly_score, anomaly_scores_mean, anomaly_scores_sd)
         # Sign test based anomaly detection
         elif detection_method == "sign_test":
-            # If last window is the baseline, we perform the Wilcoxon sign rank test for means and bartlett
+            # If last window is the baseline, we perform the Wilcoxon sign rank test for means and levene
             # test for variance to detect anomalies
             if baseline_type == "last_window":
                 test_stat_wilcoxon, pvalue_wilcoxon = st.wilcoxon(execution_data, baseline)
-                test_stat_bartlett, pvalue_bartlett = st.bartlett(execution_data, baseline)
-                if pvalue_wilcoxon < self.sig_level or pvalue_bartlett < self.sig_level:
+                test_stat_levene, pvalue_levene = st.levene(execution_data, baseline)
+                if pvalue_wilcoxon < self.sig_level or pvalue_levene < self.sig_level:
                     is_anomaly = True
-                prob_of_anomaly = 1 - min(pvalue_wilcoxon, pvalue_bartlett)
+                prob_of_anomaly = 1 - min(pvalue_wilcoxon, pvalue_levene)
             # If aggregated is the baseline, we perform the Wilcoxon sign rank test for means and gamma distribution
             # based test for the past standard deviations to detect anomalies
             elif baseline_type == "aggregated":
