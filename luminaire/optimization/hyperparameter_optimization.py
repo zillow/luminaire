@@ -256,7 +256,7 @@ class HyperparameterOptimization(object):
 
         return {'loss': cost, 'status': STATUS_OK}
 
-    def _optimize(self, data, objective_part, algo=tpe.suggest, max_evals=40):
+    def _optimize(self, data, objective_part, algo=tpe.suggest, max_evals=50):
         """
         Optimization function that calls the hyperopt for a given set of hyperparameters
         :param pandas.dataFrame data: Input time series data
@@ -315,7 +315,7 @@ class HyperparameterOptimization(object):
 
         return hyper_param
 
-    def run(self, data, max_evals=40):
+    def run(self, data, max_evals=50):
         """
         This function runs hyperparameter optimization fort LAD batch outlier detection models
 
