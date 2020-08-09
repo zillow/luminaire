@@ -114,7 +114,8 @@
   <div class="section" id="configuration-optimization">
 <h1>Configuration Optimization<a class="headerlink" href="#configuration-optimization" title="Permalink to this headline">¶</a></h1>
 <p>Luminaire <em>HyperparameterOptimization</em> performs auto-selection of the best data preprocessing configuration and the outlier detection model training configuration with respect to the input time series. This option enables Luminaire to work as a hands-off system where the user only has to provide the input data along with its frequency. This option should be used if the user wants avoid any manual configuration and should be called prior to the data pre-processing and training steps.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">luminaire.optimization.hyperparameter_optimization</span> <span class="kn">import</span> <span class="n">HyperparameterOptimization</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="go">               raw</span>
 <span class="go">index</span>
 <span class="go">2020-01-01  1326.0</span>
@@ -137,7 +138,8 @@
 <div class="section" id="fully-automatic-outlier-detection">
 <h2>Fully Automatic Outlier Detection<a class="headerlink" href="#fully-automatic-outlier-detection" title="Permalink to this headline">¶</a></h2>
 <p>Since the optimized configuration contains all the parameters required for data pre-processing and training, this can be used downstream for performing the data pre-processing and training.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">de_obj</span> <span class="o">=</span> <span class="n">DataExploration</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">opt_config</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">luminaire.exploration.data_exploration</span> <span class="kn">import</span> <span class="n">DataExploration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">de_obj</span> <span class="o">=</span> <span class="n">DataExploration</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">opt_config</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">training_data</span><span class="p">,</span> <span class="n">pre_prc</span> <span class="o">=</span> <span class="n">de_obj</span><span class="o">.</span><span class="n">profile</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">training_data</span><span class="p">)</span>
 <span class="go">                raw  interpolated</span>

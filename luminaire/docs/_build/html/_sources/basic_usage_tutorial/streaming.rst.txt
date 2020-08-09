@@ -13,6 +13,7 @@ Anomaly Detection: Pre-Configured Settings
 
 Luminaire provides the capability to configure model parameters based on the frequency that the data has been observed and the methods that can be applied (please refer to the Window density Model user guide for detailed configuration options). Luminaire settings for the window density model are already pre-configured for some typical pandas frequency types and settings for any other frequency types should be configured manually (see the user guide for more information).
 
+>>> from luminaire.model.window_density import WindowDensityHyperParams, WindowDensityModel
 >>> print(data)
                          raw  interpolated
 index                                     
@@ -70,6 +71,7 @@ Anomaly Detection: Manual Configuration
 
 There are several options in the *WindowDensityHyperParams* class that can be manually configured. The configuration should be selected mostly based on the frequency that the data has been observed.
 
+>>> from luminaire.model.window_density import WindowDensityHyperParams, WindowDensityModel
 >>> print(data)
                              raw interpolated
 index                                          

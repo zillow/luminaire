@@ -3,6 +3,7 @@ Configuration Optimization
 
 Luminaire *HyperparameterOptimization* performs auto-selection of the best data preprocessing configuration and the outlier detection model training configuration with respect to the input time series. This option enables Luminaire to work as a hands-off system where the user only has to provide the input data along with its frequency. This option should be used if the user wants avoid any manual configuration and should be called prior to the data pre-processing and training steps.
 
+>>> from luminaire.optimization.hyperparameter_optimization import HyperparameterOptimization
 >>> print(data)
                raw
 index              
@@ -27,6 +28,7 @@ Fully Automatic Outlier Detection
 
 Since the optimized configuration contains all the parameters required for data pre-processing and training, this can be used downstream for performing the data pre-processing and training.
 
+>>> from luminaire.exploration.data_exploration import DataExploration
 >>> de_obj = DataExploration(freq='D', **opt_config)
 >>> training_data, pre_prc = de_obj.profile(data)
 >>> print(training_data)

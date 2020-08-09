@@ -113,7 +113,8 @@
 <p>Luminaire <em>DataExploration</em> implements different exploratory data analysis to detect important information from time series data. This method can be used to impute missing data, detect the set of historical trend changes and change points (steady data shifts) which information can later be leveraged downstream in Luminaire outlier detection models.</p>
 <a class="reference internal image-reference" href="../_images/profile_head.png"><img alt="../_images/profile_head.png" src="../_images/profile_head.png" style="width: 648.0px; height: 289.0px;" /></a>
 <p>Luminaire data exploration and profiling runs two different workflows. The impute only option in profiling performs imputation for any missing data in the input time series and does not run any profiling to generate insights from the input time series.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">luminaire.exploration.data_exploration</span> <span class="kn">import</span> <span class="n">DataExploration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span>
 <span class="go">               raw</span>
 <span class="go">index</span>
 <span class="go">2020-01-01  1326.0</span>
