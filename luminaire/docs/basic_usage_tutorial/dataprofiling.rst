@@ -8,6 +8,7 @@ Luminaire *DataExploration* implements different exploratory data analysis to de
 
 Luminaire data exploration and profiling runs two different workflows. The impute only option in profiling performs imputation for any missing data in the input time series and does not run any profiling to generate insights from the input time series.
 
+>>> from luminaire.exploration.data_exploration import DataExploration
 >>> data
                raw
 index              

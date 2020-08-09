@@ -13,6 +13,7 @@ Anomaly Detection using Structural Model
 
 Luminaire provides the full capability to have user-specified configuration for structural modeling. Under the hood, Luminaire implements a linear or an exponential model allowing multiple user specified auto regressive and moving average components to track any temporal correlational patterns. Fourier transformation can also be applied under the hood if the data shows strong seasonality or periodic patterns. As external structural information, Luminaire allows holidays to be added as external exogenous features (currently supported for daily data only) inside the structural model.
 
+>>> from luminaire.model.lad_structural import LADStructuralModel
 >>> hyper_params = {"include_holidays_exog": True, "is_log_transformed": False, "max_ft_freq": 5, "p": 3, "q": 3}
 >>> lad_struct_obj = LADStructuralModel(hyper_params=hyper, freq='D')
 >>> print(lad_struct_obj)
@@ -20,6 +21,7 @@ Luminaire provides the full capability to have user-specified configuration for 
 
 Luminaire allows some data-specific information to be added during the training process of the structural model through *preprocessing_parameters*. The *preprocessing_parameters* can either be specified by the user if the data-specific information is available through external sources OR can be obtained using *Luminaire DataExploration*. The data-specific information includes a list of trend changes, change points (data shifts), and start and end of the input time series.
 
+>>> from luminaire.exploration.data_exploration import DataExploration
 >>> de_obj = DataExploration(freq='D', data_shift_truncate=False, is_log_transformed=True, fill_rate=0.9)
 >>> data, pre_prc = de_obj.profile(data)
 >>> print(pre_prc)
@@ -65,6 +67,7 @@ Luminaire allows monitoring noisy and not too well behaved time series data by t
 
 Filtering requires very minimal specification in terms of configurations. The user needs to only configure whether to implement a linear or exponential model.
 
+>>> from luminaire.model.lad_filtering import LADFilteringModel
 >>> hyper = {"is_log_transformed": 1}
 >>> lad_filter_obj = LADFilteringModel(hyper_params=hyper, freq='D')
 >>> print(lad_filter_obj)
