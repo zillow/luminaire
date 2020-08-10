@@ -252,7 +252,7 @@ class HyperparameterOptimization(object):
                 cost = log_loss(labels, probs, sample_weight=weights)
 
         except Exception as e:
-            return {'loss': 1, 'status': STATUS_OK}
+            return {'loss': 1e100, 'status': STATUS_OK}
 
         return {'loss': cost, 'status': STATUS_OK}
 
