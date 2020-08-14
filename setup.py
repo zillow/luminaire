@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='luminaire',
-    version='0.1.0',
+    version='0.1.0.dev1',
 
     license='Apache License 2.0',
 
