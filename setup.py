@@ -1,9 +1,12 @@
 from setuptools import setup, find_packages
 
 
+with open('requirements.txt', 'r') as f:
+    install_requires = f.read().splitlines()
+
 setup(
     name='luminaire',
-    version='0.1.0.dev1',
+    version='0.1.0.dev2',
 
     license='Apache License 2.0',
 
@@ -16,6 +19,7 @@ setup(
 
     python_requires='>=3.6',
     packages=find_packages(),
+    install_requires=install_requires,
 
     classifiers=[
         'Development Status :: 3 - Alpha',
