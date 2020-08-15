@@ -6,7 +6,7 @@ with open('requirements.txt', 'r') as f:
 
 setup(
     name='luminaire',
-    version='0.1.0.dev2',
+    version='0.1.0.dev3',
 
     license='Apache License 2.0',
 
