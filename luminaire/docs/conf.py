@@ -18,11 +18,11 @@ sys.path.insert(0, os.path.abspath('/Users/sayanc/luminaire-github'))
 # -- Project information -----------------------------------------------------
 
 project = 'luminaire'
-copyright = '2020, Zillow Group Inc.'
-author = 'Zillow Group Data Governance team'
+copyright = '2020 Zillow, Inc.'
+author = 'Zillow Group A.I. team'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = '0.1.0'
 
 
 # -- General configuration ---------------------------------------------------
