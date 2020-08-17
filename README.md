@@ -1,5 +1,13 @@
 # Luminaire: A hands-off Anomaly Detection Library
 
+<!-- Badges Start-->
+[![PyPI version](https://badge.fury.io/py/luminaire.svg)](https://badge.fury.io/py/luminaire)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/luminaire.svg)](https://pypi.org/project/luminaire/)
+[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
+[![Luminaire CI](https://github.com/zillow/luminaire/workflows/Luminaire%20CI/badge.svg)](https://github.com/zillow/luminaire/actions)
+[![Luminaire CD](https://github.com/zillow/luminaire/workflows/Luminaire%20CD/badge.svg)](https://github.com/zillow/luminaire/actions)
+<!-- Badges End -->
+
 ![Luminaire Logo](luminaire_logo.png)
 
 **Table of contents**
