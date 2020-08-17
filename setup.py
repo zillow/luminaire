@@ -14,7 +14,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='luminaire',
-    version='0.1.0.dev5',
+    version='0.1.0.dev6',
 
     license='Apache License 2.0',
 
@@ -42,8 +42,11 @@ setup(
 
     keywords='AnomalyDetection AutoML Batch Streaming',
 
-    # url='',  # this is where the github pages url will go.
+    url='https://github.com/zillow/luminaire',
 
-    # project_urls={
-    # }
+    project_urls={
+        'Documentation': 'https://github.com/zillow/luminaire/blob/master/README.md',
+        'Source': 'https://github.com/zillow/luminaire',
+        'Tracker': 'https://github.com/zillow/luminaire/issues',
+    }
 )
