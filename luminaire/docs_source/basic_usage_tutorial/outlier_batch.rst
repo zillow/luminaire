@@ -1,5 +1,5 @@
 Outlier Detection
-========
+=================
 
 Luminaire can detect outliers in time series data by modeling the predictive and the variational patterns of a time series trajectory. Luminaire is capable of tracking outliers for any time series data by applying two specific modeling capabilities:
 

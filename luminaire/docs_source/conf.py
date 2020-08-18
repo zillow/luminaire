@@ -14,6 +14,9 @@ import os
 import sys
 import sphinx_redactor_theme
 
+
+sys.path.insert(0, os.path.abspath('/Users/smits/Desktop/dqd/git_repos/external/luminaire'))
+
 # -- Project information -----------------------------------------------------
 
 project = 'luminaire'
@@ -31,9 +34,9 @@ release = '0.1.0'
 # ones.
 extensions = [
 'sphinx.ext.autodoc',
+'sphinx.ext.inheritance_diagram',
 'rinoh.frontend.sphinx',
-'sphinx_rtd_theme',
-'rst2pdf.pdfbuilder'
+'sphinx_rtd_theme'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -57,7 +60,3 @@ html_theme_path = [sphinx_redactor_theme.get_html_theme_path()]
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-
-pdf_documents = [
-('index', u'luminaire_docs', u'Luminaire: A hands-off Anomaly Detection Library', u'Zillow Group Data Governance team'),
-]

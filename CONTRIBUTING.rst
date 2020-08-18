@@ -26,6 +26,7 @@ Issues which are unassigned can be owned to implement it:
 - Create branch name with prefix ``bugfix/<bug-type>``
 - Add relevant code fix and test case
 - Update the package version inside ``setup.py``
+- Update the sphinx documentation
 - Once ready for review create a PR for ``master`` branch
 
 
@@ -52,7 +53,25 @@ Issues which are unassigned can be owned to implement it:
 - Create branch name with prefix ``feature/<feature-type>``
 - Add relevant code and test case
 - Update the package version inside ``setup.py``
+- Update the sphinx documentation
 - Once ready for review create a PR for ``master`` branch.
+
+
+Updating Sphinx Documentation
+------------------------------
+
+We use `Sphinx <https://www.sphinx-doc.org/en/master/>`__ for code documentation and
+are hosted on our `Github pages <https://zillow.github.io/luminaire>`__
+
+All the code can be found under ``luminaire/docs_source``
+
+Steps to update Sphinx documentation:
+
+- On your local terminal cd till ``~/luminaire/docs_source`` folder
+- run ``make clean``, this will remove the folder ``~/luminaire/docs_source/_build``
+- run ``make html``, this will create files under ``~/luminaire/docs_source/_build``
+- ``git add ~/_build``
+- commit updated files as part of the PR
 
 
 Github Workflow (CI/CD)

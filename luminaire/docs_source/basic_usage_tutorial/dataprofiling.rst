@@ -1,5 +1,5 @@
 Data Profiling
-========
+==============
 
 Luminaire *DataExploration* implements different exploratory data analysis to detect important information from time series data. This method can be used to impute missing data, detect the set of historical trend changes and change points (steady data shifts) which information can later be leveraged downstream in Luminaire outlier detection models.
 

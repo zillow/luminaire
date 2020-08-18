@@ -1,6 +1,7 @@
 from luminaire.model.base_model import BaseModel, BaseModelHyperParams
 from luminaire.exploration.data_exploration import DataExploration
 
+
 class WindowDensityHyperParams(BaseModelHyperParams):
     """
     Hyperparameter class for Luminaire Window density model.
@@ -11,11 +12,11 @@ class WindowDensityHyperParams(BaseModelHyperParams):
     :type ignore_window: int, optional
     :param float max_missing_train_prop: Maximum proportion of missing observation allowed in the training data.
     :type max_missing_train_prop: float, optional
-    :param bool is_log_transformed: A flag to specify whether to take a log transform of the input data. If the data contain
-        negatives, is_log_transformed is ignored even though it is set to True.
+    :param bool is_log_transformed: A flag to specify whether to take a log transform of the input data.
+        If the data contain negatives, is_log_transformed is ignored even though it is set to True.
     :type is_log_transformed: bool, optional
-    :param str baseline_type: A string flag to specify whether to take set a baseline as the previous sub-window from the
-        training data for scoring or to aggregate the overall window as a baseline.
+    :param str baseline_type: A string flag to specify whether to take set a baseline as the previous sub-window from
+        the training data for scoring or to aggregate the overall window as a baseline.
         Possible values:
             - "last_window"
             - "aggregated"
@@ -23,7 +24,8 @@ class WindowDensityHyperParams(BaseModelHyperParams):
     :param str detection_method: A string that select between two window testing method.
         Possible values:
             - "kldiv" (KL-divergence)
-            - "sign_test" (Wilcoxon sign rank test).
+            - "sign_test" (Wilcoxon sign rank test)
+
     :type detection_method: str, optional
     :param int min_window_length: Minimum size of the scoring window / a stable training sub-window length.
     :type min_window_length: int, optional
@@ -108,6 +110,7 @@ class WindowDensityHyperParams(BaseModelHyperParams):
             ma_window_length=ma_window_length,
             detrend_method=detrend_method
         )
+
 
 class WindowDensityModel(BaseModel):
     """
