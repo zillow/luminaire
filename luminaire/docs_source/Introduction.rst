@@ -1,5 +1,5 @@
 Introduction
-========
+============
 
 .. image:: front.png
    :scale: 60%
@@ -11,6 +11,7 @@ Luminaire is a python package that provides ML driven solutions for monitoring t
 - **Fully Automatic:** Luminaire performs optimizations over different sets of hyperparameters and several model classes to pick the optimal model for the time series under consideration. No model configuration is required from the user.
 
 - **Supports Diverse Anomaly Detection Types:** Luminaire supports different detection types:
+
  - Outlier Detection
  - Data Shift Detection
  - Trend Change Detection

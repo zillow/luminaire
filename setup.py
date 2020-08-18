@@ -14,7 +14,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='luminaire',
-    version='0.1.0.dev6',
+    version='0.1.0.dev7',
 
     license='Apache License 2.0',
 
@@ -40,12 +40,11 @@ setup(
         'Intended Audience :: Science/Research',
     ],
 
-    keywords='AnomalyDetection AutoML Batch Streaming',
+    keywords='anomaly-detection outlier-detection forecasting time-series automl',
 
-    url='https://github.com/zillow/luminaire',
+    url='https://zillow.github.io/luminaire',
 
     project_urls={
-        'Documentation': 'https://github.com/zillow/luminaire/blob/master/README.md',
         'Source': 'https://github.com/zillow/luminaire',
         'Tracker': 'https://github.com/zillow/luminaire/issues',
     }
