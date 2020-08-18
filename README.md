@@ -3,9 +3,9 @@
 <!-- Badges Start-->
 [![PyPI version](https://badge.fury.io/py/luminaire.svg)](https://badge.fury.io/py/luminaire)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/luminaire.svg)](https://pypi.org/project/luminaire/)
-[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
-[![Luminaire CI](https://github.com/zillow/luminaire/workflows/Luminaire%20CI/badge.svg)](https://github.com/zillow/luminaire/actions)
-[![Luminaire CD](https://github.com/zillow/luminaire/workflows/Luminaire%20CD/badge.svg)](https://github.com/zillow/luminaire/actions)
+[![License](http://img.shields.io/:license-Apache%202-blue.svg)](https://github.com/zillow/luminaire/blob/master/LICENSE.txt)
+[![Luminaire CI](https://github.com/zillow/luminaire/workflows/Luminaire%20CI/badge.svg)](https://github.com/zillow/luminaire/actions?query=workflow%3A%22Luminaire+CI%22)
+[![Luminaire CD](https://github.com/zillow/luminaire/workflows/Luminaire%20CD/badge.svg)](https://github.com/zillow/luminaire/actions?query=workflow%3A%22Luminaire+CD%22)
 <!-- Badges End -->
 
 ![Luminaire Logo](luminaire_logo.png)
@@ -14,7 +14,8 @@
 
 - [What is Luminaire](#what-is-luminaire)
 - [Quick Start](#quick-start)
-- [Anomaly Detection Flow](#anomaly-detection-flow)
+- [Time Series Outlier Detection Workflow](#time-series-outlier-detection-workflow)
+- [Anomaly Detection for High Frequency Time Series](#anomaly-detection-for-high-frequency-time-series)
 - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
 - [Development Team](#development-team)
@@ -22,25 +23,32 @@
 
 ## What is Luminaire
 
-Luminaire is a python package that provides ML-driven solutions for monitoring time series data. Luminaire provides 
-several anomaly detection and forecasting capabilities that incorporate correlational and seasonal 
-patterns as well as uncontrollable variations in the data over time.
-
-Please see the [full Luminaire documentation](luminaire/docs/_build/html/Introduction.html) 
-for detailed descriptions of the methods.
+[Luminaire](https://zillow.github.io/luminaire/luminaire/docs_source/_build/html/Introduction.html) is a python package 
+that provides ML-driven solutions for monitoring time series data. Luminaire provides several anomaly detection and 
+forecasting capabilities that incorporate correlational and seasonal patterns as well as uncontrollable variations in 
+the data over time.
 
 ## Quick Start
 
-Luminaire can be installed from PyPI.
+Install Luminaire from [PyPI](https://pypi.org/project/luminaire/) using ``pip``
 
 ```bash
 pip install luminaire
 ```
 
+Import ``luminaire`` module in python 
+```python
+import luminaire
+```
+
+Check out [Luminaire documentation](https://zillow.github.io/luminaire/luminaire/docs_source/_build/html/Introduction.html) 
+for detailed description of methods and usage.
+
+
 ## Time Series Outlier Detection Workflow
 ![Luminaire Flow](luminaire_flow.gif)
 
-Luminaire outlier detection workflow can be divided into 3 major components.
+Luminaire outlier detection workflow can be divided into 3 major components:
 
 ### Data Preprocessing and Profiling Component
 
@@ -66,14 +74,17 @@ the user needs to provide very minimal configuration for monitoring any type of 
 the preprocessing and modeling for any auto-configured anomaly detection use case. See [fully automatic outlier detection](luminaire/docs/_build/html/basic_usage_tutorial/optimization.html#fully-automatic-outlier-detection)
 for a detailed walkthrough. 
 
+
 ## Anomaly Detection for High Frequency Time Series
 
 Luminaire can also monitor a set of data points over windows of time instead of tracking individual data points. This approach is well-suited
 for streaming use cases where sustained fluctuations are of greater concern than individual fluctuations. See [anomaly detection for streaming data](/luminaire/docs/_build/html/basic_usage_tutorial/streaming.html) for detailed information.
 
+
 ## Contributing
 
 Want to help improve Luminaire? Check out our [contributing documentation](CONTRIBUTING.rst).
+
 
 ## Acknowledgements
 
