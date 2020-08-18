@@ -114,7 +114,6 @@ venv/*
 pip-selfcheck.json
 .vscode
 .project
-docs/_build/*
 metastore_db/*
 
 build
