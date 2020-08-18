@@ -67,6 +67,7 @@ All the code can be found under ``luminaire/docs_source``
 
 Steps to update Sphinx documentation:
 
+- Install required packages from ``~/luminaire/docs_source/sphinx-requirements.txt``
 - On your local terminal cd till ``~/luminaire/docs_source`` folder
 - run ``make clean``, this will remove the folder ``~/luminaire/docs_source/_build``
 - run ``make html``, this will create files under ``~/luminaire/docs_source/_build``
