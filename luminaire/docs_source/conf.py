@@ -13,7 +13,8 @@
 import os
 import sys
 import sphinx_redactor_theme
-sys.path.insert(0, os.path.abspath('/Users/sayanc/luminaire-github'))
+sys.path.append('/home/runner/work/luminaire/luminaire')
+# sys.path.insert(0, os.path.abspath('/home/runner/work/luminaire'))
 
 # -- Project information -----------------------------------------------------
 
