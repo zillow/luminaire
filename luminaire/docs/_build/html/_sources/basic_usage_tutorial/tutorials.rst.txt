@@ -1,8 +1,0 @@
-Tutorials
-=============
-
-.. toctree::
-    :titlesonly:
-    :glob:
-
-    *
