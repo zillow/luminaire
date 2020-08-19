@@ -11,7 +11,7 @@ Although *WindowDensityModel* is designed to track anomalies over streaming data
 Anomaly Detection: Pre-Configured Settings
 ------------------------------------------
 
-Luminaire provides the capability to configure model parameters based on the frequency that the data has been observed and the methods that can be applied. Luminaire settings for the window density model are already pre-configured for some typical pandas frequency types and settings for any other frequency types should be configured manually (see the user guide for `Streaming Anomaly Detection Models <https://zillow.github.io/luminaire/luminaire/docs_source/_build/html/user_guide/streaming.html/>`_).
+Luminaire provides the capability to configure model parameters based on the frequency that the data has been observed and the methods that can be applied (please refer to the Window density Model user guide for detailed configuration options). Luminaire settings for the window density model are already pre-configured for some typical pandas frequency types and settings for any other frequency types should be configured manually (see the user guide for `Streaming Anomaly Detection Models <https://zillow.github.io/luminaire/luminaire/docs_source/_build/html/user_guide/streaming.html/>`_).
 
 >>> from luminaire.model.window_density import WindowDensityHyperParams, WindowDensityModel
 >>> print(data)
