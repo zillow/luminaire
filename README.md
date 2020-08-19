@@ -46,7 +46,7 @@ for detailed description of methods and usage.
 
 
 ## Time Series Outlier Detection Workflow
-![Luminaire Flow](luminaire/docs_source/assets/luminaire_flow.gif)
+![Luminaire Flow](luminaire/docs_source/assets/luminaire_flow.png)
 
 Luminaire outlier detection workflow can be divided into 3 major components:
 
