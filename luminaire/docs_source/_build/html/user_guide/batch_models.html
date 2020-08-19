@@ -11,8 +11,6 @@
 
     <link rel="stylesheet" href="../_static/css/redactor.css" type="text/css" />
     
-    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
-    
     
     <link rel="index" title="Index" href="../genindex.html"/>
     <link rel="search" title="Search" href="../search.html"/>
@@ -114,18 +112,6 @@
                 
   <div class="section" id="luminaire-outlier-detection-models-structural-modeling">
 <h1>Luminaire Outlier Detection Models: Structural Modeling<a class="headerlink" href="#luminaire-outlier-detection-models-structural-modeling" title="Permalink to this headline">¶</a></h1>
-digraph inheritancec714bb4cf6 {
-bgcolor=transparent;
-rankdir=LR;
-size=&quot;8.0, 12.0&quot;;
-  &quot;BaseModel&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,tooltip=&quot;This is the base class for all models. Do not use this for production tasks.&quot;];
-  &quot;BaseModelHyperParams&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;];
-  &quot;LADStructuralError&quot; [URL=&quot;#luminaire.model.lad_structural.LADStructuralError&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Exception class for Luminaire structural anomaly detection model.&quot;];
-  &quot;LADStructuralHyperParams&quot; [URL=&quot;#luminaire.model.lad_structural.LADStructuralHyperParams&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Exception class for Luminaire structural anomaly detection model.&quot;];
-  &quot;BaseModelHyperParams&quot; -&gt; &quot;LADStructuralHyperParams&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
-  &quot;LADStructuralModel&quot; [URL=&quot;#luminaire.model.lad_structural.LADStructuralModel&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;A LAD structural time series model.&quot;];
-  &quot;BaseModel&quot; -&gt; &quot;LADStructuralModel&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
-}
 <span class="target" id="module-luminaire.model.lad_structural"></span><dl class="py exception">
 <dt id="luminaire.model.lad_structural.LADStructuralError">
 <em class="property">exception </em><code class="sig-prename descclassname">luminaire.model.lad_structural.</code><code class="sig-name descname">LADStructuralError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="headerlink" href="#luminaire.model.lad_structural.LADStructuralError" title="Permalink to this definition">¶</a></dt>
@@ -274,14 +260,6 @@ can be obtained by using LAD hyperparameter optimization.</p>
 </div>
 <div class="section" id="luminaire-outlier-detection-models-factoring-holidays-as-exogenous">
 <h1>Luminaire Outlier Detection Models: Factoring holidays as exogenous<a class="headerlink" href="#luminaire-outlier-detection-models-factoring-holidays-as-exogenous" title="Permalink to this headline">¶</a></h1>
-digraph inheritance9c85978823 {
-bgcolor=transparent;
-rankdir=LR;
-size=&quot;8.0, 12.0&quot;;
-  &quot;AbstractHolidayCalendar&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,tooltip=&quot;Abstract interface to create holidays following certain rules.&quot;];
-  &quot;LADHolidays&quot; [URL=&quot;#luminaire.model.model_utils.LADHolidays&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;A class that generates holiday calendars to be used as external features in the batch outlier detection model.&quot;];
-  &quot;AbstractHolidayCalendar&quot; -&gt; &quot;LADHolidays&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
-}
 <span class="target" id="module-luminaire.model.model_utils"></span><dl class="py class">
 <dt id="luminaire.model.model_utils.LADHolidays">
 <em class="property">class </em><code class="sig-prename descclassname">luminaire.model.model_utils.</code><code class="sig-name descname">LADHolidays</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">holiday_rules</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#luminaire.model.model_utils.LADHolidays" title="Permalink to this definition">¶</a></dt>
@@ -308,18 +286,6 @@ By default, holidays include:</p>
 </div>
 <div class="section" id="luminaire-outlier-detection-models-kalman-filter">
 <h1>Luminaire Outlier Detection Models: Kalman Filter<a class="headerlink" href="#luminaire-outlier-detection-models-kalman-filter" title="Permalink to this headline">¶</a></h1>
-digraph inheritance1d9352ed5d {
-bgcolor=transparent;
-rankdir=LR;
-size=&quot;8.0, 12.0&quot;;
-  &quot;BaseModel&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,tooltip=&quot;This is the base class for all models. Do not use this for production tasks.&quot;];
-  &quot;BaseModelHyperParams&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;];
-  &quot;LADFilteringHyperParams&quot; [URL=&quot;#luminaire.model.lad_filtering.LADFilteringHyperParams&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Exception class for Luminaire filtering anomaly detection model.&quot;];
-  &quot;BaseModelHyperParams&quot; -&gt; &quot;LADFilteringHyperParams&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
-  &quot;LADFilteringModel&quot; [URL=&quot;#luminaire.model.lad_filtering.LADFilteringModel&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;A Markovian state space model. This model detects anomaly based on the residual process obtained&quot;];
-  &quot;BaseModel&quot; -&gt; &quot;LADFilteringModel&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
-  &quot;LADFilteringModelError&quot; [URL=&quot;#luminaire.model.lad_filtering.LADFilteringModelError&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Exception class for Luminaire filtering anomaly detection model.&quot;];
-}
 <span class="target" id="module-luminaire.model.lad_filtering"></span><dl class="py class">
 <dt id="luminaire.model.lad_filtering.LADFilteringHyperParams">
 <em class="property">class </em><code class="sig-prename descclassname">luminaire.model.lad_filtering.</code><code class="sig-name descname">LADFilteringHyperParams</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">is_log_transformed</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#luminaire.model.lad_filtering.LADFilteringHyperParams" title="Permalink to this definition">¶</a></dt>
