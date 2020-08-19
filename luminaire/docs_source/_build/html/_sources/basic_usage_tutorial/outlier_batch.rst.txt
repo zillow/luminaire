@@ -73,7 +73,7 @@ Filtering requires very minimal specification in terms of configurations. The us
 >>> print(lad_filter_obj)
 <luminaire_models.model.lad_filtering.LADFilteringModel object at 0x7fd2b1832dd8>
 
-Similar to the structural model, the user can specify the *preprocessing_parameters* (see `Structural Modeling Tutorial <https://zillow.github.io/luminaire/luminaire/docs_source/_build/html/basic_usage_tutorial/outlier_batch.html#anomaly-detection-using-structural-model/>`_ for further information). These *preprocessing_parameters* are required to train the Luminaire filtering model.
+Similar to the structural model, the user can specify the *preprocessing_parameters* (see `Structural Modeling Tutorial <https://zillow.github.io/luminaire/luminaire/docs_source/_build/html/basic_usage_tutorial/outlier_batch.html#anomaly-detection-using-structural-model>`_ for further information). These *preprocessing_parameters* are required to train the Luminaire filtering model.
 
 >>> success, model_date, model = lad_filter_obj.train(data=data, **pre_prc)
 >>> print(success, model_date, model)
