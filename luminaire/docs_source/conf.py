@@ -34,7 +34,6 @@ release = '0.1.0'
 # ones.
 extensions = [
 'sphinx.ext.autodoc',
-'sphinx.ext.inheritance_diagram',
 'rinoh.frontend.sphinx',
 'sphinx_rtd_theme'
 ]
