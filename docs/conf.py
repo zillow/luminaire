@@ -15,7 +15,7 @@ import sys
 import sphinx_redactor_theme
 
 
-sys.path.insert(0, os.path.abspath('/Users/smits/Desktop/dqd/git_repos/external/luminaire'))
+sys.path.insert(0, os.path.abspath('/'))
 
 # -- Project information -----------------------------------------------------
 
