@@ -63,6 +63,7 @@ index
 2020-06-17 23:57:00   963.0        963.0
 2020-06-17 23:58:00   968.0        968.0
 2020-06-17 23:59:00   920.0        920.0
+
 >>> scores = model.score(scoring_data)
 >>> print(scores)
 {'Success': True, 'ConfLevel': 99.9, 'IsAnomaly': False, 'AnomalyProbability': 0.6956745734841678}
