@@ -24,7 +24,7 @@
 
 ## What is Luminaire
 
-[Luminaire](https://zillow.github.io/luminaire/Introduction.html) is a python package 
+[Luminaire](https://zillow.github.io/luminaire/introduction.html) is a python package 
 that provides ML-driven solutions for monitoring time series data. Luminaire provides several anomaly detection and 
 forecasting capabilities that incorporate correlational and seasonal patterns as well as uncontrollable variations in 
 the data over time.
@@ -42,7 +42,7 @@ Import ``luminaire`` module in python
 import luminaire
 ```
 
-Check out [Luminaire documentation](https://zillow.github.io/luminaire/Introduction.html) 
+Check out [Luminaire documentation](https://zillow.github.io/luminaire/introduction.html) 
 for detailed description of methods and usage.
 
 
