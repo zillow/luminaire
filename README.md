@@ -83,7 +83,7 @@ for streaming use cases where sustained fluctuations are of greater concern than
 
 ## Contributing
 
-Want to help improve Luminaire? Check out our [contributing documentation](luminaire/docs_source/CONTRIBUTING.rst).
+Want to help improve Luminaire? Check out our [contributing documentation](CONTRIBUTING.rst).
 
 
 ## Acknowledgements
