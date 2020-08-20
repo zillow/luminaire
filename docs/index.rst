@@ -9,7 +9,7 @@ Luminaire: A hands-off Anomaly Detection Library
 .. toctree::
    :maxdepth: 5
 
-   Introduction
+   introduction
    basic_usage_tutorial/tutorials
    user_guide/user_guide
 
