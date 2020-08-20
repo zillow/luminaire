@@ -9,43 +9,43 @@ class WindowDensityHyperParams(BaseModelHyperParams):
     :param str freq: The frequency of the time-series. Luminaire supports default configuration for 'S', 'M', 'QM',
         'H', 'D'. Any other frequency type should be specified as 'custom' and configuration should be set manually.
     :param int ignore_window: ignore a time window to be considered for training.
-    :type ignore_window: int, optional
     :param float max_missing_train_prop: Maximum proportion of missing observation allowed in the training data.
-    :type max_missing_train_prop: float, optional
     :param bool is_log_transformed: A flag to specify whether to take a log transform of the input data.
         If the data contain negatives, is_log_transformed is ignored even though it is set to True.
-    :type is_log_transformed: bool, optional
     :param str baseline_type: A string flag to specify whether to take set a baseline as the previous sub-window from
-        the training data for scoring or to aggregate the overall window as a baseline.
-        Possible values:
-            - "last_window"
-            - "aggregated"
-    :type baseline_type: str, optional
-    :param str detection_method: A string that select between two window testing method.
-        Possible values:
-            - "kldiv" (KL-divergence)
-            - "sign_test" (Wilcoxon sign rank test)
+        the training data for scoring or to aggregate the overall window as a baseline. Possible values:
 
-    :type detection_method: str, optional
+        - "last_window"
+        - "aggregated"
+
+    :param str detection_method: A string that select between two window testing method. Possible values:
+
+        - "kldiv" (KL-divergence)
+        - "sign_test" (Wilcoxon sign rank test)
+
     :param int min_window_length: Minimum size of the scoring window / a stable training sub-window length.
-    :type min_window_length: int, optional
-    .. Note :: This is not the minimum size of the whole training window which is the combination of stable sub-windows.
+    
+        .. Note :: This is not the minimum size of the whole training window which is the combination of stable sub-windows.
+
     :param int max_window_length: Maximum size of the scoring window / a stable training sub-window length.
-    :type max_window_length: int, optional
-    .. Note :: This is not the maximum size of the whole training window which is the combination of stable sub-windows.
+    
+        .. Note :: This is not the maximum size of the whole training window which is the combination of stable sub-windows.
+
     :param int window_length: Size of the scoring window / a stable training sub-window length.
-    :type window_length: int, optional
-    .. Note :: This is not the size of the whole training window which is the combination of stable sub-windows.
+    
+        .. Note :: This is not the size of the whole training window which is the combination of stable sub-windows.
+
     :param int ma_window_length: Size of the window for detrending scoring window / stable training sub-windows through
         moving average method.
-    :type ma_window_length: int, optional
-    .. Note :: ma_window_length should be small enough to maintain the stable structure of the training / scoring window
-        and large enough to remove the trend. The ideal size can be somewhere between (0.1 * window_length) and
-        (0.25 * window length).
+    
+        .. Note :: ma_window_length should be small enough to maintain the stable structure of the training / scoring window
+            and large enough to remove the trend. The ideal size can be somewhere between (0.1 * window_length) and
+            (0.25 * window length).
+    
     :param str detrend_method: A string that select between two stationarizing method. Possible values:
-            - "ma" (moving average based)
-            - "diff" (differencing based).
-    :type detrend_method: str, optional
+
+        - "ma" (moving average based)
+        - "diff" (differencing based).
     """
     def __init__(self,
                  freq='M',

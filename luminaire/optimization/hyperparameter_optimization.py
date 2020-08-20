@@ -12,16 +12,11 @@ class HyperparameterOptimization(object):
     :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
     :param str detection_type: Luminaire anomaly detection type. Only Outlier detection for batch data is currently
         supported.
-    :type detection_type: str, optional
     :param min_ts_mean: Minimum average values in the most recent window of the time series. This optional parameter
         can be used to avoid over-alerting from noisy low volume time series.
-    :type min_ts_mean: float, optional
     :param max_ts_length: The maximum required length of the time series for training.
-    :type max_ts_length: int, optional
     :param min_ts_length: The minimum required length of the time series for training.
-    :type min_ts_length: int, optional
     :param int scoring_length: Number of innovations to be scored after training window with respect to the frequency.
-    :type scoring_length: int, optional
 
     .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
     """
@@ -321,7 +316,6 @@ class HyperparameterOptimization(object):
 
         :param list[list] data: Input time series.
         :param int max_evals: Number of iterations for hyperparameter optimization.
-        :type max_evals: int, optional
         :return: Optimal hyperparameters.
         :rtype: dict
 

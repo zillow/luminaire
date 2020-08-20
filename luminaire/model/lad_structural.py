@@ -11,18 +11,13 @@ class LADStructuralHyperParams(BaseModelHyperParams):
     """
     Exception class for Luminaire structural anomaly detection model.
 
-    :param bool include_holidays_exog: whether to include holidays as exogenous variables in the regression. Holidays
-        are defined in :class:`~model.model_utils.LADHolidays`
-    :type include_holidays_exog: bool, optional
+    :param bool include_holidays_exog: whether to include holidays as exogenous variables in the regression.
+        Holidays are defined in :class:`~model.model_utils.LADHolidays`
     :param int p: Order for the AR component of the model.
-    :type p: int, optional
     :param int q: Order for the MA component of the model.
-    :type q: int, optional
     :param bool is_log_transformed: A flag to specify whether to take a log transform of the input data. If the data
         contain negatives, is_log_transformed is ignored even though it is set to True.
-    :type is_log_transformed: bool, optional
     :param int max_ft_freq: The maximum frequency order for the Fourier transformation.
-    :type max_ft_freq: int, optional
     """
     def __init__(self, include_holidays_exog=True,
                  p=2,
@@ -59,15 +54,11 @@ class LADStructuralModel(BaseModel):
         See :class:`luminaire.optimization.hyperparameter_optimization.HyperparameterOptimization` for detailed
         information.
     :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
-    :param min_ts_length: The minimum required length of the time series for training.
-    :type min_ts_length: int, optional
-    :param max_ts_length: The maximum required length of the time series for training.
-    :type max_ts_length: int, optional
-    :param min_ts_mean: Minimum average values in the most recent window of the time series. This optional parameter
-        can be used to avoid over-alerting from noisy low volume time series.
-    :type min_ts_mean: float, optional
-    :param min_ts_mean_window: Size of the most recent window to calculate min_ts_mean.
-    :type min_ts_mean_window: int, optional
+    :param int min_ts_length: The minimum required length of the time series for training.
+    :param int max_ts_length: The maximum required length of the time series for training.
+    :param float min_ts_mean: Minimum average values in the most recent window of the time series. This optional
+        parameter can be used to avoid over-alerting from noisy low volume time series.
+    :param int min_ts_mean_window: Size of the most recent window to calculate min_ts_mean.
 
     .. Note :: This class should be used to manually configure the structural model. Exact configuration parameters
         can be found in `luminaire.hyperparameter_optimization.HyperparameterOptimization`. Optimal configuration
@@ -474,7 +465,6 @@ class LADStructuralModel(BaseModel):
 
         :param pandas.DataFrame data: Input time series data
         :param bool optimize: Flag to identify whether called from hyperparameter optimization
-        :type optimize: bool, optional
         :return: success flag, the model date and the trained lad structural model object
         :rtype: tuple[bool, str, LADStructuralModel object]
 
