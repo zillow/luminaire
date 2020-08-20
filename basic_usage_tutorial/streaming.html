@@ -138,7 +138,9 @@
 <span class="go">2020-06-16 23:57:00  11114.0       11114.0</span>
 <span class="go">2020-06-16 23:58:00  10663.0       10663.0</span>
 <span class="go">2020-06-16 23:59:00  11034.0       11034.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_params</span> <span class="o">=</span> <span class="n">WindowDensityHyperParams</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">params</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_params</span> <span class="o">=</span> <span class="n">WindowDensityHyperParams</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">params</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">wdm_obj</span> <span class="o">=</span> <span class="n">WindowDensityModel</span><span class="p">(</span><span class="n">hyper_params</span><span class="o">=</span><span class="n">hyper_params</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">success</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">wdm_obj</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>

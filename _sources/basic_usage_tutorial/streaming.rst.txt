@@ -28,6 +28,7 @@ index
 2020-06-16 23:57:00  11114.0       11114.0
 2020-06-16 23:58:00  10663.0       10663.0
 2020-06-16 23:59:00  11034.0       11034.0
+
 >>> hyper_params = WindowDensityHyperParams(freq='M').params
 >>> wdm_obj = WindowDensityModel(hyper_params=hyper_params)
 >>> success, model = wdm_obj.train(data=data)
