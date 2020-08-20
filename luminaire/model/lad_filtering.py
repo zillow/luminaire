@@ -11,7 +11,6 @@ class LADFilteringHyperParams(BaseModelHyperParams):
 
     :param bool is_log_transformed: A flag to specify whether to take a log transform of the input data. If the data
         contain negatives, is_log_transformed is ignored even though it is set to True.
-    :type is_log_transformed: bool, optional
     """
     def __init__(self,
                  is_log_transformed=True):
@@ -43,9 +42,7 @@ class LADFilteringModel(BaseModel):
         See :class:`luminaire.optimization.hyperparameter_optimization.HyperparameterOptimization` for detailed information.
     :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
     :param min_ts_length: The minimum required length of the time series for training.
-    :type min_ts_length: int, optional
     :param max_ts_length: The maximum required length of the time series for training.
-    :type max_ts_length: int, optional
 
     >>> hyper = {"is_log_transformed": 1}
     lad_filtering_model = LADFilteringModel(hyper_params=hyper, freq='D')
@@ -390,7 +387,6 @@ class LADFilteringModel(BaseModel):
         :param str pred_date: Prediction date. Needs to be in yyyy-mm-dd or yyyy-mm-dd hh:mm:ss format.
         :param float synthetic_actual: Synthetic time series value. This is an artificial value used to optimize
             classification accuracy in Luminaire hyperparameter optimization.
-        :type synthetic_actual: float, optional
         :return: Model results and LAD filtering model object
         :rtype: tuple[dict, LADFilteringlModel object]
 

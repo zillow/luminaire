@@ -19,28 +19,18 @@ class DataExploration(object):
         originated as integers (such as counts), the ARIMA model can behave erratically when the numbers are small. When
         this parameter is set, any time series whose mean value is less than this will automatically result in a model
         failure, rather than a mostly bogus anomaly.
-    :type min_ts_mean: float, optional
     :param fill_rate: Minimum proportion of data availability in the recent data window.
-    :type fill_rate: float, optional
     :param max_window_size: The maximum size of the sub windows for input data segmentation.
-    :type max_window_size: int, optional
     :param window_size: The size of the sub windows for input data segmentation.
-    :type window_size: int, optional
     :param min_ts_length: The minimum required length of the time series for training.
-    :type min_ts_length: int, optional
     :param max_ts_length: The maximum required length of the time series for training.
-    :type max_ts_length: int, optional
     :param is_log_transformed: A flag to specify whether to take a log transform of the input data. If the data
         contain negatives, is_log_transformed is ignored even though it is set to True.
-    :type is_log_transformed: bool, optional
     :param data_shift_truncate: A flag to specify whether left side of the most recent change point needs to
         be truncated from the training data.
-    :type data_shift_truncate: bool, optional
     :param min_changepoint_padding_length: A padding length between two change points. This parameter makes sure
         that two consecutive change points are not close to each other.
-    :type min_changepoint_padding_length: bool, optional
     :param change_point_threshold: Minimum threshold (a value > 0) to flag change points based on KL divergence.
-    :type change_point_threshold: float, optional
 
     .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
     """
@@ -775,7 +765,6 @@ class DataExploration(object):
 
         :param list/pandas.DataFrame df: Input time series.
         :param impute_only: Flag to perform preprocessing until imputation OR full preprocessing.
-        :type impute_only: bool, optional
         :return: Preprocessed dataframe with batch data summary.
         :rtype: tuple[pandas.dataFrame, dict]
 
