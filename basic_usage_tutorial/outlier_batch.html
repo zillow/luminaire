@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <title>Outlier Detection</title>
+    
+
+    <link rel="stylesheet" href="../_static/css/redactor.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/logo.css" type="text/css" />
+    
+    
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="luminaire 0.1.0 documentation" href="../index.html"/>
+    <link rel="up" title="Tutorials" href="tutorials.html"/>
+    <link rel="next" title="Anomaly Detection for Streaming data" href="streaming.html"/>
+    <link rel="prev" title="Configuration Optimization" href="optimization.html"/> 
+</head>
+
+<body role="document">
+     
+
+    
+<a href="#" id="js-navigation-toggle" class="navigation-toggle">
+    <i class="mdi mdi-menu"></i><i class="mdi mdi-close"></i>
+</a>
+
+<section class="site-sidebar">
+
+<nav>
+
+
+    <a href="../index.html" class="branding-link">
+    
+    
+    
+        <img src="../_static/luminaire_logo.png" class="logo" />
+    
+    
+        
+        
+    
+    </a>
+
+    
+<section role="search">
+    <form action="../search.html" method="get" class="site-searchform">
+        <input type="text" name="q" placeholder="Search docs" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+</section>
+
+
+
+    <section class="site-nav">
+    
+    
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="dataprofiling.html">Data Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html">Configuration Optimization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Outlier Detection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#anomaly-detection-using-structural-model">Anomaly Detection using Structural Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#forecasting">Forecasting</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#anomaly-detection-using-filtering-model">Anomaly Detection using Filtering Model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="streaming.html">Anomaly Detection for Streaming data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/user_guide.html">User Guide</a></li>
+</ul>
+
+    
+    </section>
+
+</nav>
+
+</section>
+
+    <main class="site-main" role="main">
+        
+
+
+
+
+
+
+
+
+
+
+
+<nav class="site-breadcrumbs">
+    <ul>
+    
+        <li>
+            <a href="../index.html">Docs</a> /
+        </li>
+        
+        <li>
+            <a href="tutorials.html">Tutorials</a> /
+        </li>
+        
+        <li class="site-breadcrumbs__leaf">Outlier Detection</li>
+    
+    </ul>
+</nav>
+        <section class="site-content">
+            <div class="container">
+                
+  <div class="section" id="outlier-detection">
+<h1>Outlier Detection<a class="headerlink" href="#outlier-detection" title="Permalink to this headline">¶</a></h1>
+<p>Luminaire can detect outliers in time series data by modeling the predictive and the variational patterns of a time series trajectory. Luminaire is capable of tracking outliers for any time series data by applying two specific modeling capabilities:</p>
+<ul class="simple">
+<li><p><strong>Structural Model</strong>: This technique is suitable for time series datasets that show periodic patterns and contains good predictive signals through temporal correlations.</p></li>
+<li><p><strong>Filtering Model</strong>: This technique is suitable for noisy time series datasets that contains almost no predictive signals from the periodic or temporal correlation signals.</p></li>
+</ul>
+<div class="section" id="anomaly-detection-using-structural-model">
+<h2>Anomaly Detection using Structural Model<a class="headerlink" href="#anomaly-detection-using-structural-model" title="Permalink to this headline">¶</a></h2>
+<img alt="../_images/structural.png" src="../_images/structural.png" />
+<p>Luminaire provides the full capability to have user-specified configuration for structural modeling. Under the hood, Luminaire implements a linear or an exponential model allowing multiple user specified auto regressive and moving average components to track any temporal correlational patterns. Fourier transformation can also be applied under the hood if the data shows strong seasonality or periodic patterns. As external structural information, Luminaire allows holidays to be added as external exogenous features (currently supported for daily data only) inside the structural model.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">luminaire.model.lad_structural</span> <span class="kn">import</span> <span class="n">LADStructuralModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;include_holidays_exog&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;is_log_transformed&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;max_ft_freq&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lad_struct_obj</span> <span class="o">=</span> <span class="n">LADStructuralModel</span><span class="p">(</span><span class="n">hyper_params</span><span class="o">=</span><span class="n">hyper</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lad_struct_obj</span><span class="p">)</span>
+<span class="go">&lt;luminaire_models.model.lad_structural.LADStructuralModel object at 0x7fc91882bb38&gt;</span>
+</pre></div>
+</div>
+<p>Luminaire allows some data-specific information to be added during the training process of the structural model through <em>preprocessing_parameters</em>. The <em>preprocessing_parameters</em> can either be specified by the user if the data-specific information is available through external sources OR can be obtained using <em>Luminaire DataExploration</em>. The data-specific information includes a list of trend changes, change points (data shifts), and start and end of the input time series.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">luminaire.exploration.data_exploration</span> <span class="kn">import</span> <span class="n">DataExploration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">de_obj</span> <span class="o">=</span> <span class="n">DataExploration</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">data_shift_truncate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_log_transformed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fill_rate</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">pre_prc</span> <span class="o">=</span> <span class="n">de_obj</span><span class="o">.</span><span class="n">profile</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pre_prc</span><span class="p">)</span>
+<span class="go">{&#39;success&#39;: True, &#39;trend_change_list&#39;: [&#39;2020-04-01 00:00:00&#39;], &#39;change_point_list&#39;: [&#39;2020-03-16 00:00:00&#39;],</span>
+<span class="go">&#39;is_log_transformed&#39;: 1, &#39;min_ts_mean&#39;: None, &#39;ts_start&#39;: &#39;2020-01-01 00:00:00&#39;, &#39;ts_end&#39;: &#39;2020-06-07 00:00:00&#39;}</span>
+</pre></div>
+</div>
+<p>These <em>preprocessing_parameters</em> are used for training the structural model.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">success</span><span class="p">,</span> <span class="n">model_date</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">lad_struct_obj</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">pre_prc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">model_date</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="go">(True, &#39;2020-06-07 00:00:00&#39;, &lt;luminaire_models.model.lad_structural.LADStructuralModel object at 0x7f97e127d320&gt;)</span>
+</pre></div>
+</div>
+<p>The trained model works as a data-driven source of truth to evaluate any future time series values to be monitored. The <em>score</em> method is used to check whether new data points are anomalous.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="s1">&#39;2020-06-08&#39;</span><span class="p">)</span>
+<span class="go">{&#39;Success&#39;: True, &#39;IsLogTransformed&#39;: 1, &#39;LogTransformedAdjustedActual&#39;: 7.601402334583733, &#39;LogTransformedPrediction&#39;: 7.85697078664991, &#39;LogTransformedStdErr&#39;: 0.05909378128162875, &#39;LogTransformedCILower&#39;: 7.759770166178546, &#39;LogTransformedCIUpper&#39;: 7.954171407121274, &#39;AdjustedActual&#39;: 2000.000000000015, &#39;Prediction&#39;: 1913.333800801316, &#39;StdErr&#39;: 111.1165409184448, &#39;CILower&#39;: 1722.81265596681, &#39;CIUpper&#39;: 2093.854945635823, &#39;ConfLevel&#39;: 90.0, &#39;ExogenousHolidays&#39;: 0, &#39;IsAnomaly&#39;: False, &#39;IsAnomalyExtreme&#39;: False, &#39;AnomalyProbability&#39;: 0.5616869199903785, &#39;DownAnomalyProbability&#39;: 0.21915654000481077, &#39;UpAnomalyProbability&#39;: 0.7808434599951892, &#39;ModelFreshness&#39;: 0.1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="mi">2500</span><span class="p">,</span> <span class="s1">&#39;2020-06-09&#39;</span><span class="p">)</span>
+<span class="go">{&#39;Success&#39;: True, &#39;IsLogTransformed&#39;: 1, &#39;LogTransformedAdjustedActual&#39;: 7.824445930877619, &#39;LogTransformedPrediction&#39;: 7.879245788204654, &#39;LogTransformedStdErr&#39;: 0.060630109233816995, &#39;LogTransformedCILower&#39;: 7.779518133128947, &#39;LogTransformedCIUpper&#39;: 7.978973443280362, &#39;AdjustedActual&#39;: 2500.000000000004, &#39;Prediction&#39;: 1955.906824510712, &#39;StdErr&#39;: 116.8279277089905, &#39;CILower&#39;: 1763.74860305128, &#39;CIUpper&#39;: 2158.065045970143, &#39;ConfLevel&#39;: 90.0, &#39;ExogenousHolidays&#39;: 0, &#39;IsAnomaly&#39;: True, &#39;IsAnomalyExtreme&#39;: True, &#39;AnomalyProbability&#39;: 0.9999955054511667, &#39;DownAnomalyProbability&#39;: 2.2472744166668335e-06, &#39;UpAnomalyProbability&#39;: 0.9999977527255833, &#39;ModelFreshness&#39;: 0.2}</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/struct_score.png"><img alt="../_images/struct_score.png" src="../_images/struct_score.png" style="width: 627.0px; height: 438.90000000000003px;" /></a>
+<p>The scoring function outputs several fields. The key to identifying whether a data point has been detected as an anomaly is the <em>AnomalyProbability</em> field (for anomalous fluctuations in either direction) and <em>DownAnomalyProbability</em>, <em>UpAnomalyProbability</em> for one-sided fluctuations that are lower or higher than expected, respectively. The user can set any anomaly threshold to identify whether a pont is an anomaly or not. From the above example, by setting the anomaly threshold at <em>0.99</em> for both sided fluctuations, we can see the the the value corresponding to <em>2020-06-08</em> is non anomalous whereas the value for <em>2020-06-09</em> is anomalous. Luminaire also has its own pre-specified thresholds at <em>0.9</em> and at <em>0.999</em> for identifying mild an extreme anomalies (see the keys <em>IsAnomaly</em> and <em>IsAnomalyExtreme</em>).</p>
+<p>Luminaire generates a <em>ModelFreshness</em> score to identify how fresh the model is (i.e. what is the difference between the scoring data date and the model date). This freshness scores varies between 0 to 1 and the model object expires whenever the freshness score exceeds the value 1.</p>
+<div class="section" id="forecasting">
+<h3>Forecasting<a class="headerlink" href="#forecasting" title="Permalink to this headline">¶</a></h3>
+<p>Since the anomaly detection process through structural modeling depends on quantifying the predictive and the variational patterns of the underlying data, Luminaire also outputs several forecasting metrics such as <em>Prediction</em>, <em>StdErr</em>, <em>CILower</em> and <em>CIUpper</em> that can be used for time series forecasting use cases.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <em>ConfLevel</em> in the scoring output corresponds to the generated confidence intervals and to the <em>IsAnomaly</em> flag</p>
+</div>
+</div>
+</div>
+<div class="section" id="anomaly-detection-using-filtering-model">
+<h2>Anomaly Detection using Filtering Model<a class="headerlink" href="#anomaly-detection-using-filtering-model" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/filter.png"><img alt="../_images/filter.png" src="../_images/filter.png" style="width: 767.8000000000001px; height: 299.20000000000005px;" /></a>
+<p>Luminaire allows monitoring noisy and not too well behaved time series data by tracking the residual process from a filtering model. This model should not be used for predictive purposes but can be used to measure variational patterns and irregular fluctuations.</p>
+<p>Filtering requires very minimal specification in terms of configurations. The user needs to only configure whether to implement a linear or exponential model.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">luminaire.model.lad_filtering</span> <span class="kn">import</span> <span class="n">LADFilteringModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;is_log_transformed&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lad_filter_obj</span> <span class="o">=</span> <span class="n">LADFilteringModel</span><span class="p">(</span><span class="n">hyper_params</span><span class="o">=</span><span class="n">hyper</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lad_filter_obj</span><span class="p">)</span>
+<span class="go">&lt;luminaire_models.model.lad_filtering.LADFilteringModel object at 0x7fd2b1832dd8&gt;</span>
+</pre></div>
+</div>
+<p>Similar to the structural model, the user can specify the <em>preprocessing_parameters</em> (see <a class="reference external" href="https://zillow.github.io/luminaire/basic_usage_tutorial/outlier_batch.html#anomaly-detection-using-structural-model">Structural Modeling Tutorial</a> for further information). These <em>preprocessing_parameters</em> are required to train the Luminaire filtering model.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">success</span><span class="p">,</span> <span class="n">model_date</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">lad_filter_obj</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">pre_prc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">model_date</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="go">(True, &#39;2019-08-27 00:00:00&#39;, &lt;luminaire_models.model.lad_filtering.LADFilteringModel object at 0x7fd2aef00278&gt;)</span>
+</pre></div>
+</div>
+<p>Similar to the structural model, this trained filtering model can be used to score any future time series values. Moreover, the filtering model updates some components of the model object every time it scores to keep the variational information updated.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">scores</span><span class="p">,</span> <span class="n">model_update</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s1">&#39;2019-08-28&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">model_update</span><span class="p">)</span>
+<span class="go">({&#39;Success&#39;: True, &#39;AdjustedActual&#39;: 1.4535283491638031, &#39;ConfLevel&#39;: 90.0, &#39;Prediction&#39;: 208.36315843605394, &#39;PredStdErr&#39;: 41.36628211756695, &#39;IsAnomaly&#39;: True, &#39;IsAnomalyExtreme&#39;: False, &#39;AnomalyProbability&#39;: 0.9875848462383774, &#39;DownAnomalyProbability&#39;: 0.006207576880811305, &#39;UpAnomalyProbability&#39;: 0.9937924231191887, &#39;NonStationarityDiffOrder&#39;: 1, &#39;ModelFreshness&#39;: 0.1}, &lt;luminaire_models.model.lad_filtering.LADFilteringModel object at 0x7fd2b20a65c0&gt;)</span>
+</pre></div>
+</div>
+<p>The trained <em>model</em> can only be used to score the next innovation after the training. To score any futher points in the future, the iterative <em>model_update</em> needs to be used.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">scores_2</span><span class="p">,</span> <span class="n">model_update_2</span> <span class="o">=</span> <span class="n">model_update</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="s1">&#39;2019-08-29&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scores_2</span><span class="p">,</span> <span class="n">model_update_2</span><span class="p">)</span>
+<span class="go">({&#39;Success&#39;: True, &#39;AdjustedActual&#39;: -0.591849553174421, &#39;ConfLevel&#39;: 90.0, &#39;Prediction&#39;: 349.67004799036243, &#39;PredStdErr&#39;: 69.28590609594112, &#39;IsAnomaly&#39;: True, &#39;IsAnomalyExtreme&#39;: True, &#39;AnomalyProbability&#39;: 0.9999663774928771, &#39;DownAnomalyProbability&#39;: 0.9999831887464385, &#39;UpAnomalyProbability&#39;: 1.681125356141111e-05, &#39;NonStationarityDiffOrder&#39;: 1, &#39;ModelFreshness&#39;: 0.2}, &lt;luminaire_models.model.lad_filtering.LADFilteringModel object at 0x7fd2b1c81e48&gt;)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/filter_score.png"><img alt="../_images/filter_score.png" src="../_images/filter_score.png" style="width: 647.9000000000001px; height: 446.6px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Prediction for the filtering model is a posterior prediction, which means the prediction is made after observing the data to score. See <a class="reference external" href="https://en.wikipedia.org/wiki/Kalman_filter#Predict">kalman_filter</a> for more information.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is important to note that the model update process during scoring only updates a small portion of the model component. It is a good practice to train the model over some schedule to acheive the best performance.</p>
+</div>
+</div>
+</div>
+
+
+            </div>
+
+        </section>
+
+        
+            <nav class="site-bottom-navigation" role="navigation">
+            
+                <a href="streaming.html" class="btn btn--primary btn--next right"
+                    title="Anomaly Detection for Streaming data" accesskey="n">
+                    Next
+                </a>
+            
+            
+                <a href="optimization.html" class="btn btn--primary btn--prev"
+                    title="Configuration Optimization" accesskey="p">
+                    Previous
+                </a>
+            
+            </nav>
+        
+
+        
+            <div class="source-link">
+            
+                
+                    <a href="../_sources/basic_usage_tutorial/outlier_batch.rst.txt" rel="nofollow">
+                        <i class="mdi mdi-code-tags"></i>
+                        View page source
+                    </a>
+                
+            
+            </div>
+        
+
+
+
+    </main>
+
+    <footer class="site-footer">
+<div class="container">
+
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright 2020 Zillow, Inc..
+        </p>
+    </div>
+        <p>Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+        <a href="https://github.com/testthedocs/sphinx_ttd_theme">theme</a>
+        provided by <a href="https://testthedocs">TestTheDocs</a>. 
+
+</div>
+</footer>
+
+    
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/js/theme-min.js"></script>
+<!-- for adding github fork icon, reference: https://github.com/tholman/github-corners -->
+<a href="https://github.com/zillow/luminaire" class="github-corner" aria-label="View source on GitHub">
+    <svg width="150" height="150" viewBox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+
+<style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+     
+
+</body>
+</html>
