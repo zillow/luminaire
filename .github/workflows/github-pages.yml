@@ -22,7 +22,7 @@ jobs:
           pip install -r ./docs/sphinx_requirements.txt
 
       - run: |
-          cd ./luminaire/docs/
+          cd ./docs/
           make clean
           make html
 
