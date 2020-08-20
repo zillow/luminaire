@@ -118,3 +118,5 @@ metastore_db/*
 
 build
 build/*
+
+docs/_build/*

@@ -14,7 +14,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='luminaire',
-    version='0.1.0.dev8',
+    version='0.1.0',
 
     license='Apache License 2.0',
 
@@ -30,7 +30,7 @@ setup(
     install_requires=install_requires,
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3.6',
         'Operating System :: OS Independent',
