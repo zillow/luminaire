@@ -63,16 +63,10 @@ Updating Sphinx Documentation
 We use `Sphinx <https://www.sphinx-doc.org/en/master/>`__ for code documentation and
 are hosted on our `Github pages <https://zillow.github.io/luminaire>`__
 
-All the code can be found under ``luminaire/docs_source``
+All the source code can be found under ``luminaire/docs``. Updated contents accordingly.
 
-Steps to update Sphinx documentation:
-
-- Install required packages from ``~/luminaire/docs_source/sphinx-requirements.txt``
-- On your local terminal cd till ``~/luminaire/docs_source`` folder
-- run ``make clean``, this will remove the folder ``~/luminaire/docs_source/_build``
-- run ``make html``, this will create files under ``~/luminaire/docs_source/_build``
-- ``git add ~/_build``
-- commit updated files as part of the PR
+Whenever a PR is merged to ``master``, Luminaire Docs workflow kicks in and
+pushes the build files to ``gh-pages`` branch.
 
 
 Github Workflow (CI/CD)

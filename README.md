@@ -9,7 +9,7 @@
 [![docs](https://github.com/zillow/luminaire/workflows/Luminaire%20Docs/badge.svg)](https://github.com/zillow/luminaire/actions?query=workflow%3A%22Luminaire+Docs%22)
 <!-- Badges End -->
 
-![Luminaire Logo](luminaire/docs_source/assets/luminaire_logo.png)
+![Luminaire Logo](luminaire/docs/assets/luminaire_logo.png)
 
 **Table of contents**
 
@@ -47,7 +47,7 @@ for detailed description of methods and usage.
 
 
 ## Time Series Outlier Detection Workflow
-![Luminaire Flow](luminaire/docs_source/assets/luminaire_flow.png)
+![Luminaire Flow](luminaire/docs/assets/luminaire_flow.png)
 
 Luminaire outlier detection workflow can be divided into 3 major components:
 
