@@ -6,6 +6,7 @@
 [![License](http://img.shields.io/:license-Apache%202-blue.svg)](https://github.com/zillow/luminaire/blob/master/LICENSE.txt)
 [![Luminaire CI](https://github.com/zillow/luminaire/workflows/Luminaire%20CI/badge.svg)](https://github.com/zillow/luminaire/actions?query=workflow%3A%22Luminaire+CI%22)
 [![Luminaire CD](https://github.com/zillow/luminaire/workflows/Luminaire%20CD/badge.svg)](https://github.com/zillow/luminaire/actions?query=workflow%3A%22Luminaire+CD%22)
+[![Luminaire Docs](https://github.com/zillow/luminaire/workflows/Luminaire%20Docs/badge.svg)](https://github.com/zillow/luminaire/actions?query=workflow%3A%22Luminaire+Docs%22)
 <!-- Badges End -->
 
 ![Luminaire Logo](luminaire/docs_source/assets/luminaire_logo.png)
