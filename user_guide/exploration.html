@@ -66,8 +66,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../basic_usage_tutorial/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="user_guide.html">User Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="batch_models.html">Luminaire Outlier Detection Models: Structural Modeling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="batch_models.html#luminaire-outlier-detection-models-factoring-holidays-as-exogenous">Luminaire Outlier Detection Models: Factoring holidays as exogenous</a></li>
-<li class="toctree-l2"><a class="reference internal" href="batch_models.html#luminaire-outlier-detection-models-kalman-filter">Luminaire Outlier Detection Models: Kalman Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="batch_models.html#module-luminaire.model.model_utils">Luminaire Outlier Detection Models: Factoring holidays as exogenous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="batch_models.html#module-luminaire.model.lad_filtering">Luminaire Outlier Detection Models: Kalman Filter</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Data Exploration and Profiling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optimization.html">Luminaire Configuration Optimization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="streaming.html">Luminaire Streaming Anomaly Detection Models: Window Density Model</a></li>
@@ -113,8 +113,125 @@
         <section class="site-content">
             <div class="container">
                 
-  <div class="section" id="data-exploration-and-profiling">
-<h1>Data Exploration and Profiling<a class="headerlink" href="#data-exploration-and-profiling" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-luminaire.exploration.data_exploration">
+<span id="data-exploration-and-profiling"></span><h1>Data Exploration and Profiling<a class="headerlink" href="#module-luminaire.exploration.data_exploration" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="luminaire.exploration.data_exploration.DataExploration">
+<em class="property">class </em><code class="sig-prename descclassname">luminaire.exploration.data_exploration.</code><code class="sig-name descname">DataExploration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">freq</span><span class="o">=</span><span class="default_value">'D'</span></em>, <em class="sig-param"><span class="n">min_ts_mean</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fill_rate</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_window_size</span><span class="o">=</span><span class="default_value">24</span></em>, <em class="sig-param"><span class="n">window_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sig_level</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">min_ts_length</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_ts_length</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">is_log_transformed</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_shift_truncate</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">min_changepoint_padding_length</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">change_point_threshold</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#luminaire.exploration.data_exploration.DataExploration" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a general class for time series data exploration and pre-processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>freq</strong> (<em>str</em>) – The frequency of the time-series. A <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases">Pandas offset</a> such as ‘D’, ‘H’, or ‘M’.</p></li>
+<li><p><strong>sig_level</strong> (<em>float</em>) – The significance level to use for any statistical test withing data profile. This should be
+a number between 0 and 1.</p></li>
+<li><p><strong>min_ts_mean</strong> – The minimum mean value of the time series required for the model to run. For data that
+originated as integers (such as counts), the ARIMA model can behave erratically when the numbers are small. When
+this parameter is set, any time series whose mean value is less than this will automatically result in a model
+failure, rather than a mostly bogus anomaly.</p></li>
+<li><p><strong>fill_rate</strong> – Minimum proportion of data availability in the recent data window.</p></li>
+<li><p><strong>max_window_size</strong> – The maximum size of the sub windows for input data segmentation.</p></li>
+<li><p><strong>window_size</strong> – The size of the sub windows for input data segmentation.</p></li>
+<li><p><strong>min_ts_length</strong> – The minimum required length of the time series for training.</p></li>
+<li><p><strong>max_ts_length</strong> – The maximum required length of the time series for training.</p></li>
+<li><p><strong>is_log_transformed</strong> – A flag to specify whether to take a log transform of the input data. If the data
+contain negatives, is_log_transformed is ignored even though it is set to True.</p></li>
+<li><p><strong>data_shift_truncate</strong> – A flag to specify whether left side of the most recent change point needs to
+be truncated from the training data.</p></li>
+<li><p><strong>min_changepoint_padding_length</strong> – A padding length between two change points. This parameter makes sure
+that two consecutive change points are not close to each other.</p></li>
+<li><p><strong>change_point_threshold</strong> – Minimum threshold (a value &gt; 0) to flag change points based on KL divergence.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="luminaire.exploration.data_exploration.DataExploration.kf_naive_outlier_detection">
+<code class="sig-name descname">kf_naive_outlier_detection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_series</span></em>, <em class="sig-param"><span class="n">idx_position</span></em><span class="sig-paren">)</span><a class="headerlink" href="#luminaire.exploration.data_exploration.DataExploration.kf_naive_outlier_detection" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function detects outlier for the specified index position of the series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_series</strong> (<em>numpy.array</em>) – Input time series</p></li>
+<li><p><strong>idx_position</strong> (<em>int</em>) – Target index position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Anomaly flag</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">input_series</span> <span class="o">=</span> <span class="p">[</span><span class="mi">110</span><span class="p">,</span> <span class="mi">119</span><span class="p">,</span> <span class="mi">316</span><span class="p">,</span> <span class="mi">248</span><span class="p">,</span> <span class="mi">451</span><span class="p">,</span> <span class="mi">324</span><span class="p">,</span> <span class="mi">241</span><span class="p">,</span> <span class="mi">275</span><span class="p">,</span> <span class="mi">381</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">kf_naive_outlier_detection</span><span class="p">(</span><span class="n">input_series</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="luminaire.exploration.data_exploration.DataExploration.profile">
+<code class="sig-name descname">profile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">impute_only</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#luminaire.exploration.data_exploration.DataExploration.profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function performs required data profiling and pre-processing before hyperparameter optimization or time
+series model training.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>list/pandas.DataFrame</em>) – Input time series.</p></li>
+<li><p><strong>impute_only</strong> – Flag to perform preprocessing until imputation OR full preprocessing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Preprocessed dataframe with batch data summary.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple[pandas.dataFrame, dict]</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">de_obj</span> <span class="o">=</span> <span class="n">DataExploration</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">data_shift_truncate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">is_log_transformed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fill_rate</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span>
+<span class="go">               raw</span>
+<span class="go">index</span>
+<span class="go">2020-01-01  1326.0</span>
+<span class="go">2020-01-02  1552.0</span>
+<span class="go">2020-01-03  1432.0</span>
+<span class="go">2020-01-04  1470.0</span>
+<span class="go">2020-01-05  1565.0</span>
+<span class="gp">... </span>           <span class="o">...</span>
+<span class="go">2020-06-03  1934.0</span>
+<span class="go">2020-06-04  1873.0</span>
+<span class="go">2020-06-05  1674.0</span>
+<span class="go">2020-06-06  1747.0</span>
+<span class="go">2020-06-07  1782.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">de_obj</span><span class="o">.</span><span class="n">profile</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">summary</span>
+<span class="go">(              raw interpolated</span>
+<span class="go">2020-03-16  1371.0       1371.0</span>
+<span class="go">2020-03-17  1325.0       1325.0</span>
+<span class="go">2020-03-18  1318.0       1318.0</span>
+<span class="go">2020-03-19  1270.0       1270.0</span>
+<span class="go">2020-03-20  1116.0       1116.0</span>
+<span class="gp">... </span>           <span class="o">...</span>          <span class="o">...</span>
+<span class="go">2020-06-03  1934.0       1934.0</span>
+<span class="go">2020-06-04  1873.0       1873.0</span>
+<span class="go">2020-06-05  1674.0       1674.0</span>
+<span class="go">2020-06-06  1747.0       1747.0</span>
+<span class="go">2020-06-07  1782.0       1782.0</span>
+<span class="go">[84 rows x 2 columns], {&#39;success&#39;: True, &#39;trend_change_list&#39;: [&#39;2020-04-01 00:00:00&#39;], &#39;change_point_list&#39;:</span>
+<span class="go">[&#39;2020-03-16 00:00:00&#39;], &#39;is_log_transformed&#39;: 0, &#39;min_ts_mean&#39;: None, &#39;ts_start&#39;: &#39;2020-01-01 00:00:00&#39;,</span>
+<span class="go">&#39;ts_end&#39;: &#39;2020-06-07 00:00:00&#39;})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="luminaire.exploration.data_exploration.DataExplorationError">
+<em class="property">exception </em><code class="sig-prename descclassname">luminaire.exploration.data_exploration.</code><code class="sig-name descname">DataExplorationError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="headerlink" href="#luminaire.exploration.data_exploration.DataExplorationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception class for Luminaire Data Exploration.</p>
+</dd></dl>
+
 </div>
 
 
