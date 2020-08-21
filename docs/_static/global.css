@@ -22,3 +22,9 @@ html code, html kbd, html pre {
 .md-header-nav__topic:first-child {
     display: none;
 }
+
+/* Center images */
+a.image-reference {
+    display: block;
+    text-align: center;
+}

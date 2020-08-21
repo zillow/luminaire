@@ -44,7 +44,7 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Options for HTML output -------------------------------------------------
-
+pygments_style = 'friendly'
 html_theme = 'sphinx_material'
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -62,7 +62,7 @@ html_sidebars = {
 html_theme_options = {
     'base_url': 'http://zillow.github.io/luminaire/',
     'repo_url': 'https://github.com/zillow/luminaire/',
-    'repo_name': 'Luminaire on Github',
+    'repo_name': 'Fork me on Github',
     'repo_type': 'github',
     'nav_title': 'Luminaire',
 
@@ -70,7 +70,7 @@ html_theme_options = {
     'html_minify': True,
     'css_minify': True,
     'master_doc': False,  # disables the secondary horizontal "nav bar" which we don't use
-    'color_primary': 'blue',
-    'color_accent': 'yellow',
+    'color_primary': 'custom',
+    'color_accent': 'custom',
     'globaltoc_depth': 1,
 }
