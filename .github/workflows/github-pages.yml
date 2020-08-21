@@ -22,7 +22,8 @@ jobs:
           pip install -r ./requirements.txt
           pip install -r ./docs/sphinx_requirements.txt
 
-      - run: |
+      - name: Build documents
+        run: |
           cd ./docs/
           make clean
           make html
