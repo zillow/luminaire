@@ -3,19 +3,7 @@
 
 name: Luminaire CI
 
-on:
-  push:
-    branches:
-      - master
-      - feature/*
-      - bugfix/*
-      - hotfix/*
-  pull_request:
-    branches:
-      - master
-      - feature/*
-      - bugfix/*
-      - hotfix/*
+on: [push, pull_request]
 
 jobs:
   build:
@@ -31,6 +19,7 @@ jobs:
         python-version: '3.6'
 
     - name: Cache Dependencies
+      id: cache
       uses: actions/cache@v2
       with:
         # This path is specific to Ubuntu
