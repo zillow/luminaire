@@ -1,22 +1,21 @@
-.. luminaire documentation master file, created by
-   sphinx-quickstart on Tue Jun  2 18:15:26 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Luminaire: A hands-off Anomaly Detection Library
-*************************************************
+.. include:: introduction.rst
 
 .. toctree::
-   :maxdepth: 5
+    :hidden:
+    :caption: Tutorial
+    :maxdepth: 1
+    :glob:
 
-   introduction
-   basic_usage_tutorial/tutorials
-   user_guide/user_guide
+    tutorial/*
 
+.. toctree::
+    :hidden:
+    :caption: API Reference
+    :maxdepth: 1
+    :glob:
 
-Indices and tables
-==================
+    api_reference/*
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Index
+~~~~~
+:ref:`genindex`

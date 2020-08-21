@@ -12,20 +12,17 @@
 #
 import os
 import sys
-import sphinx_redactor_theme
-
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # -- Project information -----------------------------------------------------
 
-project = 'luminaire'
+project = html_title = 'Luminaire'
 copyright = '2020 Zillow, Inc.'
 author = 'Zillow Group A.I. team'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1.0'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -34,7 +31,8 @@ release = '0.1.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'rinoh.frontend.sphinx'
+    'sphinx.ext.viewcode',
+    'sphinx_material',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -45,18 +43,34 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme = 'sphinx_redactor_theme'
-html_theme_path = [sphinx_redactor_theme.get_html_theme_path()]
+html_theme = 'sphinx_material'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-html_logo = "assets/luminaire_logo.png"
-html_css_files = ['logo.css']
+html_logo = "assets/luminaire_logo.svg"
+html_use_index = True
+html_show_sourcelink = False
+
+html_sidebars = {
+    "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
+}
+
+html_theme_options = {
+    'base_url': 'http://zillow.github.io/luminaire/',
+    'repo_url': 'https://github.com/zillow/luminaire/',
+    'repo_name': 'Luminaire on Github',
+    'repo_type': 'github',
+    'nav_title': 'Luminaire',
+
+    # 'google_analytics_account': 'UA-XXXXX',  # todo add later
+    'html_minify': True,
+    'css_minify': True,
+    'master_doc': False,  # disables the secondary horizontal "nav bar" which we don't use
+    'color_primary': 'blue',
+    'color_accent': 'yellow',
+    'globaltoc_depth': 1,
+}

@@ -4,7 +4,7 @@ import pandas.tseries.holiday
 class LADHolidays(pandas.tseries.holiday.AbstractHolidayCalendar):
     """
     A class that generates holiday calendars to be used as external features in the batch outlier detection model.
-    By default, holidays include:
+    By default a list of common US holidays are included:
 
     - Memorial Day, plus the weekend leading into it
     - Veterans Day, plus the weekend leading into it

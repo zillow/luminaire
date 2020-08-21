@@ -1,3 +1,5 @@
+.. highlight: python3
+
 Configuration Optimization
 ==========================
 
