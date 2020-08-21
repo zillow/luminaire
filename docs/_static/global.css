@@ -1,0 +1,24 @@
+/* Global font changes */
+html body, html input {
+    font-family: "Nunito Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+html code, html kbd, html pre {
+    font-family: "Fira Code", "Inconsolata", "Courier New", Courier, monospace;
+}
+
+
+/* Make logo bigger than default */
+.md-header-nav__button {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+}
+
+.md-header-nav__button img {
+    height: 32px;
+}
+
+/* Our logo already contains the project name; hide the one that shows by default*/
+.md-header-nav__topic:first-child {
+    display: none;
+}

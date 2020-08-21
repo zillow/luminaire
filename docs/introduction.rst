@@ -12,20 +12,20 @@ Luminaire is a python package that provides ML driven solutions for monitoring t
 
 - **Supports Diverse Anomaly Detection Types:** Luminaire supports different detection types:
 
- - Outlier Detection
- - Data Shift Detection
- - Trend Change Detection
- - Null Data Detection
- - Density comparison for streaming data
+  + Outlier Detection
+  + Data Shift Detection
+  + Trend Change Detection
+  + Null Data Detection
+  + Density comparison for streaming data
 
 Data Exploration and Profiling
 -----------------------------------
 Luminaire performs exploratory profiling on the data before progressing to optimization and training. This step provides batch insights about the raw training data on a given time window and also enables automated decisions regarding data pre-processing during the optimization process. These tests and pre-processing steps include:
 
- - Checking for recent data shifts
- - Detecting recent trend changes
- - Stationarity adjustments
- - Imputation of missing data
+- Checking for recent data shifts
+- Detecting recent trend changes
+- Stationarity adjustments
+- Imputation of missing data
 
 
 Outlier Detection
