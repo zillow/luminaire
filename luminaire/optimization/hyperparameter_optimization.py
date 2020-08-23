@@ -9,7 +9,9 @@ class HyperparameterOptimization(object):
     """
     Hyperparameter optimization for LAD outlier detection configuration for batch data.
 
-    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
+    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'. Luminaire currently
+        supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',
+        'W-FRI', 'W-SAT', 'M', 'MS'.
     :param str detection_type: Luminaire anomaly detection type. Only Outlier detection for batch data is currently
         supported.
     :param min_ts_mean: Minimum average values in the most recent window of the time series. This optional parameter
@@ -18,7 +20,7 @@ class HyperparameterOptimization(object):
     :param min_ts_length: The minimum required length of the time series for training.
     :param int scoring_length: Number of innovations to be scored after training window with respect to the frequency.
 
-    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
+    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
     """
 
     def __init__(self,
