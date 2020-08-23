@@ -69,25 +69,29 @@ class WindowDensityHyperParams(BaseModelHyperParams):
             'S': 60 * 10,
             'T': 60 * 12,
             '15T': 4 * 8,
-            'H': 12, 'D': 10,
+            'H': 12,
+            'D': 10,
         }
         max_window_length_dict = {
             'S': 60 * 60 * 24,
             'T': 60 * 24 * 84,
             '15T': 4 * 24 * 7,
-            'H': 24 * 7, 'D': 90,
+            'H': 24 * 7,
+            'D': 90,
         }
         window_length_dict = {
             'S': 60 * 60,
             'T': 60 * 24,
             '15T': 4 * 24,
-            'H': 24, 'D': 28,
+            'H': 24,
+            'D': 28,
         }
         ma_window_length_dict = {
             'S': 10 * 60,
             'T': 60,
             '15T': 4 * 4,
-            'H': 12, 'D': 7,
+            'H': 12,
+            'D': 7,
         }
 
         if freq in ['S', 'T', '15T', 'H', 'D']:
