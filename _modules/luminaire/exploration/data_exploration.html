@@ -13,7 +13,9 @@
     <span class=sd >"""</span>
 <span class=sd >    This is a general class for time series data exploration and pre-processing.</span>
 
-<span class=sd >    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.</span>
+<span class=sd >    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'. Luminaire currently</span>
+<span class=sd >        supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',</span>
+<span class=sd >        'W-FRI', 'W-SAT', 'M', 'MS'.</span>
 <span class=sd >    :param float sig_level: The significance level to use for any statistical test withing data profile. This should be</span>
 <span class=sd >        a number between 0 and 1.</span>
 <span class=sd >    :param min_ts_mean: The minimum mean value of the time series required for the model to run. For data that</span>
@@ -33,7 +35,7 @@
 <span class=sd >        that two consecutive change points are not close to each other.</span>
 <span class=sd >    :param change_point_threshold: Minimum threshold (a value &gt; 0) to flag change points based on KL divergence.</span>
 
-<span class=sd >    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases</span>
+<span class=sd >    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects</span>
 <span class=sd >    """</span>
     <span class=n >__version__</span> <span class=o >=</span> <span class=s2 >"0.1"</span>
 

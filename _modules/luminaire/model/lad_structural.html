@@ -54,7 +54,9 @@
 <span class=sd >    :param dict hyper_params: Hyper parameters for Luminaire structural modeling.</span>
 <span class=sd >        See :class:`luminaire.optimization.hyperparameter_optimization.HyperparameterOptimization` for detailed</span>
 <span class=sd >        information.</span>
-<span class=sd >    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.</span>
+<span class=sd >    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'. Luminaire currently</span>
+<span class=sd >        supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',</span>
+<span class=sd >        'W-FRI', 'W-SAT', 'M', 'MS'.</span>
 <span class=sd >    :param int min_ts_length: The minimum required length of the time series for training.</span>
 <span class=sd >    :param int max_ts_length: The maximum required length of the time series for training.</span>
 <span class=sd >    :param float min_ts_mean: Minimum average values in the most recent window of the time series. This optional</span>
@@ -66,7 +68,7 @@
 <span class=sd >        can be obtained by using LAD hyperparameter optimization.</span>
 
 <span class=sd >    .. _statsmodels docs: http://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_model.ARIMA.html</span>
-<span class=sd >    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases</span>
+<span class=sd >    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects</span>
 
 <span class=sd >    &gt;&gt;&gt; hyper = {"include_holidays_exog": 0, "is_log_transformed": 1, "max_ft_freq": 2, "p": 5, "q": 1}</span>
 <span class=sd >    lad_struct_model = LADStructuralModel(hyper_params=hyper, freq='D')</span>
