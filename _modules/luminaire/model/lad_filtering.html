@@ -40,12 +40,16 @@
 <span class=sd >    through Kalman Filter based model estimation.</span>
 
 <span class=sd >    :param dict hyper_params: Hyper parameters for Luminaire structural modeling.</span>
-<span class=sd >        See :class:`luminaire.optimization.hyperparameter_optimization.HyperparameterOptimization` for detailed information.</span>
+<span class=sd >        See :class:`luminaire.model.lad_filtering.LADFilteringHyperParams` for detailed information.</span>
 <span class=sd >    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'. Luminaire currently</span>
 <span class=sd >        supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',</span>
 <span class=sd >        'W-FRI', 'W-SAT', 'M', 'MS'.</span>
 <span class=sd >    :param min_ts_length: The minimum required length of the time series for training.</span>
 <span class=sd >    :param max_ts_length: The maximum required length of the time series for training.</span>
+
+<span class=sd >    .. Note :: This class should be used to manually configure the structural model. Exact configuration parameters</span>
+<span class=sd >        can be found in `luminaire.model.lad_filtering.LADFilteringHyperParams`. Optimal configuration can be</span>
+<span class=sd >        obtained by using Luminaire hyperparameter optimization.</span>
 
 <span class=sd >    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects</span>
 
