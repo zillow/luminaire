@@ -6,7 +6,7 @@ class WindowDensityHyperParams(BaseModelHyperParams):
     """
     Hyperparameter class for Luminaire Window density model.
 
-    :param str freq: The frequency of the time-series. Luminaire supports default configuration for 'S', 'M', 'QM',
+    :param str freq: The frequency of the time-series. Luminaire supports default configuration for 'S', T, '15T',
         'H', 'D'. Any other frequency type should be specified as 'custom' and configuration should be set manually.
     :param int ignore_window: ignore a time window to be considered for training.
     :param float max_missing_train_prop: Maximum proportion of missing observation allowed in the training data.
@@ -48,7 +48,7 @@ class WindowDensityHyperParams(BaseModelHyperParams):
         - "diff" (differencing based).
     """
     def __init__(self,
-                 freq='M',
+                 freq='T',
                  ignore_window=None,
                  max_missing_train_prop=0.1,
                  is_log_transformed=False,
@@ -62,35 +62,39 @@ class WindowDensityHyperParams(BaseModelHyperParams):
                  ):
         # Detection method is KL divergence for high frequency data and sign test for low frequency data
         if not detection_method:
-            detection_method = "kldiv" if freq in ['S', 'M', 'QM'] else "sign_test"
+            detection_method = "kldiv" if freq in ['S', 'T', '15T'] else "sign_test"
 
         # Pre-specification of the window lengths for different window frequencies with their min and max
         min_window_length_dict = {
             'S': 60 * 10,
-            'M': 60 * 12,
-            'QM': 4 * 24 * 7,
-            'H': 12, 'D': 10,
+            'T': 60 * 12,
+            '15T': 4 * 8,
+            'H': 12,
+            'D': 10,
         }
         max_window_length_dict = {
             'S': 60 * 60 * 24,
-            'M': 60 * 24 * 84,
-            'QM': 4 * 24 * 168,
-            'H': 24 * 7, 'D': 90,
+            'T': 60 * 24 * 84,
+            '15T': 4 * 24 * 7,
+            'H': 24 * 7,
+            'D': 90,
         }
         window_length_dict = {
             'S': 60 * 60,
-            'M': 60 * 24,
-            'QM': 4 * 24 * 14,
-            'H': 24, 'D': 28,
+            'T': 60 * 24,
+            '15T': 4 * 24,
+            'H': 24,
+            'D': 28,
         }
         ma_window_length_dict = {
             'S': 10 * 60,
-            'M': 60,
-            'QM': 4 * 4,
-            'H': 12, 'D': 7,
+            'T': 60,
+            '15T': 4 * 4,
+            'H': 12,
+            'D': 7,
         }
 
-        if freq in ['S', 'M', 'QM', 'H', 'D']:
+        if freq in ['S', 'T', '15T', 'H', 'D']:
             min_window_length = min_window_length_dict.get(freq)
             max_window_length = max_window_length_dict.get(freq)
             window_length = window_length_dict.get(freq)
@@ -435,7 +439,7 @@ class WindowDensityModel(BaseModel):
         min_num_train_windows = self.min_num_train_windows
         max_num_train_windows = self.max_num_train_windows
         ignore_window = self._params['ignore_window']
-        if freq in ['S', 'M', 'QM', 'H', 'D']:
+        if freq in ['S', 'T', '15T', 'H', 'D']:
             min_window_length = self._params['min_window_length']
             max_window_length = self._params['max_window_length']
             window_length = self._params['window_length']
@@ -452,7 +456,7 @@ class WindowDensityModel(BaseModel):
         detrend_method = self._params['detrend_method']
         target_metric = 'raw'
         imputed_metric = 'interpolated'
-        if freq not in ['S', 'M', 'QM', 'H', 'D']:
+        if freq not in ['S', 'T', '15T', 'H', 'D']:
             detection_method = self._params['detection_method']
             if not detection_method:
                 raise ValueError('Detection method should be specified in case frequency not in the specified list')
@@ -668,7 +672,7 @@ class WindowDensityModel(BaseModel):
         detrend_method = self._params['detrend_method']
         target_metric = 'raw'
         imputed_metric = 'interpolated'
-        if freq not in ['S', 'M', 'QM', 'H', 'D']:
+        if freq not in ['S', 'T', '15T', 'H', 'D']:
             detection_method = self._params['detection_method']
             if not detection_method:
                 raise ValueError('Detection method should be specified in case frequency not in the specified list')

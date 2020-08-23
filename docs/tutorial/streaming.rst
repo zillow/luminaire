@@ -29,22 +29,22 @@ index
 2020-06-16 23:58:00  10663.0       10663.0
 2020-06-16 23:59:00  11034.0       11034.0
 
->>> hyper_params = WindowDensityHyperParams(freq='M').params
+>>> hyper_params = WindowDensityHyperParams(freq='T').params
 >>> wdm_obj = WindowDensityModel(hyper_params=hyper_params)
 >>> success, model = wdm_obj.train(data=data)
 >>> print(success, model)
 (True, <luminaire_models.model.window_density.WindowDensityModel object at 0x7f8cda42dcc0>)
 
-The model object contains the data density structure over a pre-specified window, given the frequency. Lumianire sets the following defaults for some typical pandas frequencies (any custom requirements can be updated in the hyperparameter object instance):
+The model object contains the data density structure over a pre-specified window, given the frequency. Luminaire sets the following defaults for some typical pandas frequencies (any custom requirements can be updated in the hyperparameter object instance):
 
 - 'S': Hourly windows
-- 'M': Daily windows
-- 'QM': Weekly windows
-- 'H': 12 hours windows
-- 'D': 10 days windows
+- 'T': 24 hours windows
+- '15T': 24 hours windows
+- 'H': 24 hours windows
+- 'D': 4 weeks windows
 - 'custom': User specified windows
 
-In order to score a new window innovation given the trained model object, we have to provide a equal sized window that represents a similar time interval. For example, if each of the windows in the training data represents a 24 hour window between 9 AM to 8:59:59 AM for last few days, the scoring data should represent the same interval of a different day and should have the same window size.
+In order to score a new window innovation given the trained model object, we have to provide a equal sized window that represents a similar time interval. For example, if each of the windows in the training data represents a 24 hour window between 9 AM to 8:59:59 AM (next day) for last few days, the scoring data should represent the same interval of a different day and should have the same window size.
 
 .. image:: window_train_score_auto.png
    :scale: 45%
