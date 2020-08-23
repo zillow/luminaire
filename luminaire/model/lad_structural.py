@@ -53,7 +53,9 @@ class LADStructuralModel(BaseModel):
     :param dict hyper_params: Hyper parameters for Luminaire structural modeling.
         See :class:`luminaire.optimization.hyperparameter_optimization.HyperparameterOptimization` for detailed
         information.
-    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
+    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'. Luminaire currently
+        supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',
+        'W-FRI', 'W-SAT', 'M', 'MS'.
     :param int min_ts_length: The minimum required length of the time series for training.
     :param int max_ts_length: The maximum required length of the time series for training.
     :param float min_ts_mean: Minimum average values in the most recent window of the time series. This optional
@@ -65,7 +67,7 @@ class LADStructuralModel(BaseModel):
         can be obtained by using LAD hyperparameter optimization.
 
     .. _statsmodels docs: http://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_model.ARIMA.html
-    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
+    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
 
     >>> hyper = {"include_holidays_exog": 0, "is_log_transformed": 1, "max_ft_freq": 2, "p": 5, "q": 1}
     lad_struct_model = LADStructuralModel(hyper_params=hyper, freq='D')

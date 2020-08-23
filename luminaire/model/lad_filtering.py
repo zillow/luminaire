@@ -40,9 +40,13 @@ class LADFilteringModel(BaseModel):
 
     :param dict hyper_params: Hyper parameters for Luminaire structural modeling.
         See :class:`luminaire.optimization.hyperparameter_optimization.HyperparameterOptimization` for detailed information.
-    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'.
+    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'. Luminaire currently
+        supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',
+        'W-FRI', 'W-SAT', 'M', 'MS'.
     :param min_ts_length: The minimum required length of the time series for training.
     :param max_ts_length: The maximum required length of the time series for training.
+
+    .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
 
     >>> hyper = {"is_log_transformed": 1}
     lad_filtering_model = LADFilteringModel(hyper_params=hyper, freq='D')
