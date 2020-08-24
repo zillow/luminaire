@@ -117,7 +117,7 @@ class LADStructuralModel(BaseModel):
     def _signals(cls, idx, m, n):
         """
         This function computes the sinusoids given the significant frequencies
-        :param list idx: A list containing the significat frequency indices obtained from the spectral density plot in fourier_extp()
+        :param list idx: A list containing the significant frequency indices obtained from the spectral density plot in fourier_extp()
         :param int m: Specifying the current frequency
         :param int n: Specifying the length of the time series
         :return: A numpy array containing the sinusoids corresponding to the significant frequencies
