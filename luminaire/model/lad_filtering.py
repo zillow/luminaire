@@ -43,8 +43,9 @@ class LADFilteringModel(BaseModel):
     :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'. Luminaire currently
         supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',
         'W-FRI', 'W-SAT'.
-    :param min_ts_length: The minimum required length of the time series for training.
-    :param max_ts_length: The maximum required length of the time series for training.
+    :param int min_ts_length: The minimum required length of the time series for training.
+    :param int max_ts_length: The maximum required length of the time series for training. The input time series will be
+        truncated if the length is greater than this value.
 
     .. Note :: This class should be used to manually configure the structural model. Exact configuration parameters
         can be found in `luminaire.model.lad_filtering.LADFilteringHyperParams`. Optimal configuration can be

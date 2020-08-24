@@ -17,22 +17,24 @@ class DataExploration(object):
         'W-FRI', 'W-SAT'.
     :param float sig_level: The significance level to use for any statistical test withing data profile. This should be
         a number between 0 and 1.
-    :param min_ts_mean: The minimum mean value of the time series required for the model to run. For data that
+    :param float min_ts_mean: The minimum mean value of the time series required for the model to run. For data that
         originated as integers (such as counts), the ARIMA model can behave erratically when the numbers are small. When
         this parameter is set, any time series whose mean value is less than this will automatically result in a model
         failure, rather than a mostly bogus anomaly.
-    :param fill_rate: Minimum proportion of data availability in the recent data window.
-    :param max_window_size: The maximum size of the sub windows for input data segmentation.
-    :param window_size: The size of the sub windows for input data segmentation.
-    :param min_ts_length: The minimum required length of the time series for training.
-    :param max_ts_length: The maximum required length of the time series for training.
-    :param is_log_transformed: A flag to specify whether to take a log transform of the input data. If the data
+    :param float fill_rate: Minimum proportion of data availability in the recent data window. Should be a fraction
+        between 0 and 1.
+    :param int max_window_size: The maximum size of the sub windows for input data segmentation.
+    :param int window_size: The size of the sub windows for input data segmentation.
+    :param int min_ts_length: The minimum required length of the time series for training.
+    :param int max_ts_length: The maximum required length of the time series for training.
+    :param bool is_log_transformed: A flag to specify whether to take a log transform of the input data. If the data
         contain negatives, is_log_transformed is ignored even though it is set to True.
-    :param data_shift_truncate: A flag to specify whether left side of the most recent change point needs to
+    :param bool data_shift_truncate: A flag to specify whether left side of the most recent change point needs to
         be truncated from the training data.
-    :param min_changepoint_padding_length: A padding length between two change points. This parameter makes sure
+    :param int min_changepoint_padding_length: A padding length between two change points. This parameter makes sure
         that two consecutive change points are not close to each other.
-    :param change_point_threshold: Minimum threshold (a value > 0) to flag change points based on KL divergence.
+    :param float change_point_threshold: Minimum threshold (a value > 0) to flag change points based on KL divergence.
+        This parameter can be used to tune the sensitivity of the change point detection method.
 
     .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
     """
@@ -766,7 +768,7 @@ class DataExploration(object):
         series model training.
 
         :param list/pandas.DataFrame df: Input time series.
-        :param impute_only: Flag to perform preprocessing until imputation OR full preprocessing.
+        :param bool impute_only: Flag to perform preprocessing until imputation OR full preprocessing.
         :return: Preprocessed dataframe with batch data summary.
         :rtype: tuple[pandas.dataFrame, dict]
 

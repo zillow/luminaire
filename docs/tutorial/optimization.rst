@@ -67,4 +67,6 @@ This trained model is now ready to be used for scoring future data points.
 >>> trained_model.score(2000, '2020-06-08')
 {'Success': True, 'IsLogTransformed': 1, 'LogTransformedAdjustedActual': 7.601402334583733, 'LogTransformedPrediction': 7.529710533463001, 'LogTransformedStdErr': 0.06217883425408564, 'LogTransformedCILower': 7.422390543346913, 'LogTransformedCIUpper': 7.62662106869458, 'AdjustedActual': 2000.000000000015, 'Prediction': 1861.566274906425, 'StdErr': 110.9167321105633, 'CILower': 1672.028177505716, 'CIUpper': 2051.104372307134, 'ConfLevel': 90.0, 'ExogenousHolidays': 0, 'IsAnomaly': False, 'IsAnomalyExtreme': False, 'AnomalyProbability': 0.7545715087682185, 'DownAnomalyProbability': 0.12271424561589073, 'UpAnomalyProbability': 0.8772857543841093, 'ModelFreshness': 0.1}
 
+.. Note :: Configuration optimization is an expensive process. This should be triggered when training runs for the first time on a new data. This optimal configuration can be stored to be used for training in future with newer data points. The optimization should be called again only when there is any change in the structural pattern of the data or the model starts under-performing.
+
 

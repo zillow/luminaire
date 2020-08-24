@@ -56,7 +56,8 @@ class LADStructuralModel(BaseModel):
         supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',
         'W-FRI', 'W-SAT'.
     :param int min_ts_length: The minimum required length of the time series for training.
-    :param int max_ts_length: The maximum required length of the time series for training.
+    :param int max_ts_length: The maximum required length of the time series for training. The input time series will be
+        truncated if the length is greater than this value.
     :param float min_ts_mean: Minimum average values in the most recent window of the time series. This optional
         parameter can be used to avoid over-alerting from noisy low volume time series.
     :param int min_ts_mean_window: Size of the most recent window to calculate min_ts_mean.
