@@ -11,7 +11,7 @@ class HyperparameterOptimization(object):
 
     :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'. Luminaire currently
         supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',
-        'W-FRI', 'W-SAT', 'M', 'MS'.
+        'W-FRI', 'W-SAT'.
     :param str detection_type: Luminaire anomaly detection type. Only Outlier detection for batch data is currently
         supported.
     :param min_ts_mean: Minimum average values in the most recent window of the time series. This optional parameter

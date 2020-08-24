@@ -273,7 +273,7 @@ class WindowDensityModel(BaseModel):
         else:
             return sliced_training_data
 
-    def _call_training(self, training_start, training_end, df=None, window_length=None, min_window_length=None,
+    def _call_training(self, training_start=None, training_end=None, df=None, window_length=None, min_window_length=None,
                        max_window_length=None, min_num_train_windows=None, max_num_train_windows=None,
                        ignore_window=None, imputed_metric=None, detrend_method=None, **kwargs):
         """
@@ -301,6 +301,13 @@ class WindowDensityModel(BaseModel):
         else:
             # take first value of timeseries by default
             training_start = str(df.index.min())
+
+        if training_end:
+            # if a timeseries start date is provided, take the larger of this or the first timeseries value
+            training_end = min(df.index.max(), pd.Timestamp(training_end))
+        else:
+            # take first value of timeseries by default
+            training_end = str(df.index.max())
 
         training_window = [pd.to_datetime(training_start), pd.to_datetime(training_end)]
 
