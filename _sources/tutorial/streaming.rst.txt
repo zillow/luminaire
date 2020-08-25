@@ -11,7 +11,7 @@ Although *WindowDensityModel* is designed to track anomalies over streaming data
 Anomaly Detection: Pre-Configured Settings
 ------------------------------------------
 
-Luminaire provides the capability to configure model parameters based on the frequency that the data has been observed and the methods that can be applied (please refer to the Window density Model user guide for detailed configuration options). Luminaire settings for the window density model are already pre-configured for some typical pandas frequency types and settings for any other frequency types should be configured manually (see the user guide for `Streaming Anomaly Detection Models <https://zillow.github.io/luminaire/user_guide/streaming.html>`_).
+Luminaire provides the capability to configure model parameters based on the frequency that the data has been observed and the methods that can be applied (please refer to the Window density Model user guide for detailed configuration options). Luminaire settings for the window density model are already pre-configured for some typical pandas frequency types and settings for any other frequency types should be configured manually (see the API reference for `Streaming Anomaly Detection Models <https://zillow.github.io/luminaire/api_reference/streaming.html>`_).
 
 >>> from luminaire.model.window_density import WindowDensityHyperParams, WindowDensityModel
 >>> print(data)
@@ -52,17 +52,17 @@ In order to score a new window innovation given the trained model object, we hav
 >>> scoring_data
                         raw interpolated
 index                                     
-2020-06-17 00:00:00  1121.0       1121.0
-2020-06-17 00:01:00  1091.0       1091.0
-2020-06-17 00:02:00  1063.0       1063.0
-2020-06-17 00:03:00  1085.0       1085.0
-2020-06-17 00:04:00  1063.0       1063.0
+2020-06-17 00:00:00  11021.0       11021.0
+2020-06-17 00:01:00  10931.0       10931.0
+2020-06-17 00:02:00  10637.0       10637.0
+2020-06-17 00:03:00  10845.0       10845.0
+2020-06-17 00:04:00  10163.0       10163.0
 ...                     ...          ...
-2020-06-17 23:55:00   968.0        968.0
-2020-06-17 23:56:00   995.0        995.0
-2020-06-17 23:57:00   963.0        963.0
-2020-06-17 23:58:00   968.0        968.0
-2020-06-17 23:59:00   920.0        920.0
+2020-06-17 23:55:00   9680.0        9680.0
+2020-06-17 23:56:00   9985.0        9985.0
+2020-06-17 23:57:00   9363.0        9363.0
+2020-06-17 23:58:00   9686.0        9686.0
+2020-06-17 23:59:00   9220.0        9220.0
 
 >>> scores = model.score(scoring_data)
 >>> print(scores)

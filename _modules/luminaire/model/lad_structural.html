@@ -55,9 +55,10 @@
 <span class=sd >        See :class:`luminaire.model.lad_structural.LADStructuralHyperParams` for detailed information.</span>
 <span class=sd >    :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'. Luminaire currently</span>
 <span class=sd >        supports the following pandas frequency types: 'H', 'D', 'W', 'W-SUN', 'W-MON', 'W-TUE', 'W-WED', 'W-THU',</span>
-<span class=sd >        'W-FRI', 'W-SAT', 'M', 'MS'.</span>
+<span class=sd >        'W-FRI', 'W-SAT'.</span>
 <span class=sd >    :param int min_ts_length: The minimum required length of the time series for training.</span>
-<span class=sd >    :param int max_ts_length: The maximum required length of the time series for training.</span>
+<span class=sd >    :param int max_ts_length: The maximum required length of the time series for training. The input time series will be</span>
+<span class=sd >        truncated if the length is greater than this value.</span>
 <span class=sd >    :param float min_ts_mean: Minimum average values in the most recent window of the time series. This optional</span>
 <span class=sd >        parameter can be used to avoid over-alerting from noisy low volume time series.</span>
 <span class=sd >    :param int min_ts_mean_window: Size of the most recent window to calculate min_ts_mean.</span>
