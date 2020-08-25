@@ -20,8 +20,8 @@ class WindowDensityHyperParams(BaseModelHyperParams):
 
     :param str detection_method: A string that select between two window testing method. Possible values:
 
-        - "kldiv" (KL-divergence)
-        - "sign_test" (Wilcoxon sign rank test)
+        - "kldiv" (KL-divergence). This is recommended to be set for high frequency time series such as 'S', 'T' etc.
+        - "sign_test" (Wilcoxon sign rank test). This is recommended to be set for low frequency time series such as 'H', 'D' etc.
 
     :param int min_window_length: Minimum size of the scoring window / a stable training sub-window length.
     
@@ -39,8 +39,8 @@ class WindowDensityHyperParams(BaseModelHyperParams):
         moving average method.
     
         .. Note :: ma_window_length should be small enough to maintain the stable structure of the training / scoring window
-            and large enough to remove the trend. The ideal size can be somewhere between (0.1 * window_length) and
-            (0.25 * window length).
+            and large enough to remove the trend. The ideal size can be somewhere between (0.01 * window_length) and
+            (0.25 * window length) depending on the data frequency.
     
     :param str detrend_method: A string that select between two stationarizing method. Possible values:
 
@@ -119,7 +119,7 @@ class WindowDensityHyperParams(BaseModelHyperParams):
 class WindowDensityModel(BaseModel):
     """
     This model detects anomalous windows using KL divergence (for high frequency data) and Wilcoxon sign rank test
-    (for low frequency data).
+    (for low frequency data). This default monitoring frequency is set to pandas time frequency type 'T'.
 
     :param dict hyper_params: Hyper parameters for Luminaire window density model.
         See :class:`luminaire.model.window_density.WindowDensityHyperParams` for detailed information.
@@ -273,7 +273,7 @@ class WindowDensityModel(BaseModel):
         else:
             return sliced_training_data
 
-    def _call_training(self, training_start, training_end, df=None, window_length=None, min_window_length=None,
+    def _call_training(self, training_start=None, training_end=None, df=None, window_length=None, min_window_length=None,
                        max_window_length=None, min_num_train_windows=None, max_num_train_windows=None,
                        ignore_window=None, imputed_metric=None, detrend_method=None, **kwargs):
         """
@@ -301,6 +301,13 @@ class WindowDensityModel(BaseModel):
         else:
             # take first value of timeseries by default
             training_start = str(df.index.min())
+
+        if training_end:
+            # if a timeseries start date is provided, take the larger of this or the first timeseries value
+            training_end = min(df.index.max(), pd.Timestamp(training_end))
+        else:
+            # take first value of timeseries by default
+            training_end = str(df.index.max())
 
         training_window = [pd.to_datetime(training_start), pd.to_datetime(training_end)]
 
@@ -407,7 +414,7 @@ class WindowDensityModel(BaseModel):
         """
         Input time series for training.
 
-        :param data: Input time series.
+        :param pandas.DataFrame data: Input time series.
         :return: Training summary with a success flag.
         :rtype: tuple(bool, python model object)
 
@@ -633,30 +640,30 @@ class WindowDensityModel(BaseModel):
         >>> data
                                 raw interpolated
         index
-        2018-10-06 00:00:00  204800       204800
-        2018-10-06 01:00:00  222218       222218
-        2018-10-06 02:00:00  218903       218903
-        2018-10-06 03:00:00  190639       190639
-        2018-10-06 04:00:00  148214       148214
-        2018-10-06 05:00:00  106358       106358
-        2018-10-06 06:00:00   70081        70081
-        2018-10-06 07:00:00   47748        47748
-        2018-10-06 08:00:00   36837        36837
-        2018-10-06 09:00:00   33023        33023
-        2018-10-06 10:00:00   44432        44432
-        2018-10-06 11:00:00   72773        72773
-        2018-10-06 12:00:00  115180       115180
-        2018-10-06 13:00:00  157568       157568
-        2018-10-06 14:00:00  180174       180174
-        2018-10-06 15:00:00  190048       190048
-        2018-10-06 16:00:00  188391       188391
-        2018-10-06 17:00:00  189233       189233
-        2018-10-06 18:00:00  191703       191703
-        2018-10-06 19:00:00  189848       189848
-        2018-10-06 20:00:00  192685       192685
-        2018-10-06 21:00:00  196743       196743
-        2018-10-06 22:00:00  193016       193016
-        2018-10-06 23:00:00  196441       196441
+        2018-10-11 00:00:00  204800       204800
+        2018-10-11 01:00:00  222218       222218
+        2018-10-11 02:00:00  218903       218903
+        2018-10-11 03:00:00  190639       190639
+        2018-10-11 04:00:00  148214       148214
+        2018-10-11 05:00:00  106358       106358
+        2018-10-11 06:00:00   70081        70081
+        2018-10-11 07:00:00   47748        47748
+        2018-10-11 08:00:00   36837        36837
+        2018-10-11 09:00:00   33023        33023
+        2018-10-11 10:00:00   44432        44432
+        2018-10-11 11:00:00   72773        72773
+        2018-10-11 12:00:00  115180       115180
+        2018-10-11 13:00:00  157568       157568
+        2018-10-11 14:00:00  180174       180174
+        2018-10-11 15:00:00  190048       190048
+        2018-10-11 16:00:00  188391       188391
+        2018-10-11 17:00:00  189233       189233
+        2018-10-11 18:00:00  191703       191703
+        2018-10-11 19:00:00  189848       189848
+        2018-10-11 20:00:00  192685       192685
+        2018-10-11 21:00:00  196743       196743
+        2018-10-11 22:00:00  193016       193016
+        2018-10-11 23:00:00  196441       196441
         >>> model
         <luminaire.model.window_density.WindowDensityModel object at 0x7fcaab72fdd8>
 
