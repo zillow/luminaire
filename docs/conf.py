@@ -66,7 +66,7 @@ html_theme_options = {
     'repo_type': 'github',
     'nav_title': 'Luminaire',
 
-    # 'google_analytics_account': 'UA-XXXXX',  # todo add later
+    'google_analytics_account': os.environ.get('GA_TRACKING_ID'),
     'html_minify': True,
     'css_minify': True,
     'master_doc': False,  # disables the secondary horizontal "nav bar" which we don't use
