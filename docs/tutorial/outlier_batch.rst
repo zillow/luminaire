@@ -68,8 +68,8 @@ Luminaire allows monitoring noisy and not too well behaved time series data by t
 Filtering requires very minimal specification in terms of configurations. The user needs to only configure whether to implement a linear or exponential model.
 
 >>> from luminaire.model.lad_filtering import LADFilteringModel
->>> hyper = {"is_log_transformed": 1}
->>> lad_filter_obj = LADFilteringModel(hyper_params=hyper, freq='D')
+>>> hyper_params = {"is_log_transformed": 1}
+>>> lad_filter_obj = LADFilteringModel(hyper_params=hyper_params, freq='D')
 >>> print(lad_filter_obj)
 <luminaire_models.model.lad_filtering.LADFilteringModel object at 0x7fd2b1832dd8>
 
