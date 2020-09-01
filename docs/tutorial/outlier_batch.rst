@@ -15,7 +15,7 @@ Luminaire provides the full capability to have user-specified configuration for 
 
 >>> from luminaire.model.lad_structural import LADStructuralModel
 >>> hyper_params = {"include_holidays_exog": True, "is_log_transformed": False, "max_ft_freq": 5, "p": 3, "q": 3}
->>> lad_struct_obj = LADStructuralModel(hyper_params=hyper, freq='D')
+>>> lad_struct_obj = LADStructuralModel(hyper_params=hyper_params, freq='D')
 >>> print(lad_struct_obj)
 <luminaire_models.model.lad_structural.LADStructuralModel object at 0x7fc91882bb38>
 
