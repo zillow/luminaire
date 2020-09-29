@@ -48,15 +48,15 @@ class HyperparameterOptimization(object):
         self.scoring_length = scoring_length or (scoring_length_dict.get(freq)
                                                  if freq in scoring_length_dict.keys() else 30)
 
-    def _mdape(self, actuals, predictions):
+    def _mape(self, actuals, predictions):
         """
-        This function computes the median absolute percentage error for the observed vs the predicted values.
+        This function computes the mean absolute percentage error for the observed vs the predicted values.
 
         :param numpy.array actuals: Observed values
         :param numpy.array predictions: Predicted values
         :return: Mean absolute percentage error
 
-        :rtype: numpy.mean
+        :rtype: numpy.nanmean
         """
         import numpy as np
 
@@ -69,9 +69,9 @@ class HyperparameterOptimization(object):
         filtered_actuals = actuals[filtered_idx]
         filtered_predictions = predictions[filtered_idx]
 
-        mdape = np.median(np.abs((filtered_actuals - filtered_predictions) / filtered_actuals))
+        mape = np.nanmean(np.abs((filtered_actuals - filtered_predictions) / filtered_actuals))
 
-        return mdape if not np.isnan(mdape) else None
+        return mape if not np.isnan(mape) else None
 
     def _synthetic_anomaly_check(self, observation, prediction, std_error):
         """
@@ -213,7 +213,7 @@ class HyperparameterOptimization(object):
                     labels = labels + anomaly_flags
                     probs = probs + anomaly_probabilities
 
-                mdape = self._mdape(obs, preds)
+                mape = self._mape(obs, preds)
             elif args[3]['model'] == 'LADFilteringModel':
                 # LAD filtering training and scoring
                 hyper_params = LADFilteringHyperParams(is_log_transformed=is_log_transformed)
@@ -243,11 +243,10 @@ class HyperparameterOptimization(object):
                     labels = labels + anomaly_flags_list
                     probs = probs + anomaly_probabilities_list
 
-            weights = ((1 - np.array(labels)) + 1) / float(len(labels))
-            if args[3]['model'] == 'LADStructuralModel' and mdape:
-                cost = (0.5 * mdape) + (0.5 * log_loss(labels, probs, sample_weight=weights))
+            if args[3]['model'] == 'LADStructuralModel' and mape:
+                cost = (mape * log_loss(labels, probs)) ** 0.5
             else:
-                cost = log_loss(labels, probs, sample_weight=weights)
+                cost = log_loss(labels, probs)
 
         except Exception as e:
             return {'loss': 1e100, 'status': STATUS_OK}
