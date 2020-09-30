@@ -49,15 +49,15 @@
         <span class=bp >self</span><span class=o >.</span><span class=n >scoring_length</span> <span class=o >=</span> <span class=n >scoring_length</span> <span class=ow >or</span> <span class=p >(</span><span class=n >scoring_length_dict</span><span class=o >.</span><span class=n >get</span><span class=p >(</span><span class=n >freq</span><span class=p >)</span>
                                                  <span class=k >if</span> <span class=n >freq</span> <span class=ow >in</span> <span class=n >scoring_length_dict</span><span class=o >.</span><span class=n >keys</span><span class=p >()</span> <span class=k >else</span> <span class=mi >30</span><span class=p >)</span>
 
-    <span class=k >def</span> <span class=nf >_mdape</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >actuals</span><span class=p >,</span> <span class=n >predictions</span><span class=p >):</span>
+    <span class=k >def</span> <span class=nf >_mape</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >actuals</span><span class=p >,</span> <span class=n >predictions</span><span class=p >):</span>
         <span class=sd >"""</span>
-<span class=sd >        This function computes the median absolute percentage error for the observed vs the predicted values.</span>
+<span class=sd >        This function computes the mean absolute percentage error for the observed vs the predicted values.</span>
 
 <span class=sd >        :param numpy.array actuals: Observed values</span>
 <span class=sd >        :param numpy.array predictions: Predicted values</span>
 <span class=sd >        :return: Mean absolute percentage error</span>
 
-<span class=sd >        :rtype: numpy.mean</span>
+<span class=sd >        :rtype: numpy.nanmean</span>
 <span class=sd >        """</span>
         <span class=kn >import</span> <span class=nn >numpy</span> <span class=k >as</span> <span class=nn >np</span>
 
@@ -70,9 +70,9 @@
         <span class=n >filtered_actuals</span> <span class=o >=</span> <span class=n >actuals</span><span class=p >[</span><span class=n >filtered_idx</span><span class=p >]</span>
         <span class=n >filtered_predictions</span> <span class=o >=</span> <span class=n >predictions</span><span class=p >[</span><span class=n >filtered_idx</span><span class=p >]</span>
 
-        <span class=n >mdape</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >median</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >abs</span><span class=p >((</span><span class=n >filtered_actuals</span> <span class=o >-</span> <span class=n >filtered_predictions</span><span class=p >)</span> <span class=o >/</span> <span class=n >filtered_actuals</span><span class=p >))</span>
+        <span class=n >mape</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >nanmean</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >abs</span><span class=p >((</span><span class=n >filtered_actuals</span> <span class=o >-</span> <span class=n >filtered_predictions</span><span class=p >)</span> <span class=o >/</span> <span class=n >filtered_actuals</span><span class=p >))</span>
 
-        <span class=k >return</span> <span class=n >mdape</span> <span class=k >if</span> <span class=ow >not</span> <span class=n >np</span><span class=o >.</span><span class=n >isnan</span><span class=p >(</span><span class=n >mdape</span><span class=p >)</span> <span class=k >else</span> <span class=kc >None</span>
+        <span class=k >return</span> <span class=n >mape</span> <span class=k >if</span> <span class=ow >not</span> <span class=n >np</span><span class=o >.</span><span class=n >isnan</span><span class=p >(</span><span class=n >mape</span><span class=p >)</span> <span class=k >else</span> <span class=kc >None</span>
 
     <span class=k >def</span> <span class=nf >_synthetic_anomaly_check</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >observation</span><span class=p >,</span> <span class=n >prediction</span><span class=p >,</span> <span class=n >std_error</span><span class=p >):</span>
         <span class=sd >"""</span>
@@ -214,7 +214,7 @@
                     <span class=n >labels</span> <span class=o >=</span> <span class=n >labels</span> <span class=o >+</span> <span class=n >anomaly_flags</span>
                     <span class=n >probs</span> <span class=o >=</span> <span class=n >probs</span> <span class=o >+</span> <span class=n >anomaly_probabilities</span>
 
-                <span class=n >mdape</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_mdape</span><span class=p >(</span><span class=n >obs</span><span class=p >,</span> <span class=n >preds</span><span class=p >)</span>
+                <span class=n >mape</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_mape</span><span class=p >(</span><span class=n >obs</span><span class=p >,</span> <span class=n >preds</span><span class=p >)</span>
             <span class=k >elif</span> <span class=n >args</span><span class=p >[</span><span class=mi >3</span><span class=p >][</span><span class=s1 >'model'</span><span class=p >]</span> <span class=o >==</span> <span class=s1 >'LADFilteringModel'</span><span class=p >:</span>
                 <span class=c1 ># LAD filtering training and scoring</span>
                 <span class=n >hyper_params</span> <span class=o >=</span> <span class=n >LADFilteringHyperParams</span><span class=p >(</span><span class=n >is_log_transformed</span><span class=o >=</span><span class=n >is_log_transformed</span><span class=p >)</span>
@@ -244,11 +244,10 @@
                     <span class=n >labels</span> <span class=o >=</span> <span class=n >labels</span> <span class=o >+</span> <span class=n >anomaly_flags_list</span>
                     <span class=n >probs</span> <span class=o >=</span> <span class=n >probs</span> <span class=o >+</span> <span class=n >anomaly_probabilities_list</span>
 
-            <span class=n >weights</span> <span class=o >=</span> <span class=p >((</span><span class=mi >1</span> <span class=o >-</span> <span class=n >np</span><span class=o >.</span><span class=n >array</span><span class=p >(</span><span class=n >labels</span><span class=p >))</span> <span class=o >+</span> <span class=mi >1</span><span class=p >)</span> <span class=o >/</span> <span class=nb >float</span><span class=p >(</span><span class=nb >len</span><span class=p >(</span><span class=n >labels</span><span class=p >))</span>
-            <span class=k >if</span> <span class=n >args</span><span class=p >[</span><span class=mi >3</span><span class=p >][</span><span class=s1 >'model'</span><span class=p >]</span> <span class=o >==</span> <span class=s1 >'LADStructuralModel'</span> <span class=ow >and</span> <span class=n >mdape</span><span class=p >:</span>
-                <span class=n >cost</span> <span class=o >=</span> <span class=p >(</span><span class=mf >0.5</span> <span class=o >*</span> <span class=n >mdape</span><span class=p >)</span> <span class=o >+</span> <span class=p >(</span><span class=mf >0.5</span> <span class=o >*</span> <span class=n >log_loss</span><span class=p >(</span><span class=n >labels</span><span class=p >,</span> <span class=n >probs</span><span class=p >,</span> <span class=n >sample_weight</span><span class=o >=</span><span class=n >weights</span><span class=p >))</span>
+            <span class=k >if</span> <span class=n >args</span><span class=p >[</span><span class=mi >3</span><span class=p >][</span><span class=s1 >'model'</span><span class=p >]</span> <span class=o >==</span> <span class=s1 >'LADStructuralModel'</span> <span class=ow >and</span> <span class=n >mape</span><span class=p >:</span>
+                <span class=n >cost</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >sqrt</span><span class=p >(</span><span class=n >mape</span> <span class=o >*</span> <span class=n >log_loss</span><span class=p >(</span><span class=n >labels</span><span class=p >,</span> <span class=n >probs</span><span class=p >))</span>
             <span class=k >else</span><span class=p >:</span>
-                <span class=n >cost</span> <span class=o >=</span> <span class=n >log_loss</span><span class=p >(</span><span class=n >labels</span><span class=p >,</span> <span class=n >probs</span><span class=p >,</span> <span class=n >sample_weight</span><span class=o >=</span><span class=n >weights</span><span class=p >)</span>
+                <span class=n >cost</span> <span class=o >=</span> <span class=n >log_loss</span><span class=p >(</span><span class=n >labels</span><span class=p >,</span> <span class=n >probs</span><span class=p >)</span>
 
         <span class=k >except</span> <span class=ne >Exception</span> <span class=k >as</span> <span class=n >e</span><span class=p >:</span>
             <span class=k >return</span> <span class=p >{</span><span class=s1 >'loss'</span><span class=p >:</span> <span class=mf >1e100</span><span class=p >,</span> <span class=s1 >'status'</span><span class=p >:</span> <span class=n >STATUS_OK</span><span class=p >}</span>
