@@ -244,7 +244,7 @@ class HyperparameterOptimization(object):
                     probs = probs + anomaly_probabilities_list
 
             if args[3]['model'] == 'LADStructuralModel' and mape:
-                cost = (mape * log_loss(labels, probs)) ** 0.5
+                cost = np.sqrt(mape * log_loss(labels, probs))
             else:
                 cost = log_loss(labels, probs)
 
