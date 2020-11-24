@@ -46,4 +46,4 @@ Please cite the following article if Luminaire is used for any research purpose 
 
 *Chakraborty, S., Shah, S., Soltani, K., Swigart, A., Yang, L., & Buckingham, K. (2020). Building an Automated and Self-Aware Anomaly Detection System. arXiv preprint arXiv:2011.05047.* (`arxiv_link`_)
 
-.. _arxiv_link: https://arxiv.org/abs/2001.01056
+.. _arxiv_link: https://arxiv.org/abs/2011.05047
