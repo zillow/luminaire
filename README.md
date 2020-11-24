@@ -79,7 +79,13 @@ Want to help improve Luminaire? Check out our [contributing documentation](CONTR
 Please cite the following article if Luminaire is used for any research purpose or scientific publication:
 
 *Chakraborty, S., Shah, S., Soltani, K., Swigart, A., Yang, L., & Buckingham, K. (2020). Building an Automated and 
-Self-Aware Anomaly Detection System. arXiv preprint arXiv:2011.05047.*
+Self-Aware Anomaly Detection System. arXiv preprint arXiv:2011.05047.* ([arxiv link](https://arxiv.org/abs/2011.05047))
+
+## Other Useful Resources
+
+1. *Chakraborty, S., Shah, S., Soltani, K., & Swigart, A. (2019, December). Root Cause Detection Among Anomalous Time 
+Series Using Temporal State Alignment. In 2019 18th IEEE International Conference On Machine Learning And Applications 
+(ICMLA) (pp. 523-528). IEEE.* ([arxiv link](https://arxiv.org/abs/2001.01056))
 
 
 ## Acknowledgements
