@@ -39,3 +39,9 @@ Luminaire combines many techniques under hood to find the optimal model for ever
 Anomaly Detection for Streaming Data
 ------------------------------------
 Luminaire performs anomaly detection over streaming data by comparing the volume density of the incoming data stream with a preset baseline time series window. Luminaire is capable of tracking time series windows over different data frequencies and is autoconfigured to support most typical streaming use cases.
+
+Citing
+------
+Please cite the following article if Luminaire is used for any research purpose or scientific publication:
+
+*Chakraborty, S., Shah, S., Soltani, K., Swigart, A., Yang, L., & Buckingham, K. (2020). Building an Automated and Self-Aware Anomaly Detection System. arXiv preprint arXiv:2011.05047.*

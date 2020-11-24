@@ -74,11 +74,20 @@ Luminaire can also monitor a set of data points over windows of time instead of 
 
 Want to help improve Luminaire? Check out our [contributing documentation](CONTRIBUTING.rst).
 
+## Citing
+
+Please cite the following article if Luminaire is used for any research purpose or scientific publication:
+
+*Chakraborty, S., Shah, S., Soltani, K., Swigart, A., Yang, L., & Buckingham, K. (2020). Building an Automated and 
+Self-Aware Anomaly Detection System. arXiv preprint arXiv:2011.05047.*
+
+
 ## Acknowledgements
 
 This project has leveraged methods described in the following scientific publications:
 
-1. Soule, Augustin, Kavé Salamatian, and Nina Taft. "Combining filtering and statistical methods for anomaly detection." Proceedings of the 5th ACM SIGCOMM conference on Internet Measurement. 2005.
+1. *Soule, Augustin, Kavé Salamatian, and Nina Taft. "Combining filtering and statistical methods for anomaly detection.
+" Proceedings of the 5th ACM SIGCOMM conference on Internet Measurement. 2005.*
 
 
 ## Development Team
