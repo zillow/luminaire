@@ -1,3 +1,5 @@
+from luminaire.model.model_utils import LADHolidays
+
 class DataExplorationError(Exception):
     """
     Exception class for Luminaire Data Exploration.
@@ -185,6 +187,28 @@ class DataExploration(object):
 
         return moving_averages_padded
 
+
+    @classmethod
+    def _get_exog_data(cls, exog_start, exog_end, index):
+        """
+        This function gets the exogenous data for the specified index.
+        :param pandas.Timestamp exog_start: Start date for the exogenous data
+        :param pandas.Timestampexog_end: End date for the exogenous data
+        :param list[pandas.Timestamp] index: List of indices
+        :return: Exogenous data for the given list of index
+        :rtype: pandas.DataFrame
+        """
+        import pandas as pd
+
+        holiday_calendar = LADHolidays()
+        holiday_series = holiday_calendar.holidays(start=exog_start, end=exog_end, return_name=True)
+        return (pd.DataFrame({'Holiday': holiday_series, 'Ones': 1})
+                .pivot(columns='Holiday', values='Ones')
+                .reindex(index)
+                .fillna(0)
+                )
+
+
     @classmethod
     def _stationarizer(cls, endog=None, diff_min=1, diff_max=2, significance_level=0.01, obs_incl=True):
         """
@@ -230,53 +254,75 @@ class DataExploration(object):
 
         return endog_diff, diff_order, actual_previous_per_diff
 
-    def _partition(self, lst, window_length):
+    def _partition(self, training_data, window_length, value_column=None):
         """
         This function slices a list from the end of the list based on the size of the slice. Any remainder part of the
         list from the beginning is ignored
 
-        :param list lst: The list containing the training data.
+        :param pandas.DataFrame/list training_data: Pandas dataframe or a list containing the training data.
         :param int window_length: The length of every slice of the list.
-        :return: Sliced lists of input time series
-        :rtype: list
+        :param str value_column: Value column in the training dataframe.
+        :return: Sliced lists of input time series and aggregated timestamps
+        :rtype: tuple
         """
+        import collections
+        import operator
+
+        if not isinstance(training_data, list):
+            lst = list(training_data[value_column])
+            idx = training_data.index.normalize()
+        else:
+            lst = training_data
+
         n = int(len(lst) / float(window_length))
 
         # Performing pertition
         lst_sliced = [lst[::-1][int(round(window_length * i)):
                                 int(round(window_length * (i + 1)))][::-1] for i in range(n)][::-1]
-        return lst_sliced
+
+        if not isinstance(training_data, list):
+            idx_truncated = idx[-(n * window_length):]
+            aggregated_datetime = []
+            for i in range(n):
+                current_date_window = idx_truncated[(i * window_length): ((i + 1) * window_length)]
+                dates_freq_dist = dict(collections.Counter(current_date_window))
+                aggregated_datetime.append(max(dates_freq_dist.items(), key=operator.itemgetter(1))[0])
+
+            return lst_sliced, aggregated_datetime
+        else:
+            return lst_sliced, None
 
     def _detrender(self, training_data_sliced=None, ma_window_length=None, detrend_order_max=2,
-                   significance_level=0.01, detrend_method=None, train_subwindow_len=None):
+                   significance_level=0.01, detrend_method=None, train_subwindow_len=None, agg_datetime=None):
         """
         This function tests the stationarity of the given time series and performs the required differencing.
 
         :param list training_data_sliced: The list of list containing the training data.
         :param int ma_window_length: The length of the moving average window.
         :param int detrend_order_max: Maximum number of differencing for non-stationarity.
-        :param float significance_level: Significance level for the adfuller test for checking non-stationarity
+        :param float significance_level: Significance level for the adfuller test for checking non-stationarity.
+        :param list agg_datetime: List of aggregated date times.
         :return: Difference time series and the order of differencing based on the stationarity test.
         :rtype: tuple(list, int)
         """
 
         import numpy as np
+        import pandas as pd
         from itertools import chain
         from statsmodels.tsa.stattools import adfuller
-        from pyramid.arima import auto_arima
+        from luminaire.model.lad_structural import LADStructuralModel
 
         p = (0, 6)
         d = (0, 2)
         q = (0, 6)
-        ma_forecast_adj = None
+        agg_data_model = None
 
         # Flattening the training data using for the stationarity test
         training_data_flattened = list(chain.from_iterable(training_data_sliced))
 
-        # Performing stationarity test over the raw and the aggregated version (means) of the training data
-        if detrend_method == 'ma':
-            mavges = self._moving_average(training_data_flattened, ma_window_length, train_subwindow_len)
-        avg_series = np.array(training_data_sliced).mean(0).tolist()
+        # Obtaining the aggregated series for modeling longer term patterns
+        avg_series = np.array(training_data_sliced).mean(1).tolist()
+        avg_series_df = pd.DataFrame({'index': agg_datetime, 'raw': avg_series}).set_index('index')
 
         # Performing the adfuller test over the raw and the aggregated data to test for stationarity
         adf_pvalue_raw_series = adfuller(training_data_flattened)[1]
@@ -289,9 +335,7 @@ class DataExploration(object):
             training_data_sliced_stationarized = training_data_sliced
         elif detrend_method == 'ma':
             if not detrend_flag:
-                return training_data_sliced, detrend_order, ma_forecast_adj
-            else:
-                training_data_stationarized_flattened = training_data_flattened
+                return training_data_sliced, detrend_order, agg_data_model
 
         # Take the difference until the difference data is stationarity based on the adfuller test
         while detrend_flag and detrend_order < detrend_order_max:
@@ -308,31 +352,19 @@ class DataExploration(object):
                 detrend_flag = (
                         adf_pvalue_raw_series > significance_level or adf_pvalue_avg_series > significance_level)
             elif detrend_method == 'ma':
-                training_data_stationarized_flattened = (np.array(training_data_stationarized_flattened) /
-                                                         np.array(mavges)).tolist()
-                training_data_sliced_stationarized = self._partition(training_data_stationarized_flattened,
-                                                                     train_subwindow_len)
+                training_data_sliced_stationarized = (np.array(training_data_sliced) /
+                                                      (np.array(avg_series).reshape(-1, 1))).tolist()
 
-                arima_fit = auto_arima(y=avg_series,
-                                       start_p=p[0], max_p=p[1],
-                                       d=d[0], max_d=d[1],
-                                       start_q=q[0], max_q=q[1],
-                                       seasonal=False,
-                                       trace=False,
-                                       method='css',
-                                       solver='bfgs',
-                                       error_action='ignore',  # don't want to know if an order does
-                                       # not work
-                                       suppress_warnings=True,  # don't want convergence warnings
-                                       stepwise=True)
-                model = arima_fit.arima_res_
-                forecast_window_avg = model.forecast(alpha=0.05)
-                ma_forecast_adj = forecast_window_avg[0] / float(avg_series[-1])
-                ma_forecast_adj = ma_forecast_adj[0]
+                agg_struct_model_config = {"include_holidays_exog": 1, "is_log_transformed": 0,
+                                           "max_ft_freq": 3, "p": 3, "q": 3}
+                de_obj = DataExploration(freq='D', data_shift_truncate=False, is_log_transformed=False, fill_rate=0.9)
+                agg_cleaned_data, pre_prc = de_obj.profile(avg_series_df)
+                lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
+                success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
 
                 detrend_flag = False
 
-        return training_data_sliced_stationarized, detrend_order, ma_forecast_adj
+        return training_data_sliced_stationarized, detrend_order, agg_data_model
 
     def _ma_detrender(self, series=None, padded_series=None, ma_window_length=None):
         """
