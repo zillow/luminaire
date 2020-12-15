@@ -292,8 +292,8 @@ class DataExploration(object):
         else:
             return lst_sliced, None
 
-    def _detrender(self, training_data_sliced=None, ma_window_length=None, detrend_order_max=2,
-                   significance_level=0.01, detrend_method=None, train_subwindow_len=None, agg_datetime=None):
+    def _detrender(self, training_data_sliced=None, detrend_order_max=2, significance_level=0.01,
+                   detrend_method=None, agg_datetime=None, past_model=None):
         """
         This function tests the stationarity of the given time series and performs the required differencing.
 
@@ -302,6 +302,7 @@ class DataExploration(object):
         :param int detrend_order_max: Maximum number of differencing for non-stationarity.
         :param float significance_level: Significance level for the adfuller test for checking non-stationarity.
         :param list agg_datetime: List of aggregated date times.
+        :param luminaire.model.window_density.WindowDensityModel past_model: Past stored window density model.
         :return: Difference time series and the order of differencing based on the stationarity test.
         :rtype: tuple(list, int)
         """
@@ -312,9 +313,6 @@ class DataExploration(object):
         from statsmodels.tsa.stattools import adfuller
         from luminaire.model.lad_structural import LADStructuralModel
 
-        p = (0, 6)
-        d = (0, 2)
-        q = (0, 6)
         agg_data_model = None
 
         # Flattening the training data using for the stationarity test
@@ -323,6 +321,14 @@ class DataExploration(object):
         # Obtaining the aggregated series for modeling longer term patterns
         avg_series = np.array(training_data_sliced).mean(1).tolist()
         avg_series_df = pd.DataFrame({'index': agg_datetime, 'raw': avg_series}).set_index('index')
+
+        if past_model:
+            past_df = pd.DataFrame(past_model._params['AggregatedData'],
+                                   columns=[self._target_index, self._target_metric]).set_index(self._target_index)
+            current_agg_data_dict = avg_series_df['raw'].to_dict()
+            agg_data_dict = past_df['raw'].to_dict()
+            agg_data_dict.update(current_agg_data_dict)
+            avg_series_df = pd.DataFrame({'raw': agg_data_dict})
 
         # Performing the adfuller test over the raw and the aggregated data to test for stationarity
         adf_pvalue_raw_series = adfuller(training_data_flattened)[1]
@@ -361,10 +367,23 @@ class DataExploration(object):
                 agg_cleaned_data, pre_prc = de_obj.profile(avg_series_df)
                 lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
                 success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
+                if not success:
+                    if 'AR coefficients' in agg_data_model._params['ErrorMessage']:
+                        agg_struct_model_config = {"include_holidays_exog": 1, "is_log_transformed": 0,
+                                                   "max_ft_freq": 3, "p": 0, "q": 1}
+                        lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
+                        success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
+                    elif 'MA coefficients' in agg_data_model._params['ErrorMessage']:
+                        agg_struct_model_config = {"include_holidays_exog": 1, "is_log_transformed": 0,
+                                                   "max_ft_freq": 3, "p": 1, "q": 0}
+                        lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
+                        success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
+                agg_data_model = agg_data_model if success else None
 
                 detrend_flag = False
 
-        return training_data_sliced_stationarized, detrend_order, agg_data_model
+        return training_data_sliced_stationarized, detrend_order, \
+               agg_data_model, avg_series_df.reset_index().values.tolist()
 
     def _ma_detrender(self, series=None, padded_series=None, ma_window_length=None):
         """
