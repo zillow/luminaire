@@ -25,8 +25,8 @@ class DataExploration(object):
         failure, rather than a mostly bogus anomaly.
     :param float fill_rate: Minimum proportion of data availability in the recent data window. Should be a fraction
         between 0 and 1.
-    :param int max_window_size: The maximum size of the sub windows for input data segmentation.
-    :param int window_size: The size of the sub windows for input data segmentation.
+    :param int max_window_length: The maximum size of the sub windows for input data segmentation.
+    :param int window_length: The size of the sub windows for input data segmentation.
     :param int min_ts_length: The minimum required length of the time series for training.
     :param int max_ts_length: The maximum required length of the time series for training.
     :param bool is_log_transformed: A flag to specify whether to take a log transform of the input data. If the data
@@ -46,8 +46,6 @@ class DataExploration(object):
                  freq='D',
                  min_ts_mean=None,
                  fill_rate=None,
-                 max_window_size=24,
-                 window_size=None,
                  sig_level=0.05,
                  min_ts_length=None,
                  max_ts_length=None,
@@ -55,6 +53,9 @@ class DataExploration(object):
                  data_shift_truncate=True,
                  min_changepoint_padding_length=None,
                  change_point_threshold=2,
+                 min_window_length=None,
+                 max_window_length=None,
+                 window_length=None,
                  *args,
                  **kwargs):
 
@@ -80,16 +81,35 @@ class DataExploration(object):
         }
         self.max_ts_length = max_ts_length or max_ts_length_dict.get(freq)
 
+        # Pre-specification of the window lengths for different window frequencies with their min and max
+        window_length_dict = {
+            'S': 60 * 60,
+            'T': 60 * 24,
+            '15T': 4 * 24,
+            'H': 24,
+            'D': 28,
+        }
+
+        if freq in ['S', 'T', '15T', 'H', 'D']:
+            window_length = window_length_dict.get(freq)
+        min_num_train_windows = 6
+        max_num_train_windows = 10000
+        min_window_length = 10
+        max_window_length = 100000
+
         self.freq = freq
         self.min_ts_mean = min_ts_mean
         self.fill_rate = fill_rate
-        self.max_window_size = max_window_size
-        self.window_size = window_size
         self.sig_level = sig_level
         self.is_log_transformed = is_log_transformed
         self.data_shift_truncate = data_shift_truncate
         self.change_point_threshold = change_point_threshold
         self.min_changepoint_padding_length = min_changepoint_padding_length
+        self.min_window_length = min_window_length
+        self.max_window_length = max_window_length
+        self.min_num_train_windows = min_num_train_windows
+        self.max_num_train_windows = max_num_train_windows
+        self.window_length = window_length
 
         # Assigning different padding based on the time series frequency
         min_changepoint_padding_length_dict = {
@@ -101,13 +121,15 @@ class DataExploration(object):
         self.min_changepoint_padding_length = min_changepoint_padding_length or min_changepoint_padding_length_dict.get(
             freq)
 
-        window_size_dict = {
+        tc_window_len_dict = {
             'H': 24,
             'D': 7,
         }
 
         if freq in ['H', 'D']:
-            self.window_size = window_size or window_size_dict.get(freq)
+            self.tc_window_length = tc_window_len_dict.get(freq)
+
+        self.tc_max_window_length = 24
 
     def add_missing_index(self, df=None, freq=None):
 
@@ -339,7 +361,7 @@ class DataExploration(object):
 
         if detrend_method == 'diff':
             training_data_sliced_stationarized = training_data_sliced
-        elif detrend_method == 'ma':
+        elif detrend_method == 'modeling':
             if not detrend_flag:
                 return training_data_sliced, detrend_order, agg_data_model
 
@@ -357,7 +379,7 @@ class DataExploration(object):
 
                 detrend_flag = (
                         adf_pvalue_raw_series > significance_level or adf_pvalue_avg_series > significance_level)
-            elif detrend_method == 'ma':
+            elif detrend_method == 'modeling':
                 training_data_sliced_stationarized = (np.array(training_data_sliced) /
                                                       (np.array(avg_series).reshape(-1, 1))).tolist()
 
@@ -409,19 +431,19 @@ class DataExploration(object):
 
         return stationarized_series
 
-    def _detect_window_size(self, series=None):
+    def _detect_window_size(self, series=None, streaming=False):
         """
         This function detects the ideal window size based on the seasonality pattern of the data
         :param pandas.DataFrame series: The input sequence of data.
-        :param int max_window_size: The maximum size of the sub windows for input data segmentation.
         :return: An int containing the ooptimal window size
         :rtype: int
         """
         import numpy as np
-        max_window_size = self.max_window_size
 
         n = len(series)
-        series = np.diff(series, 1)
+
+        if not streaming:
+            series = np.diff(series, 1)
         # Generating the indices based on odd and event number of terms in the time series
         if int(n) % 2 != 0:
             all_idx = np.arange(1, n // 2 + 1)
@@ -433,18 +455,20 @@ class DataExploration(object):
         # Spectral density for the fourier transformation (to identify the significant frequencies)
         psd = abs(yf[all_idx]) ** 2 + abs(yf[-all_idx]) ** 2
 
-        sig_freq_idx = np.argsort(psd)
+        sig_freq_idx = np.argsort(psd[: int(len(psd) / 2)])
 
-        return min(max_window_size,
-                   max(int(np.rint(float(n) // max(1, sig_freq_idx[-1]))),
-                       int(np.rint(float(n) // max(1, sig_freq_idx[-2])))))
+        if streaming:
+            return int(np.rint(float(n) / max(1, sig_freq_idx[-1] + 1)))
+        return min(self.tc_max_window_length,
+                   max(int(np.rint(float(n) / max(1, sig_freq_idx[-1] + 1))),
+                       int(np.rint(float(n) / max(1, sig_freq_idx[-2] + 1)))))
 
-    def _local_minima(self, input_dict=None, window_size=None):
+    def _local_minima(self, input_dict=None, window_length=None):
         """
         This function finds the index corresponding to the local minimas for detected consecutive trend changes
         :param dict input_dict: A dictionary containing the timestamps as keys for potential trend changes
         and the values being the corresponding p-values
-        :param int window_size: The size of the sub windows for input data segmentation.
+        :param int window_length: The size of the sub windows for input data segmentation.
         :return: List of local minimas
         """
         import numpy as np
@@ -461,7 +485,7 @@ class DataExploration(object):
         if len(local_min_loc) > 1:
             min_keys = [key_list[int(loc)] for loc in local_min_loc]
         elif len(local_min_loc) <= 1:
-            min_keys = [key_list[0], key_list[-1]] if len(input_dict) > window_size else [key_list[int(loc)] for loc in
+            min_keys = [key_list[0], key_list[-1]] if len(input_dict) > window_length else [key_list[int(loc)] for loc in
                                                                                           local_min_loc]
 
         return min_keys
@@ -629,8 +653,6 @@ class DataExploration(object):
         This function detects the trend changes of the input time series
         :param pandas.DataFrame input_df: The input sequence of data.
         :param str value_column: A string containing the column name containing the target series
-        :param sig_level: The significance level to identify relevant trend changes.
-        :param window_size: The size of the sub windows for input data segmentation.
         :return: list of strings with the potential trend changes.
         :rtype: list[str]
 
@@ -661,34 +683,34 @@ class DataExploration(object):
         from statsmodels.tsa.stattools import acf
 
         min_float = 1e-10
-        window_size = self.window_size
+        window_length = self.tc_window_length
         sig_level = self.sig_level
 
         series = input_df[value_column].tolist()
         timestamps = input_df.index.tolist()
 
-        if not window_size:
-            window_size = self._detect_window_size(series=series)
+        if not window_length:
+            window_length = self._detect_window_size(series=series)
 
         # Creating a crude estimation of the required window size
-        nwindows = int(window_size * 1.5)
+        nwindows = int(window_length * 1.5)
 
-        current_mid_point = window_size * nwindows
+        current_mid_point = window_length * nwindows
         past_trend_change = 0
         global_trend_changes = []
         local_trend_changes = {}
         past_p_value = -1
 
-        # If the remaining part of the time series is less than the (window_size * nwindows) we terminate the while loop
-        current_reminder = len(series) if (current_mid_point + (window_size * nwindows)) < len(series) else 0
-        while current_reminder >= window_size:
+        # If the remaining part of the time series is less than the (window_length * nwindows) we terminate the while loop
+        current_reminder = len(series) if (current_mid_point + (window_length * nwindows)) < len(series) else 0
+        while current_reminder >= window_length:
 
             # Creating the left and the right window for slope detection
-            l_window = series[current_mid_point - (window_size * nwindows): current_mid_point]
-            r_window = series[current_mid_point: current_mid_point + (window_size * nwindows)]
-            l_window_size = len(l_window)
-            r_window_size = len(r_window)
-            N = l_window_size + r_window_size
+            l_window = series[current_mid_point - (window_length * nwindows): current_mid_point]
+            r_window = series[current_mid_point: current_mid_point + (window_length * nwindows)]
+            l_window_length = len(l_window)
+            r_window_length = len(r_window)
+            N = l_window_length + r_window_length
 
             # Finding the effective degrees of freedom
             auto_corr = acf(l_window + r_window, nlags=N)
@@ -699,7 +721,7 @@ class DataExploration(object):
             eff_df = max(1, int(np.rint(1 / ((1 / float(N)) + ((2 / float(N)) * eff_df)))) - 4)
 
             # Creating the left and right indices for running the regression
-            l_x, r_x = np.arange(l_window_size), np.arange(r_window_size)
+            l_x, r_x = np.arange(l_window_length), np.arange(r_window_length)
 
             # Linear regression on the left and the right window
             l_slope, l_intercept, l_r_value, l_p_value, l_std_err = stats.linregress(l_x, l_window)
@@ -712,14 +734,14 @@ class DataExploration(object):
             l_sse = np.sum((l_window - l_window_hat) ** 2)
             r_sse = np.sum((r_window - r_window_hat) ** 2)
 
-            l_const = np.sum((np.arange(1, l_window_size + 1) - ((l_window_size + 1) / 2.0)) ** 2)
-            r_const = np.sum((np.arange(1, r_window_size + 1) - ((r_window_size + 1) / 2.0)) ** 2)
+            l_const = np.sum((np.arange(1, l_window_length + 1) - ((l_window_length + 1) / 2.0)) ** 2)
+            r_const = np.sum((np.arange(1, r_window_length + 1) - ((r_window_length + 1) / 2.0)) ** 2)
 
             prop_const = (l_const * r_const) / (l_const + r_const)
 
             total_sse = l_sse + r_sse
 
-            std_err = max(np.sqrt(total_sse / (prop_const * (l_window_size + r_window_size - 4))), min_float)
+            std_err = max(np.sqrt(total_sse / (prop_const * (l_window_length + r_window_length - 4))), min_float)
 
             t_stat = abs(l_slope - r_slope) / std_err
 
@@ -729,12 +751,12 @@ class DataExploration(object):
                 # Check if the same shift detected multiple times
                 if p_value == past_p_value:
                     local_trend_changes.pop(past_trend_change)
-                if current_reminder - window_size < window_size:
+                if current_reminder - window_length < window_length:
                     if len(local_trend_changes) > 2:
                         # _local_minima function is called to detec the optimal trend change(s) among a group of local
                         # trend changes
                         current_trend_change = self._local_minima(input_dict=local_trend_changes,
-                                                                  window_size=window_size)
+                                                                  window_length=window_length)
                         for key in current_trend_change:
                             global_trend_changes.append(timestamps[key].__str__())
                 else:
@@ -744,13 +766,13 @@ class DataExploration(object):
                 past_p_value = p_value
             else:
                 # Handling the trend changes at the tail of the time series
-                if (current_mid_point - past_trend_change) <= window_size and len(local_trend_changes) > 2:
-                    current_trend_change = self._local_minima(input_dict=local_trend_changes, window_size=window_size)
+                if (current_mid_point - past_trend_change) <= window_length and len(local_trend_changes) > 2:
+                    current_trend_change = self._local_minima(input_dict=local_trend_changes, window_length=window_length)
                     for key in current_trend_change:
                         global_trend_changes.append(timestamps[key].__str__())
                 local_trend_changes = {}
 
-            current_mid_point = current_mid_point + window_size
+            current_mid_point = current_mid_point + window_length
             current_reminder = len(series) - current_mid_point
 
         return global_trend_changes
@@ -813,6 +835,42 @@ class DataExploration(object):
         return df
 
 
+    def _prepare(self, df, impute_only, streaming=False, input_freq=None):
+
+        min_ts_length = self.min_ts_length
+        max_ts_length = self.max_ts_length
+        target_metric = 'raw'
+        imputed_metric = 'interpolated'
+
+        freq = self.freq if not input_freq else input_freq
+
+        # if input dimension/metric combination timeseries is null, skip modeling
+        if len(df) == 0:
+            raise ValueError("No model ran because dimension/metric combination is null")
+        if not streaming and len(df) < min_ts_length:
+            raise ValueError("Current time series length of {}{} is less tha minimum requires "
+                             "length {}{} for training".format(len(df), freq, min_ts_length, freq))
+
+        if isinstance(df, list):
+            import pandas as pd
+            df = (pd.DataFrame(df, columns=[self._target_index, self._target_metric]).set_index(self._target_index))
+
+        df = self.add_missing_index(df=df, freq=freq)
+
+        if not streaming:
+            df = df.iloc[-min(max_ts_length, len(df)):]
+            df = self._truncate_by_data_gaps(df=df, target_metric=target_metric)
+
+        if not streaming and len(df) < min_ts_length:
+            raise ValueError("The training data observed continuous missing data near the end. Require more stable "
+                             "data to train")
+
+        df = self._kalman_smoothing_imputation(df=df, target_metric=target_metric, imputed_metric=imputed_metric,
+                                               impute_only=impute_only)
+
+        return df
+
+
     def profile(self, df, impute_only=False, **kwargs):
         """
         This function performs required data profiling and pre-processing before hyperparameter optimization or time
@@ -868,40 +926,19 @@ class DataExploration(object):
 
         try:
             # if input dimension/metric combination timeseries is null, skip modeling
-            if len(df) == 0:
-                raise ValueError("No model ran because dimension/metric combination is null")
-            if len(df) < min_ts_length:
-                raise ValueError("Current time series length of {}{} is less tha minimum requires "
-                                 "length {}{} for training".format(len(df), self.freq, min_ts_length, self.freq))
-
-            if isinstance(df, list):
-                import pandas as pd
-                df = (pd.DataFrame(df, columns=[self._target_index, self._target_metric]).set_index(self._target_index))
-
-            df = self.add_missing_index(df=df, freq=self.freq)
-
-            df = df.iloc[-min(max_ts_length, len(df)):]
-
-            df = self._truncate_by_data_gaps(df=df, target_metric=target_metric)
-
-            if len(df) < min_ts_length:
-                raise ValueError("The training data observed continuous missing data near the end. Require more stable "
-                                 "data to train")
-
-            df = self._kalman_smoothing_imputation(df=df, target_metric=target_metric, imputed_metric=imputed_metric,
-                                                   impute_only=impute_only)
+            processed_df = self._prepare(df, impute_only)
 
             if impute_only:
                 summary = {'success': True}
-                return df, summary
+                return processed_df, summary
 
             if self.freq == 'D':
-                train_end_anomaly_flag = self.kf_naive_outlier_detection(input_series=df['interpolated'].values,
-                                                                         idx_position=len(df['interpolated']) - 1)
+                train_end_anomaly_flag = self.kf_naive_outlier_detection(input_series=processed_df['interpolated'].values,
+                                                                         idx_position=len(processed_df['interpolated']) - 1)
                 if train_end_anomaly_flag:
-                    df = df.iloc[:-1]
+                    processed_df = processed_df.iloc[:-1]
 
-            if is_log_transformed and not df[df[target_metric] < 0].empty:
+            if is_log_transformed and not processed_df[processed_df[target_metric] < 0].empty:
                 is_log_transformed = False
 
             # We want to make sure the time series does not contain any negatives in case of log transformation
@@ -910,33 +947,34 @@ class DataExploration(object):
             else:
                 min_ts_mean = self.min_ts_mean
 
-            if np.sum(np.isnan(df[target_metric].values[-(2 * min_ts_length):])) / float(2 * min_ts_length) \
+            if np.sum(np.isnan(processed_df[target_metric].values[-(2 * min_ts_length):])) / float(2 * min_ts_length) \
                     > 1 - self.fill_rate:
-                if np.sum(np.isnan(df[target_metric].values[-min_ts_length:])) > 0:
+                if np.sum(np.isnan(processed_df[target_metric].values[-min_ts_length:])) > 0:
                     raise ValueError('Too few observed data near the prediction date')
 
             if 'ts_start' not in kwargs:
-                ts_start = df.index.min()
+                ts_start = processed_df.index.min()
             else:
-                ts_start = max(df.index.min(), kwargs['ts_start'])
+                ts_start = max(processed_df.index.min(), kwargs['ts_start'])
 
             if 'ts_end' not in kwargs:
-                ts_end = df.index.max()
+                ts_end = processed_df.index.max()
             else:
-                ts_end = min(df.index.max(), kwargs['ts_end'])
+                ts_end = min(processed_df.index.max(), kwargs['ts_end'])
 
-            df = df[ts_start:]
+            processed_df = processed_df[ts_start:]
 
-            df = df.loc[:ts_end]
+            processed_df = processed_df.loc[:ts_end]
 
             if is_log_transformed:
-                df[imputed_metric] = np.log(df[imputed_metric] + 1) if is_log_transformed else df[imputed_metric]
+                processed_df[imputed_metric] = np.log(processed_df[imputed_metric] + 1) \
+                    if is_log_transformed else processed_df[imputed_metric]
 
-            data, change_point_list = self._pelt_change_point_detection(df=df, metric=imputed_metric,
+            data, change_point_list = self._pelt_change_point_detection(df=processed_df, metric=imputed_metric,
                                                                         min_ts_length=min_ts_length,
                                                                         max_ts_length=max_ts_length)
 
-            trend_change_list = self._trend_changes(input_df=df, value_column=imputed_metric)
+            trend_change_list = self._trend_changes(input_df=processed_df, value_column=imputed_metric)
 
             summary = {'success': True,
                        'trend_change_list': trend_change_list if len(trend_change_list) > 0 else None,
@@ -953,3 +991,72 @@ class DataExploration(object):
             data = None
 
         return data, summary
+
+    def stream_profile(self, df, **kwargs):
+
+        from random import sample
+        import datetime
+        import numpy as np
+        import pandas as pd
+
+        # if input dimension/metric combination timeseries is null, skip modeling
+        if len(df) > 1:
+            freq = (df.index[1:] - df.index[:-1]).value_counts().index[0]
+
+        try:
+            processed_df = self._prepare(df, impute_only=False, streaming=True, input_freq=freq)
+
+            training_end = processed_df.index[-1]
+            training_end_time = training_end.time()
+
+            train_start_search_flag = True
+            idx_date_list = []
+            for idx in processed_df.index:
+                if idx.time() == training_end_time and train_start_search_flag:
+                    training_start = idx + freq
+                    training_start_time = training_start.time()
+                    train_start_search_flag = False
+                if idx.date() not in idx_date_list:
+                    idx_date_list.append(idx.date())
+
+            trunc_df = processed_df[training_start: training_end]
+
+            window_length_list = []
+
+            for i in range(20):
+                rand_date = sample(idx_date_list, 1)[0]
+                rand_start_idx = pd.Timestamp(datetime.datetime.combine(rand_date, training_start_time))
+                if rand_date in idx_date_list[:int(len(idx_date_list) / 2)]:
+                    time_series_i = trunc_df.loc[rand_start_idx:]['interpolated'].values
+                else:
+                    time_series_i = trunc_df.loc[:rand_start_idx]['interpolated'].values
+
+                window_length_i = self._detect_window_size(time_series_i, streaming=True) if not self.window_length \
+                    else self.window_length
+                window_length_list.append(window_length_i)
+
+            window_length = int(np.median(window_length_list))
+
+            if window_length < self.min_window_length:
+                raise ValueError('Training window too small')
+            if window_length > self.max_window_length:
+                raise ValueError('Training window too large')
+            n_windows = len(df[pd.to_datetime(training_start): pd.to_datetime(training_end)]) // window_length
+            if n_windows < self.min_num_train_windows:
+                raise ValueError('Too few training windows')
+            if n_windows > self.max_num_train_windows:
+                raise ValueError('Too many training windows')
+
+            summary = {'success': True,
+                       'freq': freq,
+                       'window_length': window_length,
+                       'min_window_length': self.min_window_length,
+                       'max_window_length': self.max_window_length}
+
+        except Exception as e:
+            # Streaming data exploration failed
+            summary = {'success': False,
+                       'ErrorMessage': str(e)}
+            processed_df = None
+
+        return trunc_df, summary

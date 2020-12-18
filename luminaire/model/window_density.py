@@ -40,7 +40,7 @@ class WindowDensityHyperParams(BaseModelHyperParams):
         - "diff" (differencing based).
     """
     def __init__(self,
-                 freq='T',
+                 freq=None,
                  max_missing_train_prop=0.1,
                  is_log_transformed=False,
                  baseline_type="aggregated",
@@ -50,37 +50,6 @@ class WindowDensityHyperParams(BaseModelHyperParams):
                  window_length=None,
                  detrend_method='modeling'
                  ):
-        # Detection method is KL divergence for high frequency data and sign test for low frequency data
-        if not detection_method:
-            detection_method = "kldiv" if freq in ['S', 'T', '15T'] else "sign_test"
-
-        # Pre-specification of the window lengths for different window frequencies with their min and max
-        min_window_length_dict = {
-            'S': 60 * 10,
-            'T': 60 * 12,
-            '15T': 4 * 8,
-            'H': 12,
-            'D': 10,
-        }
-        max_window_length_dict = {
-            'S': 60 * 60 * 24,
-            'T': 60 * 24 * 84,
-            '15T': 4 * 24 * 7,
-            'H': 24 * 7,
-            'D': 90,
-        }
-        window_length_dict = {
-            'S': 60 * 60,
-            'T': 60 * 24,
-            '15T': 4 * 24,
-            'H': 24,
-            'D': 28,
-        }
-
-        if freq in ['S', 'T', '15T', 'H', 'D']:
-            min_window_length = min_window_length_dict.get(freq)
-            max_window_length = max_window_length_dict.get(freq)
-            window_length = window_length_dict.get(freq)
 
         super(WindowDensityHyperParams, self).__init__(
             model_name="WindowDensityModel",
@@ -253,9 +222,8 @@ class WindowDensityModel(BaseModel):
         else:
             return sliced_training_data
 
-    def _call_training(self, training_start=None, training_end=None, df=None, window_length=None, min_window_length=None,
-                       max_window_length=None, min_num_train_windows=None, max_num_train_windows=None,
-                       imputed_metric=None, detrend_method=None, **kwargs):
+    def _call_training(self, df=None, window_length=None, imputed_metric=None, detrend_method=None,
+                       detection_method=None, **kwargs):
         """
         This function generates the baseline and training metrics to be used for scoring
         :param str training_start: Training start date.
@@ -272,52 +240,26 @@ class WindowDensityModel(BaseModel):
         :return: Returns past anomaly scores based on training data, baseline and other related metrics.
         :rtype: tuple(list, float, float, int, list, float, dict, list)
         """
-        import pandas as pd
 
         past_model = kwargs['past_model']
-
-        if training_start:
-            # if a timeseries start date is provided, take the larger of this or the first timeseries value
-            training_start = max(df.index.min(), pd.Timestamp(training_start))
-        else:
-            # take first value of timeseries by default
-            training_start = str(df.index.min())
-
-        if training_end:
-            # if a timeseries start date is provided, take the larger of this or the first timeseries value
-            training_end = min(df.index.max(), pd.Timestamp(training_end))
-        else:
-            # take first value of timeseries by default
-            training_end = str(df.index.max())
-
-        training_window = [pd.to_datetime(training_start), pd.to_datetime(training_end)]
-
-        if window_length < min_window_length:
-            raise ValueError('Training window too small')
-        if window_length > max_window_length:
-            raise ValueError('Training window too large')
-        n_windows = len(df[pd.to_datetime(training_start): pd.to_datetime(training_end)]) // window_length
-        if n_windows < min_num_train_windows:
-            raise ValueError('Too few training windows')
-        if n_windows > max_num_train_windows:
-            raise ValueError('Too many training windows')
+        training_start = df.first_valid_index()
+        training_end = df.last_valid_index()
 
         past_anomaly_scores, anomaly_scores_mean, anomaly_scores_sd, detrend_order, baseline, \
         agg_data_model, agg_data = self._anomalous_region_detection(input_df=df,
                                                                     window_length=window_length,
-                                                                    training_window=training_window,
                                                                     value_column=imputed_metric,
                                                                     called_for="training",
                                                                     detrend_method=detrend_method,
-                                                                    past_model=past_model)
+                                                                    past_model=past_model,
+                                                                    detection_method=detection_method)
 
         return past_anomaly_scores, anomaly_scores_mean, anomaly_scores_sd, \
                detrend_order, baseline, agg_data_model, agg_data, training_start, training_end
 
 
-    def _get_model(self, input_df=None, training_window=None, window_length=None, value_column=None,
-                   detrend_method=None, baseline_type=None, detection_method=None,
-                   past_model=None):
+    def _get_model(self, input_df=None, window_length=None, value_column=None, detrend_method=None, baseline_type=None,
+                   detection_method=None, past_model=None):
         """
         This function runs the training process given the input parameters.
         :param pandas.DataFrame input_df: Input data containing the training and the scoring data.
@@ -331,16 +273,10 @@ class WindowDensityModel(BaseModel):
         :rtype: tuple(list, float, float, int, list, float)
         """
         import numpy as np
-        import pandas as pd
         from itertools import chain
 
-
-        # Obtaining and slicing the training data based on the window size
-
-        training_df = input_df[pd.to_datetime(training_window[0]): pd.to_datetime(training_window[1])]
-
         de_obj = DataExploration()
-        sliced_training_data, agg_datetime = de_obj._partition(training_df, window_length, value_column)
+        sliced_training_data, agg_datetime = de_obj._partition(input_df, window_length, value_column)
 
         # performing the stationarity test
         sliced_training_data_cleaned, detrend_order, agg_data_model, agg_data = de_obj._detrender(
@@ -411,11 +347,7 @@ class WindowDensityModel(BaseModel):
         import pandas as pd
 
         freq = self._params['freq']
-        min_num_train_windows = self.min_num_train_windows
-        max_num_train_windows = self.max_num_train_windows
         if freq in ['S', 'T', '15T', 'H', 'D']:
-            min_window_length = self._params['min_window_length']
-            max_window_length = self._params['max_window_length']
             window_length = self._params['window_length']
         else:
             min_window_length = self._params['min_window_length']
@@ -426,42 +358,33 @@ class WindowDensityModel(BaseModel):
                     'Training window length with min and max should be specified in case frequency not in the '
                     'specified list')
         is_log_transformed = self._params['is_log_transformed']
-        max_missing_train_prop = self._params['max_missing_train_prop']
         detrend_method = self._params['detrend_method']
         target_metric = 'raw'
         imputed_metric = 'interpolated'
-        if freq not in ['S', 'T', '15T', 'H', 'D']:
+        if not self._params['detection_method']:
+            detection_method = 'sign_test' if freq > np.timedelta64(30, 'm') else 'kldiv'
+        else:
             detection_method = self._params['detection_method']
-            if not detection_method:
-                raise ValueError('Detection method should be specified in case frequency not in the specified list')
 
         if len(data) == 0:
             model = {'ErrorMessage': 'DataFrame length is 0'}
             success = False
             return success, WindowDensityModel(**model)
 
-        if np.sum(np.isnan(data[target_metric])) > max_missing_train_prop:
-            raise ValueError('Too few observed data in the training time series')
-        else:
-            de_obj = DataExploration()
-            df = de_obj._kalman_smoothing_imputation(df=data, target_metric=target_metric, imputed_metric=imputed_metric)
-
         # Shift the interpolated value by +1 and get the log. This handles values with 0.
         if is_log_transformed:
             neg_flag = True if not data[data[target_metric] < 0].empty else False
-            df[imputed_metric] = df[imputed_metric] if neg_flag else np.log(df[imputed_metric] + 1)
+            data[imputed_metric] = data[imputed_metric] if neg_flag else np.log(data[imputed_metric] + 1)
 
         past_anomaly_scores, anomaly_scores_mean, anomaly_scores_sd, detrend_order, baseline, agg_data_model, \
-        agg_data, training_start, training_end = self._call_training(df=df, window_length=window_length,
-                                                                     min_window_length=min_window_length,
-                                                                     max_window_length=max_window_length,
-                                                                     min_num_train_windows=min_num_train_windows,
-                                                                     max_num_train_windows=max_num_train_windows,
+        agg_data, training_start, training_end = self._call_training(df=data, window_length=window_length,
                                                                      imputed_metric=imputed_metric,
-                                                                     detrend_method=detrend_method, **kwargs)
+                                                                     detrend_method=detrend_method,
+                                                                     detection_method=detection_method, **kwargs)
 
         success = True
         self.hyper_params['is_log_transformed'] = is_log_transformed
+        self.hyper_params['detection_method'] = detection_method
         model = {'ModelInstanceTimestamp': pd.Timestamp(training_end).time().strftime('%H:%M:%S'),
                  'TrainingStartDate': training_start,
                  'TrainingEndDate': training_end,
@@ -477,7 +400,8 @@ class WindowDensityModel(BaseModel):
         return success, WindowDensityModel(hyper_params=self.hyper_params, **model)
 
     def _call_scoring(self, df=None, imputed_metric=None, anomaly_scores_mean=None, anomaly_scores_sd=None,
-                      baseline=None, detrend_order=None, detrend_method=None, agg_data_model=None, attributes=None):
+                      baseline=None, detrend_order=None, detrend_method=None, agg_data_model=None,
+                      detection_method=None, attributes=None):
         """
         This function generates the anomaly flag and and probability for the scoring window.
         :param pandas.DataFrame df: Input training data frame.
@@ -500,7 +424,8 @@ class WindowDensityModel(BaseModel):
                                                                        baseline=baseline,
                                                                        detrend_order=detrend_order,
                                                                        detrend_method=detrend_method,
-                                                                       agg_data_model=agg_data_model)
+                                                                       agg_data_model=agg_data_model,
+                                                                       detection_method=detection_method)
 
         return is_anomaly, prob_of_anomaly, attributes
 
@@ -653,10 +578,7 @@ class WindowDensityModel(BaseModel):
         detrend_method = self._params['detrend_method']
         target_metric = 'raw'
         imputed_metric = 'interpolated'
-        if freq not in ['S', 'T', '15T', 'H', 'D']:
-            detection_method = self._params['detection_method']
-            if not detection_method:
-                raise ValueError('Detection method should be specified in case frequency not in the specified list')
+        detection_method = self._params['detection_method']
 
         # We want to make sure the time series does not contain any negatives in case of log transformation
         if is_log_transformed:
@@ -676,7 +598,8 @@ class WindowDensityModel(BaseModel):
                                                                      baseline=baseline,
                                                                      detrend_order=detrend_order,
                                                                      detrend_method=detrend_method,
-                                                                     agg_data_model=agg_data_model)
+                                                                     agg_data_model=agg_data_model,
+                                                                     detection_method=detection_method)
 
         result = {'Success': True,
                   'ConfLevel': float(1.0 - self.sig_level) * 100,
@@ -688,11 +611,10 @@ class WindowDensityModel(BaseModel):
 
 
     def _anomalous_region_detection(self, input_df=None, window_length=None,
-                                   training_window=None,
                                    value_column=None, called_for=None,
                                    anomaly_scores_mean=None,
                                    anomaly_scores_sd=None, detrend_order=None, baseline=None, detrend_method=None,
-                                   agg_data_model=None, past_model=None):
+                                   agg_data_model=None, past_model=None, detection_method=None):
         """
         This function detects anomaly given a training and a scoring window.
 
@@ -715,7 +637,6 @@ class WindowDensityModel(BaseModel):
 
         """
 
-        detection_method = self._params['detection_method']
         baseline_type = self._params['baseline_type']
 
         input_df.fillna(0, inplace=True)
@@ -724,7 +645,6 @@ class WindowDensityModel(BaseModel):
         if called_for == "training":
 
             return self._get_model(input_df=input_df,
-                                   training_window=training_window,
                                    window_length=window_length,
                                    value_column=value_column,
                                    detrend_method=detrend_method,
