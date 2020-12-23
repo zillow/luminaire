@@ -341,7 +341,7 @@ class DataExploration(object):
         training_data_flattened = list(chain.from_iterable(training_data_sliced))
 
         # Obtaining the aggregated series for modeling longer term patterns
-        avg_series = np.array(training_data_sliced).mean(1).tolist()
+        avg_series = np.median(np.array(training_data_sliced), axis=1).tolist()
         avg_series_df = pd.DataFrame({'index': agg_datetime, 'raw': avg_series}).set_index('index')
 
         if past_model:

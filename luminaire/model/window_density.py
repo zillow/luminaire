@@ -245,7 +245,7 @@ class WindowDensityModel(BaseModel):
         training_start = df.first_valid_index()
         training_end = df.last_valid_index()
 
-        past_anomaly_scores, anomaly_scores_mean, anomaly_scores_sd, detrend_order, baseline, \
+        past_anomaly_scores, gamma_alpha, gama_loc, gamma_beta, detrend_order, baseline, \
         agg_data_model, agg_data = self._anomalous_region_detection(input_df=df,
                                                                     window_length=window_length,
                                                                     value_column=imputed_metric,
@@ -254,7 +254,7 @@ class WindowDensityModel(BaseModel):
                                                                     past_model=past_model,
                                                                     detection_method=detection_method)
 
-        return past_anomaly_scores, anomaly_scores_mean, anomaly_scores_sd, \
+        return past_anomaly_scores, gamma_alpha, gama_loc, gamma_beta, \
                detrend_order, baseline, agg_data_model, agg_data, training_start, training_end
 
 
@@ -274,6 +274,7 @@ class WindowDensityModel(BaseModel):
         """
         import numpy as np
         from itertools import chain
+        import scipy.stats as st
 
         de_obj = DataExploration()
         sliced_training_data, agg_datetime = de_obj._partition(input_df, window_length, value_column)
@@ -291,13 +292,24 @@ class WindowDensityModel(BaseModel):
         if detection_method == "kldiv":
             past_anomaly_scores = np.array(self._distance_function(data=sliced_training_data_cleaned,
                                                                    called_for="training"))
-            past_anomaly_scores = past_anomaly_scores[past_anomaly_scores <
-                                                      np.percentile(past_anomaly_scores,
-                                                                    90, interpolation='midpoint')].tolist()
-            anomaly_scores_mean = np.mean(past_anomaly_scores)
-            anomaly_scores_sd = np.std(past_anomaly_scores, ddof=1)
+            alpha = []
+            loc = []
+            beta = []
+            if len(past_anomaly_scores) < 100:
+                for i in range(10):
+                    boot_scores = np.random.choice(past_anomaly_scores.tolist(), size=100, replace=True)
+                    alpha_i, loc_i, beta_i = st.gamma.fit(boot_scores)
+                    alpha.append(alpha_i)
+                    loc.append(loc_i)
+                    beta.append(beta_i)
+                gamma_alpha = np.mean(alpha)
+                gamma_loc = np.mean(loc)
+                gamma_beta = np.mean(beta)
+            else:
+                gamma_alpha, gamma_loc, gamma_beta = st.gamma.fit(past_anomaly_scores)
+            past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][:10], past_anomaly_scores])
         else:
-            past_anomaly_scores, anomaly_scores_mean, anomaly_scores_sd = None, None, None
+            past_anomaly_scores, gamma_alpha, gamma_loc, gamma_beta = None, None, None, None
 
         # If aggregated baseline type is specified, we take the whole training window as a baseline, else we
         # take the last training sub window from the sliced training data
@@ -311,8 +323,8 @@ class WindowDensityModel(BaseModel):
         elif baseline_type == "last_window":
             baseline = sliced_training_data_cleaned[-1]
 
-        return past_anomaly_scores, anomaly_scores_mean, anomaly_scores_sd, \
-               detrend_order, baseline, agg_data_model, agg_data
+        return past_anomaly_scores, gamma_alpha, gamma_loc, gamma_beta, detrend_order, \
+               baseline, agg_data_model, agg_data
 
     def train(self, data, **kwargs):
         """
@@ -376,11 +388,12 @@ class WindowDensityModel(BaseModel):
             neg_flag = True if not data[data[target_metric] < 0].empty else False
             data[imputed_metric] = data[imputed_metric] if neg_flag else np.log(data[imputed_metric] + 1)
 
-        past_anomaly_scores, anomaly_scores_mean, anomaly_scores_sd, detrend_order, baseline, agg_data_model, \
-        agg_data, training_start, training_end = self._call_training(df=data, window_length=window_length,
-                                                                     imputed_metric=imputed_metric,
-                                                                     detrend_method=detrend_method,
-                                                                     detection_method=detection_method, **kwargs)
+        past_anomaly_scores, anomaly_scores_gamma_alpha, anomaly_scores_gamma_loc, anomaly_scores_gamma_beta, \
+        detrend_order, baseline, agg_data_model, agg_data, \
+        training_start, training_end = self._call_training(df=data, window_length=window_length,
+                                                           imputed_metric=imputed_metric,
+                                                           detrend_method=detrend_method,
+                                                           detection_method=detection_method, **kwargs)
 
         success = True
         self.hyper_params['is_log_transformed'] = is_log_transformed
@@ -389,8 +402,9 @@ class WindowDensityModel(BaseModel):
                  'TrainingStartDate': training_start,
                  'TrainingEndDate': training_end,
                  'PastAnomalyScores': past_anomaly_scores,
-                 'AnomalyScoresMean': float(anomaly_scores_mean) if anomaly_scores_mean else None,
-                 'AnomalyScoresSD': float(anomaly_scores_sd) if anomaly_scores_sd else None,
+                 'AnomalyScoresGammaAlpha': float(anomaly_scores_gamma_alpha) if anomaly_scores_gamma_alpha else None,
+                 'AnomalyScoresGammaLoc': float(anomaly_scores_gamma_loc) if anomaly_scores_gamma_loc else None,
+                 'AnomalyScoresGammaBeta': float(anomaly_scores_gamma_beta) if anomaly_scores_gamma_beta else None,
                  'NonStationarityOrder': detrend_order,
                  'Baseline': baseline,
                  'AggregatedDataModel': agg_data_model,
@@ -399,9 +413,9 @@ class WindowDensityModel(BaseModel):
 
         return success, WindowDensityModel(hyper_params=self.hyper_params, **model)
 
-    def _call_scoring(self, df=None, imputed_metric=None, anomaly_scores_mean=None, anomaly_scores_sd=None,
-                      baseline=None, detrend_order=None, detrend_method=None, agg_data_model=None,
-                      detection_method=None, attributes=None):
+    def _call_scoring(self, df=None, imputed_metric=None, anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None,
+                      anomaly_scores_gamma_beta=None, baseline=None, detrend_order=None, detrend_method=None,
+                      agg_data_model=None, detection_method=None, attributes=None):
         """
         This function generates the anomaly flag and and probability for the scoring window.
         :param pandas.DataFrame df: Input training data frame.
@@ -419,8 +433,9 @@ class WindowDensityModel(BaseModel):
 
         is_anomaly, prob_of_anomaly = self._anomalous_region_detection(input_df=df, value_column=imputed_metric,
                                                                        called_for="scoring",
-                                                                       anomaly_scores_mean=anomaly_scores_mean,
-                                                                       anomaly_scores_sd=anomaly_scores_sd,
+                                                                       anomaly_scores_gamma_alpha=anomaly_scores_gamma_alpha,
+                                                                       anomaly_scores_gamma_loc=anomaly_scores_gamma_loc,
+                                                                       anomaly_scores_gamma_beta=anomaly_scores_gamma_beta,
                                                                        baseline=baseline,
                                                                        detrend_order=detrend_order,
                                                                        detrend_method=detrend_method,
@@ -430,8 +445,8 @@ class WindowDensityModel(BaseModel):
         return is_anomaly, prob_of_anomaly, attributes
 
     def _get_result(self, input_df=None, detrend_order=None, agg_data_model=None, value_column=None,
-                    detrend_method=None, baseline_type=None, detection_method=None,
-                    baseline=None, anomaly_scores_mean=None, anomaly_scores_sd=None):
+                    detrend_method=None, baseline_type=None, detection_method=None, baseline=None,
+                    anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None, anomaly_scores_gamma_beta=None):
         """
         The function scores the scoring window for anomalies based on the training metrics and the baseline
         :param pandas.DataFrame input_df: Input data containing the training and the scoring data.
@@ -485,10 +500,10 @@ class WindowDensityModel(BaseModel):
         if detection_method == "kldiv":
             current_anomaly_score = self._distance_function(data=adjusted_execution_data,
                                                             called_for="scoring", baseline=baseline)
-            if current_anomaly_score > st.norm.ppf(1 - self.sig_level, anomaly_scores_mean, anomaly_scores_sd):
+            prob_of_anomaly = st.gamma.cdf(current_anomaly_score, anomaly_scores_gamma_alpha,
+                                           anomaly_scores_gamma_loc, anomaly_scores_gamma_beta)
+            if 1 - prob_of_anomaly < self.sig_level:
                 is_anomaly = True
-
-            prob_of_anomaly = st.norm.cdf(current_anomaly_score, anomaly_scores_mean, anomaly_scores_sd)
         # Sign test based anomaly detection
         elif detection_method == "sign_test":
             # If last window is the baseline, we perform the Wilcoxon sign rank test for means and levene
@@ -585,16 +600,18 @@ class WindowDensityModel(BaseModel):
             neg_flag = True if not data[data[target_metric] < 0].empty else False
             data[imputed_metric] = data[imputed_metric] if neg_flag else np.log(data[imputed_metric] + 1)
 
-        anomaly_scores_mean = self._params['AnomalyScoresMean']
-        anomaly_scores_sd = self._params['AnomalyScoresSD']
+        anomaly_scores_gamma_alpha = self._params['AnomalyScoresGammaAlpha']
+        anomaly_scores_gamma_loc = self._params['AnomalyScoresGammaLoc']
+        anomaly_scores_gamma_beta = self._params['AnomalyScoresGammaBeta']
         baseline = self._params['Baseline']
         detrend_order = self._params['NonStationarityOrder']
         agg_data_model = self._params['AggregatedDataModel']
 
         is_anomaly, prob_of_anomaly, attributes = self._call_scoring(df=data,
                                                                      imputed_metric=imputed_metric,
-                                                                     anomaly_scores_mean=anomaly_scores_mean,
-                                                                     anomaly_scores_sd=anomaly_scores_sd,
+                                                                     anomaly_scores_gamma_alpha=anomaly_scores_gamma_alpha,
+                                                                     anomaly_scores_gamma_loc=anomaly_scores_gamma_loc,
+                                                                     anomaly_scores_gamma_beta=anomaly_scores_gamma_beta,
                                                                      baseline=baseline,
                                                                      detrend_order=detrend_order,
                                                                      detrend_method=detrend_method,
@@ -611,10 +628,10 @@ class WindowDensityModel(BaseModel):
 
 
     def _anomalous_region_detection(self, input_df=None, window_length=None,
-                                   value_column=None, called_for=None,
-                                   anomaly_scores_mean=None,
-                                   anomaly_scores_sd=None, detrend_order=None, baseline=None, detrend_method=None,
-                                   agg_data_model=None, past_model=None, detection_method=None):
+                                    value_column=None, called_for=None,
+                                    anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None,
+                                    anomaly_scores_gamma_beta=None, detrend_order=None, baseline=None,
+                                    detrend_method=None, agg_data_model=None, past_model=None, detection_method=None):
         """
         This function detects anomaly given a training and a scoring window.
 
@@ -662,5 +679,6 @@ class WindowDensityModel(BaseModel):
                                     baseline_type=baseline_type,
                                     detection_method=detection_method,
                                     baseline=baseline,
-                                    anomaly_scores_mean=anomaly_scores_mean,
-                                    anomaly_scores_sd=anomaly_scores_sd)
+                                    anomaly_scores_gamma_alpha=anomaly_scores_gamma_alpha,
+                                    anomaly_scores_gamma_loc=anomaly_scores_gamma_loc,
+                                    anomaly_scores_gamma_beta=anomaly_scores_gamma_beta)
