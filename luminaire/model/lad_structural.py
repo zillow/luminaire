@@ -538,7 +538,8 @@ class LADStructuralModel(BaseModel):
 
         index = pd.date_range(start=training_end, end=pred_date, freq=freq)[1:]  # Holidays are always daily.
 
-        pred_exog = cls._get_exog_data(pred_date, pred_date, index) if include_holidays_exog else None
+        de_obj = DataExploration()
+        pred_exog = de_obj._get_exog_data(pred_date, pred_date, index) if include_holidays_exog else None
 
         if pred_exog is not None and set(pred_exog.columns.values) != set(ext_training_features):
             missing_col_list = list(set(ext_training_features) - set(pred_exog.columns.values))

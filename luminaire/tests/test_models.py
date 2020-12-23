@@ -106,13 +106,16 @@ class TestLADStructural(object):
     def test_high_freq_window_density_training(self, window_density_model_data):
         training_start = datetime(2020, 4, 30)
         training_end = datetime(2020, 5, 25, 23, 59, 59)
-        hyper_params = WindowDensityHyperParams(freq='custom', detection_method='kldiv', window_length=6 * 24,
-                                                min_window_length=6 * 6, max_window_length=6 * 48,
-                                                ma_window_length=24, is_log_transformed=True).params
-        wdm_obj = WindowDensityModel(hyper_params=hyper_params)
-        success, model = wdm_obj.train(data=window_density_model_data,
-                                       training_start=training_start,
-                                       training_end=training_end)
+        data = window_density_model_data[(window_density_model_data.index >= training_start)
+                                                              & (window_density_model_data.index <= training_end)]
+
+        config = WindowDensityHyperParams(detection_method='kldiv',
+                                          window_length=6 * 24).params
+        de_obj = DataExploration(**config)
+        data, pre_prc = de_obj.stream_profile(df=data)
+        config.update(pre_prc)
+        wdm_obj = WindowDensityModel(hyper_params=config)
+        success, model = wdm_obj.train(data=data, past_model=None)
 
         assert success and isinstance(model, WindowDensityModel)
 
@@ -130,11 +133,14 @@ class TestLADStructural(object):
     def test_low_freq_window_density_training_last_window(self, window_density_model_data_hourly):
         training_start = datetime(2018, 4, 1)
         training_end = datetime(2018, 9, 30, 23, 59, 59)
-        hyper_params = WindowDensityHyperParams(freq='H', baseline_type="last_window").params
-        wdm_obj = WindowDensityModel(hyper_params=hyper_params)
-        success, model = wdm_obj.train(data=window_density_model_data_hourly,
-                                       training_start=training_start,
-                                       training_end=training_end)
+        data = window_density_model_data_hourly[(window_density_model_data_hourly.index >= training_start)
+                                                & (window_density_model_data_hourly.index <= training_end)]
+        config = WindowDensityHyperParams(freq='H', baseline_type="last_window").params
+        de_obj = DataExploration(**config)
+        data, pre_prc = de_obj.stream_profile(df=data)
+        config.update(pre_prc)
+        wdm_obj = WindowDensityModel(hyper_params=config)
+        success, model = wdm_obj.train(data=data, past_model=None)
 
         assert success and isinstance(model, WindowDensityModel)
 
@@ -153,11 +159,14 @@ class TestLADStructural(object):
     def test_low_freq_window_density_training_aggregated(self, window_density_model_data_hourly):
         training_start = datetime(2018, 4, 1)
         training_end = datetime(2018, 9, 30, 23, 59, 59)
-        hyper_params = WindowDensityHyperParams(freq='H').params
-        wdm_obj = WindowDensityModel(hyper_params=hyper_params)
-        success, model = wdm_obj.train(data=window_density_model_data_hourly,
-                                       training_start=training_start,
-                                       training_end=training_end)
+        data = window_density_model_data_hourly[(window_density_model_data_hourly.index >= training_start)
+                                                & (window_density_model_data_hourly.index <= training_end)]
+        config = WindowDensityHyperParams(freq='H', baseline_type="aggregated").params
+        de_obj = DataExploration(**config)
+        data, pre_prc = de_obj.stream_profile(df=data)
+        config.update(pre_prc)
+        wdm_obj = WindowDensityModel(hyper_params=config)
+        success, model = wdm_obj.train(data=data, past_model=None)
 
         assert success and isinstance(model, WindowDensityModel)
 

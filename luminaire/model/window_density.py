@@ -307,7 +307,8 @@ class WindowDensityModel(BaseModel):
                 gamma_beta = np.mean(beta)
             else:
                 gamma_alpha, gamma_loc, gamma_beta = st.gamma.fit(past_anomaly_scores)
-            past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][:10], past_anomaly_scores])
+            if past_model and len(past_model._params['PastAnomalyScores']) >= 10:
+                past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][:10], past_anomaly_scores])
         else:
             past_anomaly_scores, gamma_alpha, gamma_loc, gamma_beta = None, None, None, None
 
@@ -374,7 +375,12 @@ class WindowDensityModel(BaseModel):
         target_metric = 'raw'
         imputed_metric = 'interpolated'
         if not self._params['detection_method']:
-            detection_method = 'sign_test' if freq > np.timedelta64(30, 'm') else 'kldiv'
+            if freq in ['S', 'T', '15T']:
+                detection_method = 'kldiv'
+            elif freq in ['H', 'D']:
+                detection_method = 'sign_test'
+            else:
+                detection_method = 'sign_test' if freq > np.timedelta64(30, 'm') else 'kldiv'
         else:
             detection_method = self._params['detection_method']
 
@@ -413,13 +419,13 @@ class WindowDensityModel(BaseModel):
 
         return success, WindowDensityModel(hyper_params=self.hyper_params, **model)
 
-    def _call_scoring(self, df=None, imputed_metric=None, anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None,
+    def _call_scoring(self, df=None, target_metric=None, anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None,
                       anomaly_scores_gamma_beta=None, baseline=None, detrend_order=None, detrend_method=None,
                       agg_data_model=None, detection_method=None, attributes=None):
         """
         This function generates the anomaly flag and and probability for the scoring window.
         :param pandas.DataFrame df: Input training data frame.
-        :param str imputed_metric: Column storing the time series values.
+        :param str target_metric: Column storing the time series values.
         :param float anomaly_scores_mean: Mean of the anomaly scores for the traing sub-windows.
         :param float anomaly_scores_sd: Standard deviation of the anomaly scores for the traing sub-windows.
         :param list baseline: A list storing a baseline window used to score the scoring window.
@@ -431,7 +437,7 @@ class WindowDensityModel(BaseModel):
         :rtype: tuple(bool, float, dict)
         """
 
-        is_anomaly, prob_of_anomaly = self._anomalous_region_detection(input_df=df, value_column=imputed_metric,
+        is_anomaly, prob_of_anomaly = self._anomalous_region_detection(input_df=df, value_column=target_metric,
                                                                        called_for="scoring",
                                                                        anomaly_scores_gamma_alpha=anomaly_scores_gamma_alpha,
                                                                        anomaly_scores_gamma_loc=anomaly_scores_gamma_loc,
@@ -509,19 +515,11 @@ class WindowDensityModel(BaseModel):
             # If last window is the baseline, we perform the Wilcoxon sign rank test for means and levene
             # test for variance to detect anomalies
             if baseline_type == "last_window":
-                baseline_execution_data = copy.copy(baseline)
-                baseline_execution_data.append(adjusted_execution_data)
-                pca = PCA()
-                scores = pca.fit_transform(StandardScaler().fit_transform(baseline_execution_data))
-                robust_cov = MinCovDet().fit(scores[:, :3])
-                mahalanobis_distance = robust_cov.mahalanobis(scores[:, :3])
-                pvalue_mahalanobis = 1 - st.chi2.cdf(mahalanobis_distance[-1],
-                                                     np.array(baseline_execution_data).shape[1])
-
-                test_stat_levene, pvalue_levene = st.levene(adjusted_execution_data, baseline)
-                if pvalue_mahalanobis < self.sig_level or pvalue_levene < self.sig_level:
+                test_stat_wilcoxon, pvalue_wilcoxon = st.wilcoxon(execution_data, baseline)
+                test_stat_levene, pvalue_levene = st.levene(execution_data, baseline)
+                if pvalue_wilcoxon < self.sig_level or pvalue_levene < self.sig_level:
                     is_anomaly = True
-                prob_of_anomaly = 1 - min(pvalue_mahalanobis, pvalue_levene)
+                prob_of_anomaly = 1 - min(pvalue_wilcoxon, pvalue_levene)
             # If aggregated is the baseline, we perform the Wilcoxon sign rank test for means and gamma distribution
             # based test for the past standard deviations to detect anomalies
             elif baseline_type == "aggregated":
@@ -608,7 +606,7 @@ class WindowDensityModel(BaseModel):
         agg_data_model = self._params['AggregatedDataModel']
 
         is_anomaly, prob_of_anomaly, attributes = self._call_scoring(df=data,
-                                                                     imputed_metric=imputed_metric,
+                                                                     target_metric=target_metric,
                                                                      anomaly_scores_gamma_alpha=anomaly_scores_gamma_alpha,
                                                                      anomaly_scores_gamma_loc=anomaly_scores_gamma_loc,
                                                                      anomaly_scores_gamma_beta=anomaly_scores_gamma_beta,

@@ -53,8 +53,6 @@ class DataExploration(object):
                  data_shift_truncate=True,
                  min_changepoint_padding_length=None,
                  change_point_threshold=2,
-                 min_window_length=None,
-                 max_window_length=None,
                  window_length=None,
                  *args,
                  **kwargs):
@@ -363,7 +361,7 @@ class DataExploration(object):
             training_data_sliced_stationarized = training_data_sliced
         elif detrend_method == 'modeling':
             if not detrend_flag:
-                return training_data_sliced, detrend_order, agg_data_model
+                return training_data_sliced, detrend_order, agg_data_model, agg_data_model
 
         # Take the difference until the difference data is stationarity based on the adfuller test
         while detrend_flag and detrend_order < detrend_order_max:
@@ -992,7 +990,7 @@ class DataExploration(object):
 
         return data, summary
 
-    def stream_profile(self, df, **kwargs):
+    def stream_profile(self, df, impute_only=False, **kwargs):
 
         from random import sample
         import datetime
@@ -1004,7 +1002,10 @@ class DataExploration(object):
             freq = (df.index[1:] - df.index[:-1]).value_counts().index[0]
 
         try:
-            processed_df = self._prepare(df, impute_only=False, streaming=True, input_freq=freq)
+            processed_df = self._prepare(df, impute_only=impute_only, streaming=True, input_freq=freq)
+
+            if impute_only:
+                return processed_df, None
 
             training_end = processed_df.index[-1]
             training_end_time = training_end.time()
@@ -1021,31 +1022,34 @@ class DataExploration(object):
 
             trunc_df = processed_df[training_start: training_end]
 
-            window_length_list = []
+            if not self.window_length:
+                window_length_list = []
 
-            for i in range(20):
-                rand_date = sample(idx_date_list, 1)[0]
-                rand_start_idx = pd.Timestamp(datetime.datetime.combine(rand_date, training_start_time))
-                if rand_date in idx_date_list[:int(len(idx_date_list) / 2)]:
-                    time_series_i = trunc_df.loc[rand_start_idx:]['interpolated'].values
-                else:
-                    time_series_i = trunc_df.loc[:rand_start_idx]['interpolated'].values
+                for i in range(20):
+                    rand_date = sample(idx_date_list, 1)[0]
+                    rand_start_idx = pd.Timestamp(datetime.datetime.combine(rand_date, training_start_time))
+                    if rand_date in idx_date_list[:int(len(idx_date_list) / 2)]:
+                        time_series_i = trunc_df.loc[rand_start_idx:]['interpolated'].values
+                    else:
+                        time_series_i = trunc_df.loc[:rand_start_idx]['interpolated'].values
 
-                window_length_i = self._detect_window_size(time_series_i, streaming=True) if not self.window_length \
-                    else self.window_length
-                window_length_list.append(window_length_i)
+                    window_length_i = self._detect_window_size(time_series_i, streaming=True) if not self.window_length \
+                        else self.window_length
+                    window_length_list.append(window_length_i)
 
-            window_length = int(np.median(window_length_list))
+                window_length = int(np.median(window_length_list))
 
-            if window_length < self.min_window_length:
-                raise ValueError('Training window too small')
-            if window_length > self.max_window_length:
-                raise ValueError('Training window too large')
-            n_windows = len(df[pd.to_datetime(training_start): pd.to_datetime(training_end)]) // window_length
-            if n_windows < self.min_num_train_windows:
-                raise ValueError('Too few training windows')
-            if n_windows > self.max_num_train_windows:
-                raise ValueError('Too many training windows')
+                if window_length < self.min_window_length:
+                    raise ValueError('Training window too small')
+                if window_length > self.max_window_length:
+                    raise ValueError('Training window too large')
+                n_windows = len(df[pd.to_datetime(training_start): pd.to_datetime(training_end)]) // window_length
+                if n_windows < self.min_num_train_windows:
+                    raise ValueError('Too few training windows')
+                if n_windows > self.max_num_train_windows:
+                    raise ValueError('Too many training windows')
+            else:
+                window_length = self.window_length
 
             summary = {'success': True,
                        'freq': freq,
@@ -1057,6 +1061,6 @@ class DataExploration(object):
             # Streaming data exploration failed
             summary = {'success': False,
                        'ErrorMessage': str(e)}
-            processed_df = None
+            trunc_df = None
 
         return trunc_df, summary
