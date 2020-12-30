@@ -115,7 +115,7 @@ class TestLADStructural(object):
         data, pre_prc = de_obj.stream_profile(df=data)
         config.update(pre_prc)
         wdm_obj = WindowDensityModel(hyper_params=config)
-        success, model = wdm_obj.train(data=data, past_model=None)
+        success, ts_end, model = wdm_obj.train(data=data, past_model=None)
 
         assert success and isinstance(model, WindowDensityModel)
 
@@ -140,7 +140,7 @@ class TestLADStructural(object):
         data, pre_prc = de_obj.stream_profile(df=data)
         config.update(pre_prc)
         wdm_obj = WindowDensityModel(hyper_params=config)
-        success, model = wdm_obj.train(data=data, past_model=None)
+        success, ts_end, model = wdm_obj.train(data=data, past_model=None)
 
         assert success and isinstance(model, WindowDensityModel)
 
@@ -166,7 +166,7 @@ class TestLADStructural(object):
         data, pre_prc = de_obj.stream_profile(df=data)
         config.update(pre_prc)
         wdm_obj = WindowDensityModel(hyper_params=config)
-        success, model = wdm_obj.train(data=data, past_model=None)
+        success, ts_end, model = wdm_obj.train(data=data, past_model=None)
 
         assert success and isinstance(model, WindowDensityModel)
 

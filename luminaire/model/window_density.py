@@ -406,7 +406,6 @@ class WindowDensityModel(BaseModel):
         self.hyper_params['detection_method'] = detection_method
         model = {'ModelInstanceTimestamp': pd.Timestamp(training_end).time().strftime('%H:%M:%S'),
                  'TrainingStartDate': training_start,
-                 'TrainingEndDate': training_end,
                  'PastAnomalyScores': past_anomaly_scores,
                  'AnomalyScoresGammaAlpha': float(anomaly_scores_gamma_alpha) if anomaly_scores_gamma_alpha else None,
                  'AnomalyScoresGammaLoc': float(anomaly_scores_gamma_loc) if anomaly_scores_gamma_loc else None,
@@ -417,7 +416,7 @@ class WindowDensityModel(BaseModel):
                  'AggregatedData': agg_data
                  }
 
-        return success, WindowDensityModel(hyper_params=self.hyper_params, **model)
+        return success, str(training_end), WindowDensityModel(hyper_params=self.hyper_params, **model)
 
     def _call_scoring(self, df=None, target_metric=None, anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None,
                       anomaly_scores_gamma_beta=None, baseline=None, detrend_order=None, detrend_method=None,
