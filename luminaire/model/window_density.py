@@ -359,7 +359,8 @@ class WindowDensityModel(BaseModel):
         import numpy as np
         import pandas as pd
 
-        freq = self._params['freq']
+        freq = pd.Timedelta(self._params['freq']) if self._params['freq'] not in ['S', 'T', '15T', 'H', 'D'] \
+            else self._params['freq']
         if freq in ['S', 'T', '15T', 'H', 'D']:
             window_length = self._params['window_length']
         else:
@@ -404,8 +405,8 @@ class WindowDensityModel(BaseModel):
         success = True
         self.hyper_params['is_log_transformed'] = is_log_transformed
         self.hyper_params['detection_method'] = detection_method
-        model = {'ModelInstanceTimestamp': pd.Timestamp(training_end).time().strftime('%H:%M:%S'),
-                 'TrainingStartDate': training_start,
+        model = {'ModelInstanceTimestamp': str(pd.Timestamp(training_end).time().strftime('%H:%M:%S')),
+                 'TrainingStartDate': str(training_start),
                  'PastAnomalyScores': past_anomaly_scores,
                  'AnomalyScoresGammaAlpha': float(anomaly_scores_gamma_alpha) if anomaly_scores_gamma_alpha else None,
                  'AnomalyScoresGammaLoc': float(anomaly_scores_gamma_loc) if anomaly_scores_gamma_loc else None,
@@ -583,8 +584,6 @@ class WindowDensityModel(BaseModel):
         """
 
         import numpy as np
-
-        freq = self._params['freq']
 
         is_log_transformed = self._params['is_log_transformed']
         detrend_method = self._params['detrend_method']

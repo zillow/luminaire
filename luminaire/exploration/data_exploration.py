@@ -833,25 +833,30 @@ class DataExploration(object):
         return df
 
 
-    def _prepare(self, df, impute_only, streaming=False, input_freq=None):
+    def _prepare(self, df, impute_only, streaming=False):
+
+        import pandas as pd
 
         min_ts_length = self.min_ts_length
         max_ts_length = self.max_ts_length
         target_metric = 'raw'
         imputed_metric = 'interpolated'
 
-        freq = self.freq if not input_freq else input_freq
-
         # if input dimension/metric combination timeseries is null, skip modeling
         if len(df) == 0:
             raise ValueError("No model ran because dimension/metric combination is null")
         if not streaming and len(df) < min_ts_length:
             raise ValueError("Current time series length of {}{} is less tha minimum requires "
-                             "length {}{} for training".format(len(df), freq, min_ts_length, freq))
+                             "length {}{} for training".format(len(df), self.freq, min_ts_length, self.freq))
 
         if isinstance(df, list):
-            import pandas as pd
             df = (pd.DataFrame(df, columns=[self._target_index, self._target_metric]).set_index(self._target_index))
+
+        if not self.freq:
+            if streaming and len(df) > 1:
+                freq = (pd.DatetimeIndex(df.index[1:]) - pd.DatetimeIndex(df.index[:-1])).value_counts().index[0]
+        else:
+            freq = self.freq
 
         df = self.add_missing_index(df=df, freq=freq)
 
@@ -866,7 +871,10 @@ class DataExploration(object):
         df = self._kalman_smoothing_imputation(df=df, target_metric=target_metric, imputed_metric=imputed_metric,
                                                impute_only=impute_only)
 
-        return df
+        if streaming:
+            return df, freq
+        else:
+            return df
 
 
     def profile(self, df, impute_only=False, **kwargs):
@@ -923,8 +931,7 @@ class DataExploration(object):
         imputed_metric = 'interpolated'
 
         try:
-            # if input dimension/metric combination timeseries is null, skip modeling
-            processed_df = self._prepare(df, impute_only)
+            processed_df= self._prepare(df, impute_only)
 
             if impute_only:
                 summary = {'success': True}
@@ -997,12 +1004,8 @@ class DataExploration(object):
         import numpy as np
         import pandas as pd
 
-        # if input dimension/metric combination timeseries is null, skip modeling
-        if len(df) > 1:
-            freq = (df.index[1:] - df.index[:-1]).value_counts().index[0]
-
         try:
-            processed_df = self._prepare(df, impute_only=impute_only, streaming=True, input_freq=freq)
+            processed_df, freq = self._prepare(df, impute_only=impute_only, streaming=True)
 
             if impute_only:
                 return processed_df, None
@@ -1014,7 +1017,8 @@ class DataExploration(object):
             idx_date_list = []
             for idx in processed_df.index:
                 if idx.time() == training_end_time and train_start_search_flag:
-                    training_start = idx + freq
+                    delta = "1" + freq if not any(char.isdigit() for char in str(freq)) else freq
+                    training_start = idx + pd.Timedelta(delta)
                     training_start_time = training_start.time()
                     train_start_search_flag = False
                 if idx.date() not in idx_date_list:
@@ -1043,7 +1047,7 @@ class DataExploration(object):
                     raise ValueError('Training window too small')
                 if window_length > self.max_window_length:
                     raise ValueError('Training window too large')
-                n_windows = len(df[pd.to_datetime(training_start): pd.to_datetime(training_end)]) // window_length
+                n_windows = len(trunc_df) // window_length
                 if n_windows < self.min_num_train_windows:
                     raise ValueError('Too few training windows')
                 if n_windows > self.max_num_train_windows:
@@ -1052,7 +1056,7 @@ class DataExploration(object):
                 window_length = self.window_length
 
             summary = {'success': True,
-                       'freq': freq,
+                       'freq': str(freq),
                        'window_length': window_length,
                        'min_window_length': self.min_window_length,
                        'max_window_length': self.max_window_length}
