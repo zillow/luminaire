@@ -223,7 +223,7 @@ class WindowDensityModel(BaseModel):
             return sliced_training_data
 
     def _call_training(self, df=None, window_length=None, imputed_metric=None, detrend_method=None,
-                       detection_method=None, **kwargs):
+                       detection_method=None, freq=None, **kwargs):
         """
         This function generates the baseline and training metrics to be used for scoring
         :param str training_start: Training start date.
@@ -240,19 +240,44 @@ class WindowDensityModel(BaseModel):
         :return: Returns past anomaly scores based on training data, baseline and other related metrics.
         :rtype: tuple(list, float, float, int, list, float, dict, list)
         """
+        import pandas as pd
+
+        past_anomaly_scores = dict()
+        gamma_alpha = dict()
+        gama_loc = dict()
+        gamma_beta = dict()
+        detrend_order = dict()
+        baseline = dict()
+        agg_data_model = dict()
+        agg_data = dict()
 
         past_model = kwargs['past_model']
         training_start = df.first_valid_index()
         training_end = df.last_valid_index()
+        current_training_end = training_end
 
-        past_anomaly_scores, gamma_alpha, gama_loc, gamma_beta, detrend_order, baseline, \
-        agg_data_model, agg_data = self._anomalous_region_detection(input_df=df,
-                                                                    window_length=window_length,
-                                                                    value_column=imputed_metric,
-                                                                    called_for="training",
-                                                                    detrend_method=detrend_method,
-                                                                    past_model=past_model,
-                                                                    detection_method=detection_method)
+        while (training_end - current_training_end) < pd.Timedelta('1D'):
+            df_current = df[df.index <= current_training_end]
+            past_anomaly_scores_current, gamma_alpha_current, gama_loc_current, gamma_beta_current, \
+            detrend_order_current, baseline_current, agg_data_model_current, \
+            agg_data_current = self._anomalous_region_detection(input_df=df_current,
+                                                                window_length=window_length,
+                                                                value_column=imputed_metric,
+                                                                called_for="training",
+                                                                detrend_method=detrend_method,
+                                                                past_model=past_model,
+                                                                detection_method=detection_method)
+
+            past_anomaly_scores.update({str(current_training_end.time().strftime('%H:%M:%S')): past_anomaly_scores_current})
+            gamma_alpha.update({str(current_training_end.time().strftime('%H:%M:%S')): float(gamma_alpha_current) if gamma_alpha_current else None})
+            gama_loc.update({str(current_training_end.time().strftime('%H:%M:%S')): float(gama_loc_current) if gama_loc_current else None})
+            gamma_beta.update({str(current_training_end.time().strftime('%H:%M:%S')): float(gamma_beta_current) if gamma_beta_current else None})
+            detrend_order.update({str(current_training_end.time().strftime('%H:%M:%S')): detrend_order_current})
+            baseline.update({str(current_training_end.time().strftime('%H:%M:%S')): baseline_current})
+            agg_data_model.update({str(current_training_end.time().strftime('%H:%M:%S')): agg_data_model_current})
+            agg_data.update({str(current_training_end.time().strftime('%H:%M:%S')): agg_data_current})
+
+            current_training_end = current_training_end - min(pd.Timedelta('30T'), freq * 10)
 
         return past_anomaly_scores, gamma_alpha, gama_loc, gamma_beta, \
                detrend_order, baseline, agg_data_model, agg_data, training_start, training_end
@@ -400,17 +425,17 @@ class WindowDensityModel(BaseModel):
         training_start, training_end = self._call_training(df=data, window_length=window_length,
                                                            imputed_metric=imputed_metric,
                                                            detrend_method=detrend_method,
-                                                           detection_method=detection_method, **kwargs)
+                                                           detection_method=detection_method,
+                                                           freq=freq, **kwargs)
 
         success = True
         self.hyper_params['is_log_transformed'] = is_log_transformed
         self.hyper_params['detection_method'] = detection_method
-        model = {'ModelInstanceTimestamp': str(pd.Timestamp(training_end).time().strftime('%H:%M:%S')),
-                 'TrainingStartDate': str(training_start),
+        model = {'TrainingStartDate': str(training_start),
                  'PastAnomalyScores': past_anomaly_scores,
-                 'AnomalyScoresGammaAlpha': float(anomaly_scores_gamma_alpha) if anomaly_scores_gamma_alpha else None,
-                 'AnomalyScoresGammaLoc': float(anomaly_scores_gamma_loc) if anomaly_scores_gamma_loc else None,
-                 'AnomalyScoresGammaBeta': float(anomaly_scores_gamma_beta) if anomaly_scores_gamma_beta else None,
+                 'AnomalyScoresGammaAlpha': anomaly_scores_gamma_alpha,
+                 'AnomalyScoresGammaLoc': anomaly_scores_gamma_loc,
+                 'AnomalyScoresGammaBeta': anomaly_scores_gamma_beta,
                  'NonStationarityOrder': detrend_order,
                  'Baseline': baseline,
                  'AggregatedDataModel': agg_data_model,
@@ -584,6 +609,7 @@ class WindowDensityModel(BaseModel):
         """
 
         import numpy as np
+        import pandas as pd
 
         is_log_transformed = self._params['is_log_transformed']
         detrend_method = self._params['detrend_method']
@@ -596,12 +622,23 @@ class WindowDensityModel(BaseModel):
             neg_flag = True if not data[data[target_metric] < 0].empty else False
             data[imputed_metric] = data[imputed_metric] if neg_flag else np.log(data[imputed_metric] + 1)
 
-        anomaly_scores_gamma_alpha = self._params['AnomalyScoresGammaAlpha']
-        anomaly_scores_gamma_loc = self._params['AnomalyScoresGammaLoc']
-        anomaly_scores_gamma_beta = self._params['AnomalyScoresGammaBeta']
-        baseline = self._params['Baseline']
-        detrend_order = self._params['NonStationarityOrder']
-        agg_data_model = self._params['AggregatedDataModel']
+        model_timestamps = list(self._params['AnomalyScoresGammaAlpha'].keys())
+        scoring_start = data.index[0]
+        current_min_timedelta = pd.Timedelta('10D')
+        for timestamp in model_timestamps:
+            current_datetime = pd.Timestamp(str(data.index[0].date()) + ' ' + timestamp)
+            temp_timedelta = scoring_start - current_datetime
+            temp_timedelta = pd.Timedelta('1D') + temp_timedelta if temp_timedelta < pd.Timedelta(0) else temp_timedelta
+            if temp_timedelta < current_min_timedelta:
+                opt_timestamp = timestamp
+                current_min_timedelta = temp_timedelta
+
+        anomaly_scores_gamma_alpha = self._params['AnomalyScoresGammaAlpha'][opt_timestamp]
+        anomaly_scores_gamma_loc = self._params['AnomalyScoresGammaLoc'][opt_timestamp]
+        anomaly_scores_gamma_beta = self._params['AnomalyScoresGammaBeta'][opt_timestamp]
+        baseline = self._params['Baseline'][opt_timestamp]
+        detrend_order = self._params['NonStationarityOrder'][opt_timestamp]
+        agg_data_model = self._params['AggregatedDataModel'][opt_timestamp]
 
         is_anomaly, prob_of_anomaly, attributes = self._call_scoring(df=data,
                                                                      target_metric=target_metric,
