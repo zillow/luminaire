@@ -343,8 +343,9 @@ class DataExploration(object):
         avg_series_df = pd.DataFrame({'index': agg_datetime, 'raw': avg_series}).set_index('index')
 
         if past_model:
-            past_df = pd.DataFrame(past_model._params['AggregatedData'],
-                                   columns=[self._target_index, self._target_metric]).set_index(self._target_index)
+            past_df = pd.DataFrame(past_model._params['AggregatedData'][
+                                       list(past_model._params['AggregatedData'].keys())[0]], columns=[
+                self._target_index, self._target_metric]).set_index(self._target_index)
             current_agg_data_dict = avg_series_df['raw'].to_dict()
             agg_data_dict = past_df['raw'].to_dict()
             agg_data_dict.update(current_agg_data_dict)
@@ -384,6 +385,7 @@ class DataExploration(object):
                 agg_struct_model_config = {"include_holidays_exog": 1, "is_log_transformed": 0,
                                            "max_ft_freq": 3, "p": 3, "q": 3}
                 de_obj = DataExploration(freq='D', data_shift_truncate=False, is_log_transformed=False, fill_rate=0.9)
+                avg_series_df = avg_series_df[~avg_series_df.index.duplicated(keep='first')]
                 agg_cleaned_data, pre_prc = de_obj.profile(avg_series_df)
                 lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
                 success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)

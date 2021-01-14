@@ -105,7 +105,7 @@ class TestLADStructural(object):
 
     def test_high_freq_window_density_training(self, window_density_model_data):
         training_start = datetime(2020, 4, 30)
-        training_end = datetime(2020, 5, 25, 23, 59, 59)
+        training_end = datetime(2020, 5, 27, 23, 59, 59)
         data = window_density_model_data[(window_density_model_data.index >= training_start)
                                                               & (window_density_model_data.index <= training_end)]
 
@@ -120,8 +120,8 @@ class TestLADStructural(object):
         assert success and isinstance(model, WindowDensityModel)
 
     def test_high_freq_window_density_scoring(self, window_density_model_data, window_density_model):
-        scoring_start = datetime(2020, 5, 26)
-        scoring_end = datetime(2020, 5, 26, 23, 59, 59)
+        scoring_start = datetime(2020, 5, 28)
+        scoring_end = datetime(2020, 5, 28, 23, 59, 59)
 
         data = window_density_model_data[(window_density_model_data.index >= scoring_start)
                                          & (window_density_model_data.index <= scoring_end)]

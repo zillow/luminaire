@@ -277,6 +277,8 @@ class WindowDensityModel(BaseModel):
             agg_data_model.update({str(current_training_end.time().strftime('%H:%M:%S')): agg_data_model_current})
             agg_data.update({str(current_training_end.time().strftime('%H:%M:%S')): agg_data_current})
 
+            if isinstance(freq, str):
+                freq = pd.Timedelta('1' + freq)
             current_training_end = current_training_end - min(pd.Timedelta('30T'), freq * 10)
 
         return past_anomaly_scores, gamma_alpha, gama_loc, gamma_beta, \
@@ -298,6 +300,7 @@ class WindowDensityModel(BaseModel):
         :rtype: tuple(list, float, float, int, list, float)
         """
         import numpy as np
+        import pandas as pd
         from itertools import chain
         import scipy.stats as st
 
@@ -332,8 +335,23 @@ class WindowDensityModel(BaseModel):
                 gamma_beta = np.mean(beta)
             else:
                 gamma_alpha, gamma_loc, gamma_beta = st.gamma.fit(past_anomaly_scores)
-            if past_model and len(past_model._params['PastAnomalyScores']) >= 10:
-                past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][:10], past_anomaly_scores])
+
+            if past_model:
+                model_timestamps = list(past_model._params['PastAnomalyScores'].keys())
+                training_end = input_df.index[-1]
+                current_min_timedelta = pd.Timedelta('10D')
+                for timestamp in model_timestamps:
+                    current_datetime = pd.Timestamp(str(training_end.date()) + ' ' + timestamp)
+                    temp_timedelta = training_end - current_datetime
+                    temp_timedelta = pd.Timedelta('1D') + temp_timedelta if temp_timedelta < pd.Timedelta(
+                        0) else temp_timedelta
+                    if temp_timedelta < current_min_timedelta:
+                        opt_timestamp = timestamp
+                        current_min_timedelta = temp_timedelta
+
+            if past_model and len(past_model._params['PastAnomalyScores'][opt_timestamp]) >= 10:
+                past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][opt_timestamp][:10]
+                                                         , past_anomaly_scores])
         else:
             past_anomaly_scores, gamma_alpha, gamma_loc, gamma_beta = None, None, None, None
 
@@ -626,7 +644,7 @@ class WindowDensityModel(BaseModel):
         scoring_start = data.index[0]
         current_min_timedelta = pd.Timedelta('10D')
         for timestamp in model_timestamps:
-            current_datetime = pd.Timestamp(str(data.index[0].date()) + ' ' + timestamp)
+            current_datetime = pd.Timestamp(str(scoring_start.date()) + ' ' + timestamp)
             temp_timedelta = scoring_start - current_datetime
             temp_timedelta = pd.Timedelta('1D') + temp_timedelta if temp_timedelta < pd.Timedelta(0) else temp_timedelta
             if temp_timedelta < current_min_timedelta:
