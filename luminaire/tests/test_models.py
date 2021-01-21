@@ -128,7 +128,7 @@ class TestLADStructural(object):
 
         result = window_density_model.score(data)
 
-        assert result['Success'] and isinstance(result['AnomalyProbability'], float)
+        assert result[0]['Success'] and isinstance(result[0]['AnomalyProbability'], float)
 
     def test_low_freq_window_density_training_last_window(self, window_density_model_data_hourly):
         training_start = datetime(2018, 4, 1)
@@ -154,7 +154,7 @@ class TestLADStructural(object):
 
         result = window_density_model_hourly_last_window.score(data)
 
-        assert result['Success'] and isinstance(result['AnomalyProbability'], float)
+        assert result[0]['Success'] and isinstance(result[0]['AnomalyProbability'], float)
 
     def test_low_freq_window_density_training_aggregated(self, window_density_model_data_hourly):
         training_start = datetime(2018, 4, 1)
@@ -180,4 +180,4 @@ class TestLADStructural(object):
 
         result = window_density_model_hourly_aggregated.score(data)
 
-        assert result['Success'] and isinstance(result['AnomalyProbability'], float)
+        assert result[0]['Success'] and isinstance(result[0]['AnomalyProbability'], float)

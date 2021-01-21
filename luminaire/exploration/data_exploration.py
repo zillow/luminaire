@@ -860,7 +860,8 @@ class DataExploration(object):
         else:
             freq = self.freq
 
-        df = self.add_missing_index(df=df, freq=freq)
+        freq_delta = pd.Timedelta("1" + freq) if not any(char.isdigit() for char in str(freq)) else pd.Timedelta(freq)
+        df = self.add_missing_index(df=df, freq=freq_delta)
 
         if not streaming:
             df = df.iloc[-min(max_ts_length, len(df)):]

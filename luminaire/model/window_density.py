@@ -675,7 +675,7 @@ class WindowDensityModel(BaseModel):
                   'AnomalyProbability': float(prob_of_anomaly),
                   }
 
-        return result
+        return result, data.reset_index().values.tolist()
 
 
     def _anomalous_region_detection(self, input_df=None, window_length=None,
