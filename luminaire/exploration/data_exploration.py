@@ -835,7 +835,7 @@ class DataExploration(object):
         return df
 
 
-    def _prepare(self, df, impute_only, streaming=False):
+    def _prepare(self, df, impute_only, streaming=False, **kwargs):
 
         import pandas as pd
 
@@ -871,8 +871,11 @@ class DataExploration(object):
             raise ValueError("The training data observed continuous missing data near the end. Require more stable "
                              "data to train")
 
-        df = self._kalman_smoothing_imputation(df=df, target_metric=target_metric, imputed_metric=imputed_metric,
-                                               impute_only=impute_only)
+        if streaming and 'impute_zero' in kwargs and kwargs['impute_zero']:
+            df = df.fillna(0)
+        else:
+            df = self._kalman_smoothing_imputation(df=df, target_metric=target_metric, imputed_metric=imputed_metric,
+                                                   impute_only=impute_only)
 
         if streaming:
             return df, freq
@@ -1008,7 +1011,7 @@ class DataExploration(object):
         import pandas as pd
 
         try:
-            processed_df, freq = self._prepare(df, impute_only=impute_only, streaming=True)
+            processed_df, freq = self._prepare(df, impute_only=impute_only, streaming=True, **kwargs)
 
             if impute_only:
                 return processed_df, None
