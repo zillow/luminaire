@@ -387,20 +387,21 @@ class DataExploration(object):
                 de_obj = DataExploration(freq='D', data_shift_truncate=False, is_log_transformed=False, fill_rate=0.9)
                 avg_series_df = avg_series_df[~avg_series_df.index.duplicated(keep='first')]
                 agg_cleaned_data, pre_prc = de_obj.profile(avg_series_df)
-                lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
-                success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
-                if not success:
-                    if 'AR coefficients' in agg_data_model._params['ErrorMessage']:
-                        agg_struct_model_config = {"include_holidays_exog": 1, "is_log_transformed": 0,
-                                                   "max_ft_freq": 3, "p": 0, "q": 1}
-                        lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
-                        success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
-                    elif 'MA coefficients' in agg_data_model._params['ErrorMessage']:
-                        agg_struct_model_config = {"include_holidays_exog": 1, "is_log_transformed": 0,
-                                                   "max_ft_freq": 3, "p": 1, "q": 0}
-                        lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
-                        success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
-                agg_data_model = agg_data_model if success else None
+                if pre_prc['success']:
+                    lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
+                    success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
+                    if not success:
+                        if 'AR coefficients' in agg_data_model._params['ErrorMessage']:
+                            agg_struct_model_config = {"include_holidays_exog": 1, "is_log_transformed": 0,
+                                                       "max_ft_freq": 3, "p": 0, "q": 1}
+                            lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
+                            success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
+                        elif 'MA coefficients' in agg_data_model._params['ErrorMessage']:
+                            agg_struct_model_config = {"include_holidays_exog": 1, "is_log_transformed": 0,
+                                                       "max_ft_freq": 3, "p": 1, "q": 0}
+                            lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
+                            success, model_date, agg_data_model = lad_struct_obj.train(data=agg_cleaned_data, **pre_prc)
+                    agg_data_model = agg_data_model if success else None
 
                 detrend_flag = False
 
