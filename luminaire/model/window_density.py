@@ -537,8 +537,11 @@ class WindowDensityModel(BaseModel):
             dates_freq_dist = dict(collections.Counter(idx))
             scoring_datetime = str(max(dates_freq_dist.items(), key=operator.itemgetter(1))[0])
             execution_data_avg = np.mean(execution_data)
-            data_adjust_forecast = agg_data_model.score(execution_data_avg, scoring_datetime)['Prediction'] \
-                if agg_data_model else 1.0
+            try:
+                data_adjust_forecast = agg_data_model.score(execution_data_avg, scoring_datetime)['Prediction'] \
+                    if agg_data_model else 1.0
+            except:
+                data_adjust_forecast = 1
             adjusted_execution_data = execution_data / data_adjust_forecast
             if detrend_order > 0:
                 adjusted_execution_data = adjusted_execution_data.to_list()
