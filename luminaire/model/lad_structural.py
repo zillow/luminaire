@@ -273,23 +273,6 @@ class LADStructuralModel(BaseModel):
 
         return 0
 
-    @classmethod
-    def _get_exog_data(cls, exog_start, exog_end, index):
-        """
-        This function gets the exogenous data for the specified index.
-        :param pandas.Timestamp exog_start: Start date for the exogenous data
-        :param pandas.Timestampexog_end: End date for the exogenous data
-        :param list[pandas.Timestamp] index: List of indices
-        :return: Exogenous data for the given list of index
-        :rtype: pandas.DataFrame
-        """
-        holiday_calendar = LADHolidays()
-        holiday_series = holiday_calendar.holidays(start=exog_start, end=exog_end, return_name=True)
-        return (pd.DataFrame({'Holiday': holiday_series, 'Ones': 1})
-                .pivot(columns='Holiday', values='Ones')
-                .reindex(index)
-                .fillna(0)
-                )
 
     def _fit(self, endog, endog_end, min_ts_mean, min_ts_mean_window, include_holidays=False,
              min_ts_length=None, max_ft_freq=None, exog_data=None, optimize=None):
@@ -445,7 +428,9 @@ class LADStructuralModel(BaseModel):
 
             index = pd.date_range(start=ts_start, end=ts_end, freq=freq)  # Holidays are always daily.
 
-            exog_data = self._get_exog_data(ts_start, ts_end, index) if self._params['include_holidays_exog'] else None
+            de_obj = DataExploration()
+            exog_data = de_obj._get_exog_data(ts_start, ts_end, index) if self._params[
+                'include_holidays_exog'] else None
 
             # always run the model first without holiday exogenous variables
             result, order = self._fit(endog=endog, endog_end=ts_end, min_ts_mean=min_ts_mean,
@@ -553,7 +538,8 @@ class LADStructuralModel(BaseModel):
 
         index = pd.date_range(start=training_end, end=pred_date, freq=freq)[1:]  # Holidays are always daily.
 
-        pred_exog = cls._get_exog_data(pred_date, pred_date, index) if include_holidays_exog else None
+        de_obj = DataExploration()
+        pred_exog = de_obj._get_exog_data(pred_date, pred_date, index) if include_holidays_exog else None
 
         if pred_exog is not None and set(pred_exog.columns.values) != set(ext_training_features):
             missing_col_list = list(set(ext_training_features) - set(pred_exog.columns.values))
