@@ -225,20 +225,16 @@ class WindowDensityModel(BaseModel):
     def _call_training(self, df=None, window_length=None, imputed_metric=None, detrend_method=None,
                        detection_method=None, freq=None, **kwargs):
         """
-        This function generates the baseline and training metrics to be used for scoring
-        :param str training_start: Training start date.
-        :param str training_end: Training end date.
+        This function generates the baseline and training metrics to be used for scoring.
+
         :param pandas.DataFrame df: Input training data frame.
-        :param dict attributes: Model attributes.
         :param int window_length: The length of a training sub-window.
-        :param int min_window_length: Minimum size of a stable training sub-window length.
-        :param int max_window_length: Maximum size of a stable training sub-window length.
-        :param int min_num_train_windows: Minimum number of training windows.
-        :param int max_num_train_windows: Maximum number of training windows.
         :param str imputed_metric: Column storing the time series values.
-        :param str detrend_method: Detrend method "ma" or "diff" for nonstationarity.
+        :param str detrend_method: Detrend method "modeling" or "diff" for nonstationarity.
+        :param str detection_method: Detection method "kldiv" or "sign_test".
+        :param str freq: Data frequency.
         :return: Returns past anomaly scores based on training data, baseline and other related metrics.
-        :rtype: tuple(list, float, float, int, list, float, dict, list)
+        :rtype: tuple(list, float, float, float, int, list, luminaire.model, float, dict, list)
         """
         import pandas as pd
 
@@ -290,14 +286,14 @@ class WindowDensityModel(BaseModel):
         """
         This function runs the training process given the input parameters.
         :param pandas.DataFrame input_df: Input data containing the training and the scoring data.
-        :param list training_window: A list containing the start and the end of the training window.
         :param int window_length: The length of a training sub-window / scoring window.
         :param str value_column: Column containing the values.
-        :param str detrend_method: Selects between "ma" or "diff" detrend method.
+        :param str detrend_method: Selects between "modeling" or "diff" detrend method.
         :param str baseline_type: Selects between "aggregated" or "last_window" baseline.
         :param str detection_method: Selects between "kldiv" or "sign_test" distance method.
+        :param str past_model: luminaire.model to append model metadata from past
         :return: Returns past anomaly scores based on training data, baseline and other related metrics.
-        :rtype: tuple(list, float, float, int, list, float)
+        :rtype: tuple(list, float, float, float, int, list, luminaire.model, float)
         """
         import numpy as np
         import pandas as pd
@@ -375,8 +371,8 @@ class WindowDensityModel(BaseModel):
         Input time series for training.
 
         :param pandas.DataFrame data: Input time series.
-        :return: Training summary with a success flag.
-        :rtype: tuple(bool, python model object)
+        :return: Trained model with the training timestamp and a success flag
+        :rtype: tuple(bool, str, python model object)
 
         >>> data
                                 raw interpolated
@@ -397,7 +393,7 @@ class WindowDensityModel(BaseModel):
         >>> success, model = wdm_obj.train(data)
 
         >>> success, model
-        (True, <luminaire.model.window_density.WindowDensityModel object at 0x7fd7c5a34e80>)
+        (True, "2018-10-10 23:00:00", <luminaire.model.window_density.WindowDensityModel object at 0x7fd7c5a34e80>)
         """
         import numpy as np
         import pandas as pd
@@ -469,14 +465,16 @@ class WindowDensityModel(BaseModel):
         This function generates the anomaly flag and and probability for the scoring window.
         :param pandas.DataFrame df: Input training data frame.
         :param str target_metric: Column storing the time series values.
-        :param float anomaly_scores_mean: Mean of the anomaly scores for the traing sub-windows.
-        :param float anomaly_scores_sd: Standard deviation of the anomaly scores for the traing sub-windows.
+        :param float anomaly_scores_gamma_alpha: Gamma fit alpha parameter.
+        :param float anomaly_scores_gamma_loc: Gamma fit location parameter.
+        :param float anomaly_scores_gamma_beta: Gamma fit beta parameter.
         :param list baseline: A list storing a baseline window used to score the scoring window.
         :param int detrend_order: The order of detrending based on MA or differencing method.
-        :param str detrend_method: Selects between "ma" or "diff" detrend method.
-        :param float agg_data_model: Prediction model for aggregated data.
+        :param str detrend_method: Selects between "modeling" or "diff" detrend method.
+        :param luminaire.model.lad_structural.LADStructuralModel agg_data_model: Prediction model for aggregated data.
+        :param str detection_method: Selects between "kldiv" or "sign_test" distance method.
         :param attributes: Model attributes.
-        :return: Returns the probability of anomaly with the corresponding anomaly probability.
+        :return: Returns the anomaly flag with the corresponding anomaly probability.
         :rtype: tuple(bool, float, dict)
         """
 
@@ -499,18 +497,17 @@ class WindowDensityModel(BaseModel):
         """
         The function scores the scoring window for anomalies based on the training metrics and the baseline
         :param pandas.DataFrame input_df: Input data containing the training and the scoring data.
-        :param list scoring_window: A list containing the start and the end of the scoring window.
         :param int detrend_order: The order of detrending based on MA or differencing method.
         :param luminaire.model.lad_structural.LADStructuralModel agg_data_model: Prediction model for aggregated data.
         :param str value_column: Column containing the values.
-        :param str detrend_method: Selects between "ma" or "diff" detrend method.
+        :param str detrend_method: Selects between "modeling" or "diff" detrend method.
         :param str baseline_type: Selects between "aggregated" or "last_window" baseline.
         :param str detection_method: Selects between "kldiv" or "sign_test" distance method.
         :param list baseline: A list storing a baseline window used to score the scoring window.
-        :param float anomaly_scores_mean: Mean of the anomaly scores between training sub-windows.
-        :param float anomaly_scores_sd: Standard deviation of the anomaly scores between training sub-windows.
-        :param float significance_level: Significance level for anomaly detection
-        :return: Returns the probability of anomaly with the corresponding anomaly probability.
+        :param float anomaly_scores_gamma_alpha: Gamma fit alpha parameter.
+        :param float anomaly_scores_gamma_loc: Gamma fit location parameter.
+        :param float anomaly_scores_gamma_beta: Gamma fit beta parameter.
+        :return: Returns the anomaly flag with the corresponding anomaly probability.
         :rtype: tuple(bool, float)
         """
 
@@ -691,18 +688,17 @@ class WindowDensityModel(BaseModel):
 
         :param pandas.DataFrame input_df: Input data containing the training and the scoring data.
         :param int window_length: The length of a training sub-window / scoring window.
-        :param list training_window: A list containing the start and the end of the training window.
-        :param list scoring_window: A list containing the start and the end of the training window.
         :param str value_column: A string identifying the value column from the input dataframe
         :param str called_for: A flag to specify whether this function is called for training or scoring.
-        :param float significance_level: The significance level to use when determining anomalies. This should be a
-        number between 0 and 1, with values closer to 1 generating more anomalies.
-        :param float anomaly_scores_mean: Means of the past anomaly scores.
-        :param float anomaly_scores_sd: Standard deviation of the past anomaly scores.
+        :param float anomaly_scores_gamma_alpha: Gamma fit alpha parameter.
+        :param float anomaly_scores_gamma_loc: Gamma fit location parameter.
+        :param float anomaly_scores_gamma_beta: Gamma fit beta parameter.
         :param int detrend_order: Number of differencing for the scoring data. Only required if called for scoring.
         :param list baseline: The baseline for the scoring. only required if called for scoring.
-        :param list baseline: The baseline for the scoring. only required if called for scoring.
+        :param str detrend_method: Selects between "modeling" or "diff" detrend method.
+        :param luminaire.model.lad_structural.LADStructuralModel agg_data_model: Prediction model for aggregated data.
         :param luminaire.model.window_density.WindowDensityModel past_model: Past stored window density model.
+        :param str detection_method: Selects between "kldiv" or "sign_test" distance method.
         :return: Anomaly flag with the corresponding probability of anomaly.
         :rtype: tuple(bool, float)
 

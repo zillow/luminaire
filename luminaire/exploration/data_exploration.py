@@ -213,7 +213,7 @@ class DataExploration(object):
         """
         This function gets the exogenous data for the specified index.
         :param pandas.Timestamp exog_start: Start date for the exogenous data
-        :param pandas.Timestampexog_end: End date for the exogenous data
+        :param pandas.Timestamp exog_end: End date for the exogenous data
         :param list[pandas.Timestamp] index: List of indices
         :return: Exogenous data for the given list of index
         :rtype: pandas.DataFrame
@@ -318,7 +318,6 @@ class DataExploration(object):
         This function tests the stationarity of the given time series and performs the required differencing.
 
         :param list training_data_sliced: The list of list containing the training data.
-        :param int ma_window_length: The length of the moving average window.
         :param int detrend_order_max: Maximum number of differencing for non-stationarity.
         :param float significance_level: Significance level for the adfuller test for checking non-stationarity.
         :param list agg_datetime: List of aggregated date times.
@@ -436,7 +435,8 @@ class DataExploration(object):
         """
         This function detects the ideal window size based on the seasonality pattern of the data
         :param pandas.DataFrame series: The input sequence of data.
-        :return: An int containing the ooptimal window size
+        :param bool streaming: Glag to update the logic for streaming anomaly detection models.
+        :return: An int containing the optimal window size
         :rtype: int
         """
         import numpy as np
@@ -471,6 +471,7 @@ class DataExploration(object):
         and the values being the corresponding p-values
         :param int window_length: The size of the sub windows for input data segmentation.
         :return: List of local minimas
+        :rtype: list
         """
         import numpy as np
         import collections
@@ -500,6 +501,7 @@ class DataExploration(object):
         :param pandas.dataframe df: A pandas dataframe containing time series ignoring the top 5% volatility
         :param str metric: A string in the dataframe column names that contains the time series
         :return: A list containing the magnitude of changes for every corresponding change points
+        :rtype: list
         """
         import numpy as np
 
@@ -551,6 +553,7 @@ class DataExploration(object):
         The training time series length truncates accordingly based on minimum between max_ts_length and the
         length of the input time series.
         :return: A pandas dataframe containing the time series after the last changepoint
+        :rtype: tuple
 
         >>> df
                           raw  interpolated
@@ -837,6 +840,16 @@ class DataExploration(object):
 
 
     def _prepare(self, df, impute_only, streaming=False, **kwargs):
+        """
+        This function performs a basic data preparation before performing a full profiling
+
+        :param pandas.DataFrame/list df: Input time series in pandas data frame or in list format
+        :param bool impute_only: A flag to decide whether to return just after imputation only
+        :param streaming: A flag to identify the logic based on streaming vs non-streaming data
+        :param kwargs: Other input parameters
+        :return: Pandas dataframe with prepared data (with identified frequency for streaming)
+        :rtype: tuple
+        """
 
         import pandas as pd
 
@@ -1005,6 +1018,15 @@ class DataExploration(object):
         return data, summary
 
     def stream_profile(self, df, impute_only=False, **kwargs):
+        """
+        This function performs data preparation for streaming data.
+
+        :param df: list/pandas.DataFrame df: Input time series.
+        :param impute_only: Flag to perform preprocessing until imputation OR full preprocessing.
+        :param kwargs: Other input parameters.
+        :return: Prepared ppandas dataframe with profile information.
+        :rtype: tuple[pandas.dataFrame, dict]
+        """
 
         from random import sample
         import datetime
