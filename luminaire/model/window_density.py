@@ -247,7 +247,7 @@ class WindowDensityModel(BaseModel):
         agg_data_model = dict()
         agg_data = dict()
 
-        past_model = kwargs['past_model']
+        past_model = kwargs['past_model'] if 'past_model' in kwargs else None
         training_start = df.first_valid_index()
         training_end = df.last_valid_index()
         current_training_end = training_end
@@ -291,7 +291,7 @@ class WindowDensityModel(BaseModel):
         :param str detrend_method: Selects between "modeling" or "diff" detrend method.
         :param str baseline_type: Selects between "aggregated" or "last_window" baseline.
         :param str detection_method: Selects between "kldiv" or "sign_test" distance method.
-        :param str past_model: luminaire.model to append model metadata from past
+        :param luminaire.model.window_density.WindowDensityModel past_model: luminaire.model to append model metadata from past
         :return: Returns past anomaly scores based on training data, baseline and other related metrics.
         :rtype: tuple(list, float, float, float, int, list, luminaire.model, float)
         """
