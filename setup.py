@@ -28,7 +28,7 @@ setup(
     python_requires='>=3.6',
     packages=find_packages(),
     install_requires=install_requires,
-
+    setup_requires=['pytest', 'pytest-runner', 'flake8==3.7.9'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: Apache Software License',
