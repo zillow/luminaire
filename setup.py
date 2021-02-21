@@ -25,8 +25,9 @@ setup(
     author='Zillow Group A.I. team',
     author_email='luminaire-dev-oss@zillowgroup.com',
 
-    python_requires='>=3.6',
+    python_requires='>=3.6,<3.7',
     packages=find_packages(),
+    setup_requires=['numpy==1.17.0'],
     install_requires=install_requires,
 
     classifiers=[
