@@ -70,6 +70,21 @@ def training_test_data():
     return data
 
 @pytest.fixture(scope='session')
+def training_test_data_zeroes():
+    """
+    Data with all zeroes to test lad structural training
+    """
+
+    data = pd.read_csv(get_data_path('daily_test_time_series.csv'))
+    data['index'] = pd.DatetimeIndex(data['index'])
+    data['raw'] = np.zeros_like(np.array(data['raw']))
+    data['interpolated'] = data['raw']
+    data = pd.DataFrame(data, columns=['index', 'raw', 'interpolated']).set_index('index')
+
+    return data
+
+
+@pytest.fixture(scope='session')
 def scoring_test_data():
     """
     Data with missing indexes to test lad structural training
