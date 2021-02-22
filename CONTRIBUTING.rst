@@ -3,67 +3,44 @@ Contributions
 
 Contributions are welcome, greatly appreciated and overall helps to improve the package.
 
-Report Bugs
------------
+Submitting Bugs, Features, and other Feedback
+---------------------------------------------
 
-Before creating a new issue, do check if a `bug was already reported <https://github.com/zillow/luminaire/labels/bug>`__
+We use `Github Issues <https://github.com/zillow/luminaire/issues>`_ to track all kinds of feedback around Luminaire. Before creating a new issue, please seaarch through the list to see if your bug or feature has already been reported. If not, feel free to open a new one.
 
-Report bugs through `GitHub Issues <https://github.com/zillow/luminaire/issues>`__:
+For bugs, please include:
+- As much detailed information as you have about the bug itself
+- A minimal code example that reproduces the bug behavior
+- Your python version (``python --version``)
+- Versions for all packages in use (``pip list``) - we need this because Luminaire makes use of on multiple packages for statistical modeling.
+- Make sure to label the issues as ``bug``
 
-- Create a ``New Issue``
-- Provide detailed information about the bug and preferably part of the code that exhibits the problem
-- Make sure to tag label as ``bug``
+For new features and enhancements, please include:
+- An explanation of the feature
+- How it would work (code examples would be great)
+- Benefits and scope
+- If your request involves a statistical method that's not currently in use by Luminaire, be sure to link to or cite scientific publications so that we can evaluate the method.
 
+Fixing bugs and implementing features
+-------------------------------------
 
-Fix Bugs
---------
+Look through our `issue board <https://github.com/zillow/luminaire/issues>`_ with either ``kind:bug`` or ``kind:feature``. We prefer every pull request to include the following:
 
-Look through our `GitHub issues labeled "kind:bug"
-<https://github.com/zillow/luminaire/labels/bug>`__ for bugs.
+- A link to the issue being fixed (please use Github's syntax like "Closes #number")
+- Code changes itself
+- Test cases
+- Documentation changes if there are any behavior or function, class, or object signature changes
 
-Issues which are unassigned can be owned to implement it:
+Please do not bump the version number in ``setup.py`` unless asked by a project owner. 
 
-- Create branch name with prefix ``bugfix/<bug-type>``
-- Add relevant code fix and test case
-- Update the package version inside ``setup.py``
-- Update the sphinx documentation
-- Once ready for review create a PR for ``master`` branch
+Updating Documentation
+----------------------
 
+We use `Sphinx <https://www.sphinx-doc.org/en/master/>`__ to compile documentation for this package, 
+which is hosted on `Github pages <https://zillow.github.io/luminaire>`__
 
-Report Features
----------------
-
-Before creating a new feature request, do check if a `features was already requested <https://github.com/zillow/luminaire/labels/feature>`__
-
-Report new features through `GitHub Issues <https://github.com/zillow/luminaire/issues>`__:
-
-- Create a ``New Issue``
-- Provide detailed information about the feature, how it would work, benefits and scope
-- Make sure to tag label as ``feature``
-
-
-Implement Features
-------------------
-
-Look through the `GitHub issues labeled "kind:feature"
-<https://github.com/zillow/luminaire/labels/feature>`__ for features.
-
-Issues which are unassigned can be owned to implement it:
-
-- Create branch name with prefix ``feature/<feature-type>``
-- Add relevant code and test case
-- Update the package version inside ``setup.py``
-- Update the sphinx documentation
-- Once ready for review create a PR for ``master`` branch.
-
-
-Updating Sphinx Documentation
-------------------------------
-
-We use `Sphinx <https://www.sphinx-doc.org/en/master/>`__ for code documentation and
-are hosted on our `Github pages <https://zillow.github.io/luminaire>`__
-
-All the source code can be found under ``luminaire/docs``. Updated contents accordingly.
+All the source code can be found under ``luminaire/docs``. Whenever a code change is made, documentation
+should be updated accordingly.
 
 Whenever a PR is merged to ``master``, Luminaire Docs workflow kicks in and
 pushes the build files to ``gh-pages`` branch.
@@ -76,30 +53,18 @@ Github Workflow is used for CI/CD.
 
 Luminaire CI:
 
-One each commit `Luminaire CI Workflow <https://github.com/zillow/luminaire/actions?query=workflow%3A%22Luminaire+CI%22>`__ is invoked.
-Details about the Luminaire CI Workflow can be found `here <https://github.com/zillow/luminaire/blob/master/.github/workflows/python-app.yml>`__
-
+Each commit invokes the `Luminaire CI Workflow <https://github.com/zillow/luminaire/actions?query=workflow%3A%22Luminaire+CI%22>`__, which
+attempts to build the package and run tests. Definition for the workflow can be found `here <https://github.com/zillow/luminaire/blob/master/.github/workflows/python-app.yml>`__
 
 Luminaire CD:
 
-For releasing the code and making it available on PyPI, follow this steps:
+For releasing code and making it available on PyPI. This can only be done by project owners.
 
-- ``setup.py`` has a new version specified
-- PR for ``master`` branch is approved and merged
+- Make sure ``setup.py`` has a new version specified. If all changes were submitted by the open source community, you may need to make a new PR to bump version numbers.
 - `Create a new release <https://github.com/zillow/luminaire/releases/new>`__
-- Specify the ``Tag version`` with prefix ``v<version>`` example: v0.1.0
-- Select ``master`` branch
-- Provide relevant release title and description
-- If this is a pre-release check the box
-- Click ``Publish release`` and this will trigger `Luminaire CD Workflow <https://github.com/zillow/luminaire/blob/master/.github/workflows/python-publish.yml>`__
-- Check `PyPI release history <https://pypi.org/project/luminaire/#history>`__
+- Set the ``Tag version`` to the new version number with prefix ``v<version>`` example: ``v0.1.0``, and title to the same version number but without the prefix, such as ``0.1.0``
+- Check that you're releasing the correct branch (usually ``master``)
+- The description should include all changes included in that version. Use the commit history to help you compile it.
+- If this is a pre-release check the box (pre-release version numbers should look like ``0.1.0.dev1``
 
-
-Submit Feedback
----------------
-
-The best way to send feedback is by `creating an issue on GitHub <https://github.com/zillow/luminaire/issues>`__.
-
-- Create a ``New Issue``
-- Provide detailed information about feedback
-- Make sure to tag label as ``feedback``
+Publishing the release triggers `Luminaire CD Workflow <https://github.com/zillow/luminaire/blob/master/.github/workflows/python-publish.yml>`__. This will build the package and make it available on PyPI. You can verify that the release went through by checking the `release history <https://pypi.org/project/luminaire/#history>`__
