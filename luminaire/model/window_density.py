@@ -316,21 +316,6 @@ class WindowDensityModel(BaseModel):
         if detection_method == "kldiv":
             past_anomaly_scores = np.array(self._distance_function(data=sliced_training_data_cleaned,
                                                                    called_for="training"))
-            alpha = []
-            loc = []
-            beta = []
-            if len(past_anomaly_scores) < 100:
-                for i in range(10):
-                    boot_scores = np.random.choice(past_anomaly_scores.tolist(), size=100, replace=True)
-                    alpha_i, loc_i, beta_i = st.gamma.fit(boot_scores)
-                    alpha.append(alpha_i)
-                    loc.append(loc_i)
-                    beta.append(beta_i)
-                gamma_alpha = np.mean(alpha)
-                gamma_loc = np.mean(loc)
-                gamma_beta = np.mean(beta)
-            else:
-                gamma_alpha, gamma_loc, gamma_beta = st.gamma.fit(past_anomaly_scores)
 
             if past_model:
                 model_timestamps = list(past_model._params['PastAnomalyScores'].keys())
@@ -345,9 +330,25 @@ class WindowDensityModel(BaseModel):
                         opt_timestamp = timestamp
                         current_min_timedelta = temp_timedelta
 
-            if past_model and len(past_model._params['PastAnomalyScores'][opt_timestamp]) >= 10:
-                past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][opt_timestamp][:10]
+                past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][opt_timestamp][
+                                                      int(len(past_anomaly_scores) / 4): -int(len(past_anomaly_scores) / 4)]
                                                          , past_anomaly_scores])
+
+            if len(past_anomaly_scores) < 100:
+                alpha = []
+                loc = []
+                beta = []
+                for i in range(10):
+                    boot_scores = np.random.choice(past_anomaly_scores.tolist(), size=100, replace=True)
+                    alpha_i, loc_i, beta_i = st.gamma.fit(boot_scores)
+                    alpha.append(alpha_i)
+                    loc.append(loc_i)
+                    beta.append(beta_i)
+                gamma_alpha = np.mean(alpha)
+                gamma_loc = np.mean(loc)
+                gamma_beta = np.mean(beta)
+            else:
+                gamma_alpha, gamma_loc, gamma_beta = st.gamma.fit(past_anomaly_scores)
         else:
             past_anomaly_scores, gamma_alpha, gamma_loc, gamma_beta = None, None, None, None
 
