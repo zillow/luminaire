@@ -60,12 +60,10 @@ Luminaire CD:
 
 For releasing code and making it available on PyPI. This can only be done by project owners.
 
-- Make sure ``setup.py`` has a new version specified. If all changes were submitted by the open source community, you may need to make 
-a new PR to bump version numbers.
+- Make sure ``setup.py`` has a new version specified. If all changes were submitted by the open source community, you may need to make a new PR to bump version numbers.
 - `Create a new release <https://github.com/zillow/luminaire/releases/new>`__
-- Specify the ``Tag version`` with prefix ``v<version>`` example: ``v0.1.0``
-- Set release title to the same version number but without the prfix, such as ``0.1.0``
-- Select ``master`` branch
+- Set the ``Tag version`` to the new version number with prefix ``v<version>`` example: ``v0.1.0``, and title to the same version number but without the prefix, such as ``0.1.0``
+- Check that you're releasing the correct branch (usually ``master``)
 - The description should include all changes included in that version. Use the commit history to help you compile it.
 - If this is a pre-release check the box (pre-release version numbers should look like ``0.1.0.dev1``
 
