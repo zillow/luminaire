@@ -16,6 +16,18 @@ class TestLADStructural(object):
 
         assert success and isinstance(model, LADStructuralModel)
 
+    def test_lad_structural_training_zeroes(self, training_test_data_zeroes):
+
+        hyper_params = LADStructuralHyperParams(is_log_transformed=False, p=4, q=0).params
+        lad_struct_obj = LADStructuralModel(hyper_params, freq='D')
+        data_summary = {'ts_start': training_test_data_zeroes.first_valid_index(),
+                        'ts_end': training_test_data_zeroes.last_valid_index(),
+                        'is_log_transformed': False}
+        success, ts_end, model = lad_struct_obj.train(data=training_test_data_zeroes, **data_summary)
+
+        assert success and isinstance(model, LADStructuralModel)
+
+
     def test_lad_structural_scoring(self, scoring_test_data, lad_structural_model):
 
         pred_date_normal = scoring_test_data.index[0]
