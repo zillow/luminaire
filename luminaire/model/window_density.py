@@ -247,7 +247,7 @@ class WindowDensityModel(BaseModel):
         agg_data_model = dict()
         agg_data = dict()
 
-        past_model = kwargs['past_model'] if 'past_model' in kwargs else None
+        past_model = kwargs.get('past_model')
         training_start = df.first_valid_index()
         training_end = df.last_valid_index()
         current_training_end = training_end
@@ -300,6 +300,9 @@ class WindowDensityModel(BaseModel):
         from itertools import chain
         import scipy.stats as st
 
+        model_history_truncation_prop = 0.25    # This is the proportion of history to truncate from both sides
+        # everytime we store the past anomaly scores
+
         de_obj = DataExploration()
         sliced_training_data, agg_datetime = de_obj._partition(input_df, window_length, value_column)
 
@@ -331,7 +334,8 @@ class WindowDensityModel(BaseModel):
                         current_min_timedelta = temp_timedelta
 
                 past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][opt_timestamp][
-                                                      int(len(past_anomaly_scores) / 4): -int(len(past_anomaly_scores) / 4)]
+                                                      int(len(past_anomaly_scores) * model_history_truncation_prop):
+                                                      -int(len(past_anomaly_scores) * model_history_truncation_prop)]
                                                          , past_anomaly_scores])
 
             if len(past_anomaly_scores) < 100:
