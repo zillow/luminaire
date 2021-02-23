@@ -247,7 +247,7 @@ class WindowDensityModel(BaseModel):
         agg_data_model = dict()
         agg_data = dict()
 
-        past_model = kwargs['past_model']
+        past_model = kwargs.get('past_model')
         training_start = df.first_valid_index()
         training_end = df.last_valid_index()
         current_training_end = training_end
@@ -291,7 +291,7 @@ class WindowDensityModel(BaseModel):
         :param str detrend_method: Selects between "modeling" or "diff" detrend method.
         :param str baseline_type: Selects between "aggregated" or "last_window" baseline.
         :param str detection_method: Selects between "kldiv" or "sign_test" distance method.
-        :param str past_model: luminaire.model to append model metadata from past
+        :param luminaire.model.window_density.WindowDensityModel past_model: luminaire.model to append model metadata from past
         :return: Returns past anomaly scores based on training data, baseline and other related metrics.
         :rtype: tuple(list, float, float, float, int, list, luminaire.model, float)
         """
@@ -299,6 +299,9 @@ class WindowDensityModel(BaseModel):
         import pandas as pd
         from itertools import chain
         import scipy.stats as st
+
+        model_history_truncation_prop = 0.25    # This is the proportion of history to truncate from both sides
+        # everytime we store the past anomaly scores
 
         de_obj = DataExploration()
         sliced_training_data, agg_datetime = de_obj._partition(input_df, window_length, value_column)
@@ -316,21 +319,6 @@ class WindowDensityModel(BaseModel):
         if detection_method == "kldiv":
             past_anomaly_scores = np.array(self._distance_function(data=sliced_training_data_cleaned,
                                                                    called_for="training"))
-            alpha = []
-            loc = []
-            beta = []
-            if len(past_anomaly_scores) < 100:
-                for i in range(10):
-                    boot_scores = np.random.choice(past_anomaly_scores.tolist(), size=100, replace=True)
-                    alpha_i, loc_i, beta_i = st.gamma.fit(boot_scores)
-                    alpha.append(alpha_i)
-                    loc.append(loc_i)
-                    beta.append(beta_i)
-                gamma_alpha = np.mean(alpha)
-                gamma_loc = np.mean(loc)
-                gamma_beta = np.mean(beta)
-            else:
-                gamma_alpha, gamma_loc, gamma_beta = st.gamma.fit(past_anomaly_scores)
 
             if past_model:
                 model_timestamps = list(past_model._params['PastAnomalyScores'].keys())
@@ -345,9 +333,26 @@ class WindowDensityModel(BaseModel):
                         opt_timestamp = timestamp
                         current_min_timedelta = temp_timedelta
 
-            if past_model and len(past_model._params['PastAnomalyScores'][opt_timestamp]) >= 10:
-                past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][opt_timestamp][:10]
+                past_anomaly_scores = np.concatenate([past_model._params['PastAnomalyScores'][opt_timestamp][
+                                                      int(len(past_anomaly_scores) * model_history_truncation_prop):
+                                                      -int(len(past_anomaly_scores) * model_history_truncation_prop)]
                                                          , past_anomaly_scores])
+
+            if len(past_anomaly_scores) < 100:
+                alpha = []
+                loc = []
+                beta = []
+                for i in range(10):
+                    boot_scores = np.random.choice(past_anomaly_scores.tolist(), size=100, replace=True)
+                    alpha_i, loc_i, beta_i = st.gamma.fit(boot_scores)
+                    alpha.append(alpha_i)
+                    loc.append(loc_i)
+                    beta.append(beta_i)
+                gamma_alpha = np.mean(alpha)
+                gamma_loc = np.mean(loc)
+                gamma_beta = np.mean(beta)
+            else:
+                gamma_alpha, gamma_loc, gamma_beta = st.gamma.fit(past_anomaly_scores)
         else:
             past_anomaly_scores, gamma_alpha, gamma_loc, gamma_beta = None, None, None, None
 
