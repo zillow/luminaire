@@ -231,9 +231,6 @@
 <span class=sd >        :param bool include_holidays: Whether to consider holidays as exogenous</span>
 <span class=sd >        :param list ift_matrix: A list of list All exogenous variables where the ith column is the inverse Fourier</span>
 <span class=sd >        transformation of the time series with first i*2 most relevant frequencies</span>
-<span class=sd >        :param int train_len: Storing the length of the time series</span>
-<span class=sd >        :param int pred_len: Storing the length of the future time points to predict</span>
-<span class=sd >        :param bool arima_error: Storing whether there is any exception occurred in the auto_arima run</span>
 <span class=sd >        :param list stepwise_fit: A list storing different model object</span>
 <span class=sd >        :param bool optimize: Flag to identify whether called from hyperparameter optimization</span>
 <span class=sd >        :param list x_pred: list storing exogenous variable corresponding to the time point to predict</span>
@@ -253,8 +250,7 @@
                 <span class=n >exog</span><span class=p >[</span><span class=s1 >'fourier_feature'</span><span class=p >]</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >float64</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >real</span><span class=p >(</span><span class=n >fourier_exog</span><span class=p >[:,</span> <span class=mi >0</span><span class=p >]))</span>
 
         <span class=c1 ># This check is required due to a bug in statsmodel arima which inflates the predictions and std error</span>
-        <span class=c1 ># for time series containing only 0's. Can be removed if fixed in a later version of statsmodel</span>
-        <span class=c1 ># or pyramid</span>
+        <span class=c1 ># for time series containing only 0's. TODO: Can be removed if fixed in a later version of statsmodels</span>
         <span class=k >if</span> <span class=n >np</span><span class=o >.</span><span class=n >count_nonzero</span><span class=p >(</span><span class=n >endog</span><span class=p >)</span> <span class=o >==</span> <span class=mi >0</span><span class=p >:</span>
             <span class=n >idx_max</span> <span class=o >=</span> <span class=nb >len</span><span class=p >(</span><span class=n >endog</span><span class=p >)</span> <span class=o >//</span> <span class=mi >2</span>
             <span class=n >idx</span> <span class=o >=</span> <span class=nb >int</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >random</span><span class=o >.</span><span class=n >randint</span><span class=p >(</span><span class=mi >0</span><span class=p >,</span> <span class=n >idx_max</span><span class=p >,</span> <span class=mi >1</span><span class=p >)[</span><span class=mi >0</span><span class=p >])</span>
