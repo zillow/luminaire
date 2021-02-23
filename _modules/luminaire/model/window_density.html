@@ -248,7 +248,7 @@
         <span class=n >agg_data_model</span> <span class=o >=</span> <span class=nb >dict</span><span class=p >()</span>
         <span class=n >agg_data</span> <span class=o >=</span> <span class=nb >dict</span><span class=p >()</span>
 
-        <span class=n >past_model</span> <span class=o >=</span> <span class=n >kwargs</span><span class=p >[</span><span class=s1 >'past_model'</span><span class=p >]</span>
+        <span class=n >past_model</span> <span class=o >=</span> <span class=n >kwargs</span><span class=o >.</span><span class=n >get</span><span class=p >(</span><span class=s1 >'past_model'</span><span class=p >)</span>
         <span class=n >training_start</span> <span class=o >=</span> <span class=n >df</span><span class=o >.</span><span class=n >first_valid_index</span><span class=p >()</span>
         <span class=n >training_end</span> <span class=o >=</span> <span class=n >df</span><span class=o >.</span><span class=n >last_valid_index</span><span class=p >()</span>
         <span class=n >current_training_end</span> <span class=o >=</span> <span class=n >training_end</span>
@@ -292,7 +292,7 @@
 <span class=sd >        :param str detrend_method: Selects between "modeling" or "diff" detrend method.</span>
 <span class=sd >        :param str baseline_type: Selects between "aggregated" or "last_window" baseline.</span>
 <span class=sd >        :param str detection_method: Selects between "kldiv" or "sign_test" distance method.</span>
-<span class=sd >        :param str past_model: luminaire.model to append model metadata from past</span>
+<span class=sd >        :param luminaire.model.window_density.WindowDensityModel past_model: luminaire.model to append model metadata from past</span>
 <span class=sd >        :return: Returns past anomaly scores based on training data, baseline and other related metrics.</span>
 <span class=sd >        :rtype: tuple(list, float, float, float, int, list, luminaire.model, float)</span>
 <span class=sd >        """</span>
@@ -300,6 +300,9 @@
         <span class=kn >import</span> <span class=nn >pandas</span> <span class=k >as</span> <span class=nn >pd</span>
         <span class=kn >from</span> <span class=nn >itertools</span> <span class=kn >import</span> <span class=n >chain</span>
         <span class=kn >import</span> <span class=nn >scipy.stats</span> <span class=k >as</span> <span class=nn >st</span>
+
+        <span class=n >model_history_truncation_prop</span> <span class=o >=</span> <span class=mf >0.25</span>    <span class=c1 ># This is the proportion of history to truncate from both sides</span>
+        <span class=c1 ># everytime we store the past anomaly scores</span>
 
         <span class=n >de_obj</span> <span class=o >=</span> <span class=n >DataExploration</span><span class=p >()</span>
         <span class=n >sliced_training_data</span><span class=p >,</span> <span class=n >agg_datetime</span> <span class=o >=</span> <span class=n >de_obj</span><span class=o >.</span><span class=n >_partition</span><span class=p >(</span><span class=n >input_df</span><span class=p >,</span> <span class=n >window_length</span><span class=p >,</span> <span class=n >value_column</span><span class=p >)</span>
@@ -317,21 +320,6 @@
         <span class=k >if</span> <span class=n >detection_method</span> <span class=o >==</span> <span class=s2 >"kldiv"</span><span class=p >:</span>
             <span class=n >past_anomaly_scores</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >array</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >_distance_function</span><span class=p >(</span><span class=n >data</span><span class=o >=</span><span class=n >sliced_training_data_cleaned</span><span class=p >,</span>
                                                                    <span class=n >called_for</span><span class=o >=</span><span class=s2 >"training"</span><span class=p >))</span>
-            <span class=n >alpha</span> <span class=o >=</span> <span class=p >[]</span>
-            <span class=n >loc</span> <span class=o >=</span> <span class=p >[]</span>
-            <span class=n >beta</span> <span class=o >=</span> <span class=p >[]</span>
-            <span class=k >if</span> <span class=nb >len</span><span class=p >(</span><span class=n >past_anomaly_scores</span><span class=p >)</span> <span class=o >&lt;</span> <span class=mi >100</span><span class=p >:</span>
-                <span class=k >for</span> <span class=n >i</span> <span class=ow >in</span> <span class=nb >range</span><span class=p >(</span><span class=mi >10</span><span class=p >):</span>
-                    <span class=n >boot_scores</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >random</span><span class=o >.</span><span class=n >choice</span><span class=p >(</span><span class=n >past_anomaly_scores</span><span class=o >.</span><span class=n >tolist</span><span class=p >(),</span> <span class=n >size</span><span class=o >=</span><span class=mi >100</span><span class=p >,</span> <span class=n >replace</span><span class=o >=</span><span class=kc >True</span><span class=p >)</span>
-                    <span class=n >alpha_i</span><span class=p >,</span> <span class=n >loc_i</span><span class=p >,</span> <span class=n >beta_i</span> <span class=o >=</span> <span class=n >st</span><span class=o >.</span><span class=n >gamma</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >boot_scores</span><span class=p >)</span>
-                    <span class=n >alpha</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >alpha_i</span><span class=p >)</span>
-                    <span class=n >loc</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >loc_i</span><span class=p >)</span>
-                    <span class=n >beta</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >beta_i</span><span class=p >)</span>
-                <span class=n >gamma_alpha</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >mean</span><span class=p >(</span><span class=n >alpha</span><span class=p >)</span>
-                <span class=n >gamma_loc</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >mean</span><span class=p >(</span><span class=n >loc</span><span class=p >)</span>
-                <span class=n >gamma_beta</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >mean</span><span class=p >(</span><span class=n >beta</span><span class=p >)</span>
-            <span class=k >else</span><span class=p >:</span>
-                <span class=n >gamma_alpha</span><span class=p >,</span> <span class=n >gamma_loc</span><span class=p >,</span> <span class=n >gamma_beta</span> <span class=o >=</span> <span class=n >st</span><span class=o >.</span><span class=n >gamma</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >past_anomaly_scores</span><span class=p >)</span>
 
             <span class=k >if</span> <span class=n >past_model</span><span class=p >:</span>
                 <span class=n >model_timestamps</span> <span class=o >=</span> <span class=nb >list</span><span class=p >(</span><span class=n >past_model</span><span class=o >.</span><span class=n >_params</span><span class=p >[</span><span class=s1 >'PastAnomalyScores'</span><span class=p >]</span><span class=o >.</span><span class=n >keys</span><span class=p >())</span>
@@ -346,9 +334,26 @@
                         <span class=n >opt_timestamp</span> <span class=o >=</span> <span class=n >timestamp</span>
                         <span class=n >current_min_timedelta</span> <span class=o >=</span> <span class=n >temp_timedelta</span>
 
-            <span class=k >if</span> <span class=n >past_model</span> <span class=ow >and</span> <span class=nb >len</span><span class=p >(</span><span class=n >past_model</span><span class=o >.</span><span class=n >_params</span><span class=p >[</span><span class=s1 >'PastAnomalyScores'</span><span class=p >][</span><span class=n >opt_timestamp</span><span class=p >])</span> <span class=o >&gt;=</span> <span class=mi >10</span><span class=p >:</span>
-                <span class=n >past_anomaly_scores</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >concatenate</span><span class=p >([</span><span class=n >past_model</span><span class=o >.</span><span class=n >_params</span><span class=p >[</span><span class=s1 >'PastAnomalyScores'</span><span class=p >][</span><span class=n >opt_timestamp</span><span class=p >][:</span><span class=mi >10</span><span class=p >]</span>
+                <span class=n >past_anomaly_scores</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >concatenate</span><span class=p >([</span><span class=n >past_model</span><span class=o >.</span><span class=n >_params</span><span class=p >[</span><span class=s1 >'PastAnomalyScores'</span><span class=p >][</span><span class=n >opt_timestamp</span><span class=p >][</span>
+                                                      <span class=nb >int</span><span class=p >(</span><span class=nb >len</span><span class=p >(</span><span class=n >past_anomaly_scores</span><span class=p >)</span> <span class=o >*</span> <span class=n >model_history_truncation_prop</span><span class=p >):</span>
+                                                      <span class=o >-</span><span class=nb >int</span><span class=p >(</span><span class=nb >len</span><span class=p >(</span><span class=n >past_anomaly_scores</span><span class=p >)</span> <span class=o >*</span> <span class=n >model_history_truncation_prop</span><span class=p >)]</span>
                                                          <span class=p >,</span> <span class=n >past_anomaly_scores</span><span class=p >])</span>
+
+            <span class=k >if</span> <span class=nb >len</span><span class=p >(</span><span class=n >past_anomaly_scores</span><span class=p >)</span> <span class=o >&lt;</span> <span class=mi >100</span><span class=p >:</span>
+                <span class=n >alpha</span> <span class=o >=</span> <span class=p >[]</span>
+                <span class=n >loc</span> <span class=o >=</span> <span class=p >[]</span>
+                <span class=n >beta</span> <span class=o >=</span> <span class=p >[]</span>
+                <span class=k >for</span> <span class=n >i</span> <span class=ow >in</span> <span class=nb >range</span><span class=p >(</span><span class=mi >10</span><span class=p >):</span>
+                    <span class=n >boot_scores</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >random</span><span class=o >.</span><span class=n >choice</span><span class=p >(</span><span class=n >past_anomaly_scores</span><span class=o >.</span><span class=n >tolist</span><span class=p >(),</span> <span class=n >size</span><span class=o >=</span><span class=mi >100</span><span class=p >,</span> <span class=n >replace</span><span class=o >=</span><span class=kc >True</span><span class=p >)</span>
+                    <span class=n >alpha_i</span><span class=p >,</span> <span class=n >loc_i</span><span class=p >,</span> <span class=n >beta_i</span> <span class=o >=</span> <span class=n >st</span><span class=o >.</span><span class=n >gamma</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >boot_scores</span><span class=p >)</span>
+                    <span class=n >alpha</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >alpha_i</span><span class=p >)</span>
+                    <span class=n >loc</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >loc_i</span><span class=p >)</span>
+                    <span class=n >beta</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >beta_i</span><span class=p >)</span>
+                <span class=n >gamma_alpha</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >mean</span><span class=p >(</span><span class=n >alpha</span><span class=p >)</span>
+                <span class=n >gamma_loc</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >mean</span><span class=p >(</span><span class=n >loc</span><span class=p >)</span>
+                <span class=n >gamma_beta</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >mean</span><span class=p >(</span><span class=n >beta</span><span class=p >)</span>
+            <span class=k >else</span><span class=p >:</span>
+                <span class=n >gamma_alpha</span><span class=p >,</span> <span class=n >gamma_loc</span><span class=p >,</span> <span class=n >gamma_beta</span> <span class=o >=</span> <span class=n >st</span><span class=o >.</span><span class=n >gamma</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >past_anomaly_scores</span><span class=p >)</span>
         <span class=k >else</span><span class=p >:</span>
             <span class=n >past_anomaly_scores</span><span class=p >,</span> <span class=n >gamma_alpha</span><span class=p >,</span> <span class=n >gamma_loc</span><span class=p >,</span> <span class=n >gamma_beta</span> <span class=o >=</span> <span class=kc >None</span><span class=p >,</span> <span class=kc >None</span><span class=p >,</span> <span class=kc >None</span><span class=p >,</span> <span class=kc >None</span>
 
