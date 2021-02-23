@@ -230,9 +230,6 @@ class LADStructuralModel(BaseModel):
         :param bool include_holidays: Whether to consider holidays as exogenous
         :param list ift_matrix: A list of list All exogenous variables where the ith column is the inverse Fourier
         transformation of the time series with first i*2 most relevant frequencies
-        :param int train_len: Storing the length of the time series
-        :param int pred_len: Storing the length of the future time points to predict
-        :param bool arima_error: Storing whether there is any exception occurred in the auto_arima run
         :param list stepwise_fit: A list storing different model object
         :param bool optimize: Flag to identify whether called from hyperparameter optimization
         :param list x_pred: list storing exogenous variable corresponding to the time point to predict
@@ -252,8 +249,7 @@ class LADStructuralModel(BaseModel):
                 exog['fourier_feature'] = np.float64(np.real(fourier_exog[:, 0]))
 
         # This check is required due to a bug in statsmodel arima which inflates the predictions and std error
-        # for time series containing only 0's. Can be removed if fixed in a later version of statsmodel
-        # or pyramid
+        # for time series containing only 0's. TODO: Can be removed if fixed in a later version of statsmodels
         if np.count_nonzero(endog) == 0:
             idx_max = len(endog) // 2
             idx = int(np.random.randint(0, idx_max, 1)[0])
