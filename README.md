@@ -83,17 +83,14 @@ Self-Aware Anomaly Detection System. arXiv preprint arXiv:2011.05047.* ([arxiv l
 
 ## Other Useful Resources
 
-1. *Chakraborty, S., Shah, S., Soltani, K., & Swigart, A. (2019, December). Root Cause Detection Among Anomalous Time 
+- *Chakraborty, S., Shah, S., Soltani, K., & Swigart, A. (2019, December). Root Cause Detection Among Anomalous Time 
 Series Using Temporal State Alignment. In 2019 18th IEEE International Conference On Machine Learning And Applications 
 (ICMLA) (pp. 523-528). IEEE.* ([arxiv link](https://arxiv.org/abs/2001.01056))
 
 
-## Acknowledgements
+## Blogs
 
-This project has leveraged methods described in the following scientific publications:
-
-1. *Soule, Augustin, Kavé Salamatian, and Nina Taft. "Combining filtering and statistical methods for anomaly detection.
-" Proceedings of the 5th ACM SIGCOMM conference on Internet Measurement. 2005.*
+- Zillow Tech Hub: [*Automatic and Self-aware Anomaly Detection at Zillow Using Luminaire*](https://medium.com/zillow-tech-hub/automatic-and-self-aware-anomaly-detection-at-zillow-using-luminaire-7addfdae4ca9)
 
 
 ## Development Team
