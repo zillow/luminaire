@@ -1059,6 +1059,8 @@ class DataExploration(object):
             if not self.window_length:
                 window_length_list = []
 
+                # If the window size is not specified, the following logic makes several random segments of the
+                # time series which obtains a list of optimal window sizes
                 for i in range(100):
                     rand_date = sample(idx_date_list, 1)[0]
                     rand_start_idx = pd.Timestamp(datetime.datetime.combine(rand_date, training_start_time))
@@ -1072,6 +1074,9 @@ class DataExploration(object):
                     window_length_list.append(window_length_i)
 
                 window_length_list = np.array(window_length_list)
+
+                # From the list of optimal window sizes, if it is a list of constants, we take the constant as the
+                # window size. Otherwise, we obtain the window size that is most frequently observed in the list.
                 if np.all(window_length_list == min(window_length_list)):
                     window_length = window_length_list[0]
                 else:
