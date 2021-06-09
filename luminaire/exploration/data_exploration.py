@@ -1032,6 +1032,7 @@ class DataExploration(object):
         import datetime
         import numpy as np
         import pandas as pd
+        from scipy import stats
 
         try:
             processed_df, freq = self._prepare(df, impute_only=impute_only, streaming=True, **kwargs)
@@ -1058,7 +1059,9 @@ class DataExploration(object):
             if not self.window_length:
                 window_length_list = []
 
-                for i in range(20):
+                # If the window size is not specified, the following logic makes several random segments of the
+                # time series which obtains a list of optimal window sizes
+                for i in range(100):
                     rand_date = sample(idx_date_list, 1)[0]
                     rand_start_idx = pd.Timestamp(datetime.datetime.combine(rand_date, training_start_time))
                     if rand_date in idx_date_list[:int(len(idx_date_list) / 2)]:
@@ -1070,7 +1073,21 @@ class DataExploration(object):
                         else self.window_length
                     window_length_list.append(window_length_i)
 
-                window_length = int(np.median(window_length_list))
+                window_length_list = np.array(window_length_list)
+
+                # From the list of optimal window sizes, if it is a list of constants, we take the constant as the
+                # window size. Otherwise, we obtain the window size that is most frequently observed in the list.
+                if np.all(window_length_list == min(window_length_list)):
+                    window_length = window_length_list[0]
+                else:
+                    bin_count = max(1, int((max(window_length_list) - min(window_length_list)) / 12))
+                    bins = np.linspace(min(window_length_list) - 1, max(window_length_list) + 1, bin_count)
+                    if len(bins) == 1:
+                        window_length = int(stats.mode(window_length_list).mode[0])
+                    else:
+                        digitized = np.digitize(window_length_list, bins)
+                        arg_mode = np.argmax([len(window_length_list[digitized == i]) for i in range(1, len(bins))]) + 1
+                        window_length = int(stats.mode(window_length_list[digitized == arg_mode]).mode[0])
 
                 if window_length < self.min_window_length:
                     raise ValueError('Training window too small')
