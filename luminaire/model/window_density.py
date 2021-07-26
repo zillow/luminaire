@@ -543,17 +543,18 @@ class WindowDensityModel(BaseModel):
             dates_freq_dist = dict(collections.Counter(idx))
             scoring_datetime = str(max(dates_freq_dist.items(), key=operator.itemgetter(1))[0])
             execution_data_avg = np.mean(execution_data)
-            try:
-                data_adjust_forecast = agg_data_model.score(execution_data_avg, scoring_datetime)['Prediction'] \
-                    if agg_data_model else 1.0
-            except:
-                data_adjust_forecast = 1
-            adjusted_execution_data = execution_data / data_adjust_forecast
+            # If detrending is needed, we scale the scoring data accordingly using the agg_dat_model forecast
             if detrend_order > 0:
-                data_adjust_forecast = agg_data[-1][-1]
+                try:
+                    data_adjust_forecast = agg_data_model.score(execution_data_avg, scoring_datetime)['Prediction'] \
+                        if agg_data_model else agg_data[-1][-1]
+                except:
+                    # If the scoring for the agg_data_model fails for some reason, we use the latest agg_data for the
+                    # detrending adjustment
+                    data_adjust_forecast = agg_data[-1][-1]
                 adjusted_execution_data = (execution_data / data_adjust_forecast).tolist()
             else:
-                adjusted_execution_data = list(adjusted_execution_data)
+                adjusted_execution_data = list(execution_data)
 
         # Kl divergence based anomaly detection
         if detection_method == "kldiv":
