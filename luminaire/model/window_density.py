@@ -465,7 +465,7 @@ class WindowDensityModel(BaseModel):
 
     def _call_scoring(self, df=None, target_metric=None, anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None,
                       anomaly_scores_gamma_beta=None, baseline=None, detrend_order=None, detrend_method=None,
-                      agg_data_model=None, detection_method=None, attributes=None):
+                      agg_data_model=None, detection_method=None, attributes=None, agg_data=None):
         """
         This function generates the anomaly flag and and probability for the scoring window.
         :param pandas.DataFrame df: Input training data frame.
@@ -479,6 +479,7 @@ class WindowDensityModel(BaseModel):
         :param luminaire.model.lad_structural.LADStructuralModel agg_data_model: Prediction model for aggregated data.
         :param str detection_method: Selects between "kldiv" or "sign_test" distance method.
         :param attributes: Model attributes.
+        :param agg_data: Aggregated Data per day.
         :return: Returns the anomaly flag with the corresponding anomaly probability.
         :rtype: tuple(bool, float, dict)
         """
@@ -492,13 +493,15 @@ class WindowDensityModel(BaseModel):
                                                                        detrend_order=detrend_order,
                                                                        detrend_method=detrend_method,
                                                                        agg_data_model=agg_data_model,
-                                                                       detection_method=detection_method)
+                                                                       detection_method=detection_method,
+                                                                       agg_data=agg_data)
 
         return is_anomaly, prob_of_anomaly, attributes
 
     def _get_result(self, input_df=None, detrend_order=None, agg_data_model=None, value_column=None,
                     detrend_method=None, baseline_type=None, detection_method=None, baseline=None,
-                    anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None, anomaly_scores_gamma_beta=None):
+                    anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None, anomaly_scores_gamma_beta=None,
+                    agg_data=None):
         """
         The function scores the scoring window for anomalies based on the training metrics and the baseline
         :param pandas.DataFrame input_df: Input data containing the training and the scoring data.
@@ -512,6 +515,7 @@ class WindowDensityModel(BaseModel):
         :param float anomaly_scores_gamma_alpha: Gamma fit alpha parameter.
         :param float anomaly_scores_gamma_loc: Gamma fit location parameter.
         :param float anomaly_scores_gamma_beta: Gamma fit beta parameter.
+        :param agg_data: Aggregated Data per day.
         :return: Returns the anomaly flag with the corresponding anomaly probability.
         :rtype: tuple(bool, float)
         """
@@ -539,16 +543,18 @@ class WindowDensityModel(BaseModel):
             dates_freq_dist = dict(collections.Counter(idx))
             scoring_datetime = str(max(dates_freq_dist.items(), key=operator.itemgetter(1))[0])
             execution_data_avg = np.mean(execution_data)
-            try:
-                data_adjust_forecast = agg_data_model.score(execution_data_avg, scoring_datetime)['Prediction'] \
-                    if agg_data_model else 1.0
-            except:
-                data_adjust_forecast = 1
-            adjusted_execution_data = execution_data / data_adjust_forecast
+            # If detrending is needed, we scale the scoring data accordingly using the agg_dat_model forecast
             if detrend_order > 0:
-                adjusted_execution_data = adjusted_execution_data.to_list()
+                try:
+                    data_adjust_forecast = agg_data_model.score(execution_data_avg, scoring_datetime)['Prediction'] \
+                        if agg_data_model else agg_data[-1][-1]
+                except:
+                    # If the scoring for the agg_data_model fails for some reason, we use the latest agg_data for the
+                    # detrending adjustment
+                    data_adjust_forecast = agg_data[-1][-1]
+                adjusted_execution_data = (execution_data / data_adjust_forecast).tolist()
             else:
-                adjusted_execution_data = list(adjusted_execution_data)
+                adjusted_execution_data = list(execution_data)
 
         # Kl divergence based anomaly detection
         if detection_method == "kldiv":
@@ -662,6 +668,7 @@ class WindowDensityModel(BaseModel):
         baseline = self._params['Baseline'][opt_timestamp]
         detrend_order = self._params['NonStationarityOrder'][opt_timestamp]
         agg_data_model = self._params['AggregatedDataModel'][opt_timestamp]
+        agg_data = self._params['AggregatedData'][opt_timestamp]
 
         is_anomaly, prob_of_anomaly, attributes = self._call_scoring(df=data,
                                                                      target_metric=target_metric,
@@ -672,7 +679,8 @@ class WindowDensityModel(BaseModel):
                                                                      detrend_order=detrend_order,
                                                                      detrend_method=detrend_method,
                                                                      agg_data_model=agg_data_model,
-                                                                     detection_method=detection_method)
+                                                                     detection_method=detection_method,
+                                                                     agg_data=agg_data)
 
         result = {'Success': True,
                   'ConfLevel': float(1.0 - self.sig_level) * 100,
@@ -687,7 +695,8 @@ class WindowDensityModel(BaseModel):
                                     value_column=None, called_for=None,
                                     anomaly_scores_gamma_alpha=None, anomaly_scores_gamma_loc=None,
                                     anomaly_scores_gamma_beta=None, detrend_order=None, baseline=None,
-                                    detrend_method=None, agg_data_model=None, past_model=None, detection_method=None):
+                                    detrend_method=None, agg_data_model=None, past_model=None, detection_method=None,
+                                    agg_data=None):
         """
         This function detects anomaly given a training and a scoring window.
 
@@ -704,6 +713,7 @@ class WindowDensityModel(BaseModel):
         :param luminaire.model.lad_structural.LADStructuralModel agg_data_model: Prediction model for aggregated data.
         :param luminaire.model.window_density.WindowDensityModel past_model: Past stored window density model.
         :param str detection_method: Selects between "kldiv" or "sign_test" distance method.
+        :param agg_data: Aggregated Data per day.
         :return: Anomaly flag with the corresponding probability of anomaly.
         :rtype: tuple(bool, float)
 
@@ -736,4 +746,5 @@ class WindowDensityModel(BaseModel):
                                     baseline=baseline,
                                     anomaly_scores_gamma_alpha=anomaly_scores_gamma_alpha,
                                     anomaly_scores_gamma_loc=anomaly_scores_gamma_loc,
-                                    anomaly_scores_gamma_beta=anomaly_scores_gamma_beta)
+                                    anomaly_scores_gamma_beta=anomaly_scores_gamma_beta,
+                                    agg_data=agg_data)
