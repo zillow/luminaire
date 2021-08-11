@@ -532,6 +532,10 @@ class WindowDensityModel(BaseModel):
 
         is_anomaly = False
         execution_data = input_df[value_column]
+        adjusted_execution_data = []
+        prob_of_anomaly = []
+        len_req_agg_data_model = 42     # Setting a hard threshold to have predictions from aggregated data
+        # for stationarity adjustment
 
         if detrend_method == 'diff':
             # Obtain the execution data and perform the necessary differencing
@@ -545,23 +549,47 @@ class WindowDensityModel(BaseModel):
             execution_data_avg = np.mean(execution_data)
             # If detrending is needed, we scale the scoring data accordingly using the agg_dat_model forecast
             if detrend_order > 0:
+                snapshot_len_max = min(len(agg_data), len_req_agg_data_model)
+                agg_data_trunc = np.array(agg_data)[:, 1][-snapshot_len_max:]
+                data_adjust_forecast = []
                 try:
-                    data_adjust_forecast = agg_data_model.score(execution_data_avg, scoring_datetime)['Prediction'] \
-                        if agg_data_model else agg_data[-1][-1]
+                    if agg_data_model and len(agg_data) > len_req_agg_data_model:
+                        score = agg_data_model.score(execution_data_avg, scoring_datetime)
+                        data_adjust_forecast.append(score['Prediction'])
+                        data_adjust_forecast.append(score['CILower'])
+                        data_adjust_forecast.append(score['CIUpper'])
+                    else:
+                        data_adjust_forecast.append(np.median(agg_data_trunc))
+                        data_adjust_forecast.append(np.percentile(agg_data_trunc, 5))       # setting a 2-sigma limit
+                        data_adjust_forecast.append(np.percentile(agg_data_trunc, 95))       # setting a 2-sigma limit
                 except:
                     # If the scoring for the agg_data_model fails for some reason, we use the latest agg_data for the
                     # detrending adjustment
-                    data_adjust_forecast = agg_data[-1][-1]
-                adjusted_execution_data = (execution_data / data_adjust_forecast).tolist()
+                    data_adjust_forecast.append(np.median(agg_data_trunc))
+                    data_adjust_forecast.append(np.percentile(agg_data_trunc, 5))       # setting a 2-sigma limit
+                    data_adjust_forecast.append(np.percentile(agg_data_trunc, 95))       # setting a 2-sigma limit
+                for i in range(3):
+                    if data_adjust_forecast[i] != 0:
+                        adjusted_execution_data.append((execution_data / data_adjust_forecast[i]).tolist())
             else:
                 adjusted_execution_data = list(execution_data)
 
         # Kl divergence based anomaly detection
         if detection_method == "kldiv":
-            current_anomaly_score = self._distance_function(data=adjusted_execution_data,
-                                                            called_for="scoring", baseline=baseline)
-            prob_of_anomaly = st.gamma.cdf(current_anomaly_score, anomaly_scores_gamma_alpha,
-                                           anomaly_scores_gamma_loc, anomaly_scores_gamma_beta)
+            if detrend_order > 0:
+                prob_of_anomaly = []
+                for i in range(3):
+                    current_anomaly_score = self._distance_function(data=adjusted_execution_data[i],
+                                                                    called_for="scoring", baseline=baseline)
+                    prob_of_anomaly.append(st.gamma.cdf(current_anomaly_score, anomaly_scores_gamma_alpha,
+                                                        anomaly_scores_gamma_loc, anomaly_scores_gamma_beta))
+                prob_of_anomaly = np.min(prob_of_anomaly)
+            else:
+                current_anomaly_score = self._distance_function(data=adjusted_execution_data,
+                                                                called_for="scoring", baseline=baseline)
+                prob_of_anomaly = st.gamma.cdf(current_anomaly_score, anomaly_scores_gamma_alpha,
+                                               anomaly_scores_gamma_loc, anomaly_scores_gamma_beta)
+
             if 1 - prob_of_anomaly < self.sig_level:
                 is_anomaly = True
         # Sign test based anomaly detection
@@ -578,20 +606,24 @@ class WindowDensityModel(BaseModel):
             # based test for the past standard deviations to detect anomalies
             elif baseline_type == "aggregated":
                 baseline_sds = np.array(baseline).std(1).tolist()
-                baseline_execution_data = copy.copy(baseline)
-                baseline_execution_data.append(adjusted_execution_data)
-                pca = PCA()
-                scores = pca.fit_transform(StandardScaler().fit_transform(baseline_execution_data))
-                robust_cov = MinCovDet().fit(scores[:, :3])
-                mahalanobis_distance = robust_cov.mahalanobis(scores[:, :3])
-                pvalue_mahalanobis = 1 - st.chi2.cdf(mahalanobis_distance[-1],
-                                                     np.array(baseline_execution_data).shape[1])
+                if detrend_order == 0:
+                    adjusted_execution_data = [adjusted_execution_data]
+                for current_adjusted_data in adjusted_execution_data:
+                    baseline_execution_data = copy.copy(baseline)
+                    baseline_execution_data.append(current_adjusted_data)
+                    pca = PCA()
+                    scores = pca.fit_transform(StandardScaler().fit_transform(baseline_execution_data))
+                    robust_cov = MinCovDet().fit(scores[:, :3])
+                    mahalanobis_distance = robust_cov.mahalanobis(scores[:, :3])        # getting the top 3 dimensions
+                    pvalue_mahalanobis = 1 - st.chi2.cdf(mahalanobis_distance[-1],
+                                                         np.array(baseline_execution_data).shape[1])
 
-                gamma_alpha, gamma_loc, gamma_beta = st.gamma.fit(baseline_sds)
-                pvalue_gamma = 1 - st.gamma.cdf(np.std(adjusted_execution_data), gamma_alpha, gamma_loc, gamma_beta)
-                if pvalue_mahalanobis < self.sig_level or pvalue_gamma < self.sig_level:
-                    is_anomaly = True
-                prob_of_anomaly = 1 - min(pvalue_mahalanobis, pvalue_gamma)
+                    gamma_alpha, gamma_loc, gamma_beta = st.gamma.fit(baseline_sds)
+                    pvalue_gamma = 1 - st.gamma.cdf(np.std(current_adjusted_data), gamma_alpha, gamma_loc, gamma_beta)
+                    if pvalue_mahalanobis < self.sig_level or pvalue_gamma < self.sig_level:
+                        is_anomaly = True
+                    prob_of_anomaly.append(1 - min(pvalue_mahalanobis, pvalue_gamma))
+                prob_of_anomaly = np.min(prob_of_anomaly)
 
         return is_anomaly, prob_of_anomaly
 
