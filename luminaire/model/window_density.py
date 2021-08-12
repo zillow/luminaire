@@ -505,7 +505,9 @@ class WindowDensityModel(BaseModel):
         """
         The function scores the scoring window for anomalies based on the training metrics and the baseline
         :param pandas.DataFrame input_df: Input data containing the training and the scoring data.
-        :param int detrend_order: The order of detrending based on MA or differencing method.
+        :param int detrend_order: The non-negative order of detrending based on Modeling or differencing method. When
+        the detrend_order > 0, corresponding detrending need to be performed using the method specified in the model
+        config.
         :param luminaire.model.lad_structural.LADStructuralModel agg_data_model: Prediction model for aggregated data.
         :param str value_column: Column containing the values.
         :param str detrend_method: Selects between "modeling" or "diff" detrend method.
@@ -553,6 +555,8 @@ class WindowDensityModel(BaseModel):
                 agg_data_trunc = np.array(agg_data)[:, 1][-snapshot_len_max:]
                 data_adjust_forecast = []
                 try:
+                    # Setting the data adjustment window of the original data using the predictions and the CILower and
+                    # CIUpper keeping the prediction uncertainty of the agg_model in mind
                     if agg_data_model and len(agg_data) > len_req_agg_data_model:
                         score = agg_data_model.score(execution_data_avg, scoring_datetime)
                         data_adjust_forecast.append(score['Prediction'])
@@ -607,6 +611,7 @@ class WindowDensityModel(BaseModel):
             elif baseline_type == "aggregated":
                 baseline_sds = np.array(baseline).std(1).tolist()
                 if detrend_order == 0:
+                    # crearing a 2d list to make it easy to loop through in the following for loop
                     adjusted_execution_data = [adjusted_execution_data]
                 for current_adjusted_data in adjusted_execution_data:
                     baseline_execution_data = copy.copy(baseline)
