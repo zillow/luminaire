@@ -384,7 +384,7 @@ class DataExploration(object):
                 agg_struct_model_config = {"include_holidays_exog": 1, "is_log_transformed": 0,
                                            "max_ft_freq": 3, "p": 3, "q": 3}
                 de_obj = DataExploration(freq='D', data_shift_truncate=False, is_log_transformed=False, fill_rate=0.9)
-                avg_series_df = avg_series_df[~avg_series_df.index.duplicated(keep='first')]
+                avg_series_df = avg_series_df.groupby(level=0).max()
                 agg_cleaned_data, pre_prc = de_obj.profile(avg_series_df)
                 if pre_prc['success']:
                     lad_struct_obj = LADStructuralModel(hyper_params=agg_struct_model_config, freq='D')
