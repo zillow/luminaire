@@ -6,4 +6,5 @@ pandas==0.25.3
 pykalman==0.9.5
 scipy==1.2.3
 statsmodels==0.10.2
-scikit-learn==0.19.2
+scikit-learn==0.24.2
+decorator==5.1.0
