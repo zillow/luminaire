@@ -41,7 +41,7 @@ Import ``luminaire`` module in python
 import luminaire
 ```
 
-Check out [Luminaire documentation](https://zillow.github.io/luminaire) for detailed description of methods and usage.
+See [Examples](#Examples) to get started. Also, refer to the [Luminaire documentation](https://zillow.github.io/luminaire) for detailed description of methods and usage.
 
 
 ## Time Series Outlier Detection Workflow
@@ -122,7 +122,7 @@ wdm_obj = WindowDensityModel(hyper_params=config)
 success, training_end, model = wdm_obj.train(data=data)
 
 # Scoring
-score, scored_window = model.score(scoring_data)
+score, scored_window = model.score(scoring_data)    # scoring_data is data over a time-window instead of a datapoint
 ```
 
 ## Contributing
