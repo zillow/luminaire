@@ -41,7 +41,7 @@ Import ``luminaire`` module in python
 import luminaire
 ```
 
-Check out [Luminaire documentation](https://zillow.github.io/luminaire) for detailed description of methods and usage.
+See [Examples](#Examples) to get started. Also, refer to the [Luminaire documentation](https://zillow.github.io/luminaire) for detailed description of methods and usage.
 
 
 ## Time Series Outlier Detection Workflow
@@ -69,6 +69,61 @@ the user needs to provide very minimal configuration for monitoring any type of 
 ## Anomaly Detection for High Frequency Time Series
 
 Luminaire can also monitor a set of data points over windows of time instead of tracking individual data points. This approach is well-suited for streaming use cases where sustained fluctuations are of greater concern than individual fluctuations. See [anomaly detection for streaming data](https://zillow.github.io/luminaire/tutorial/streaming.html) for detailed information.
+
+## Examples
+
+### Batch Time Series Monitoring
+```python
+import pandas as pd
+from luminaire.optimization.hyperparameter_optimization import HyperparameterOptimization
+from luminaire.exploration.data_exploration import DataExploration
+
+data = pd.read_csv('Path to input time series data')
+# Input data should have a time column set as the index column of the dataframe and a value column named as 'raw'
+
+# Optimization
+hopt_obj = HyperparameterOptimization(freq='D')
+opt_config = hopt_obj.run(data=data)
+
+# Profiling
+de_obj = DataExploration(freq='D', **opt_config)
+training_data, pre_prc = de_obj.profile(data)
+
+# Identify Model
+model_class_name = opt_config['LuminaireModel']
+module = __import__('luminaire.model', fromlist=[''])
+model_class = getattr(module, model_class_name)
+
+# Training
+model_object = model_class(hyper_params=opt_config, freq='D')
+success, model_date, trained_model = model_object.train(data=training_data, **pre_prc)
+
+# Scoring
+trained_model.score(100, '2021-01-01')
+```
+
+### Streaming Time Series Monitoring
+```python
+import pandas as pd
+from luminaire.model.window_density import WindowDensityHyperParams, WindowDensityModel
+from luminaire.exploration.data_exploration import DataExploration
+
+data = pd.read_csv('Path to input time series data')
+# Input data should have a time column set as the index column of the dataframe and a value column named as 'raw'
+
+# Configuration Specs and Profiling
+config = WindowDensityHyperParams().params
+de_obj = DataExploration(**config)
+data, pre_prc = de_obj.stream_profile(df=data)
+config.update(pre_prc)
+
+# Training
+wdm_obj = WindowDensityModel(hyper_params=config)
+success, training_end, model = wdm_obj.train(data=data)
+
+# Scoring
+score, scored_window = model.score(scoring_data)    # scoring_data is data over a time-window instead of a datapoint
+```
 
 ## Contributing
 
