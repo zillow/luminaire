@@ -442,12 +442,72 @@ class LADStructuralModel(BaseModel):
 
         return result, order
 
-    def train(self, data, optimize=False, **kwargs):
+    def _validate_model(self, data, hyper_params, result):
+        """
+        This function validates a newly trained model before publishing
+
+        :param pandas.DataFrame data: Input time series data
+        :param dict hyper_params: Hyperparameters for model training
+        :param dict result: Training outputs
+        :return: A validation flag for model to publish
+
+        :rtype: bool
+        """
+
+        import numpy as np
+        import scipy.stats as st
+
+        levene_alpha = 0.05
+        grubb_alpha = 0.001
+        f_test_alpha = 0.05
+        mwu_alpha = 0.0005
+        passed = True
+
+        model = LADStructuralModel(hyper_params=self.hyper_params, **result)
+
+        freq = "1" + result['freq'] if not any(char.isdigit() for char in result['freq']) else result['freq']
+
+        baseline = data[self._imputed_metric][-self.max_scoring_length:].values
+        baseline = (np.exp(baseline) - 1).tolist() if hyper_params['is_log_transformed'] else baseline.tolist()
+
+        predictions = []
+        pred_date = pd.Timestamp(result['training_end_date'])
+        for i in range(len(baseline)):
+            pred_date = pred_date + pd.Timedelta(freq)
+            result = model.score(baseline[i], pred_date)
+            if result['Success']:
+                predictions.append(result['Prediction'])
+
+        if len(predictions) == len(baseline):
+            N = len(predictions)
+
+            pvalue_levene = st.levene(predictions, baseline)[1]
+            pvalue_levene_diff = st.levene(np.diff(predictions), np.diff(baseline))[1]
+            pvalue_mwu = st.mannwhitneyu(predictions, baseline)[1] if predictions != baseline else 1.0
+
+            grubb_test_stat = max(abs(np.array(predictions) - np.mean(predictions))) / np.std(predictions, ddof=1)
+            t_cutoff = st.t.ppf((grubb_alpha / (2 * N)), df=N - 2)
+            grubb_test = grubb_test_stat > ((N - 1) / np.sqrt(N)) * np.sqrt((t_cutoff**2) / (N - 2 + (t_cutoff**2)))
+
+            if grubb_test:
+                passed = False
+            if np.std(baseline, ddof=1) > 0:
+                if (not np.isnan(pvalue_levene) and not np.isnan(pvalue_levene_diff) and not np.isnan(pvalue_mwu)) and \
+                        (pvalue_levene < levene_alpha or pvalue_levene_diff < levene_alpha):
+                    F = (np.std(predictions, ddof=1) ** 2) / (np.std(baseline, ddof=1) ** 2)
+                    f_test_pval = 1 - st.f.cdf(F, N - 1, len(baseline) - 1)
+                    if f_test_pval < f_test_alpha and pvalue_mwu < mwu_alpha:
+                        passed = False
+
+        return passed
+
+    def train(self, data, optimize=False, validate=False, **kwargs):
         """
         This function trains a structural LAD model for a given time series.
 
         :param pandas.DataFrame data: Input time series data
         :param bool optimize: Flag to identify whether called from hyperparameter optimization
+        :param bool validate: Flag to identify whether to run model validation after training
         :return: success flag, the model date and the trained lad structural model object
         :rtype: tuple[bool, str, LADStructuralModel object]
 
@@ -492,6 +552,12 @@ class LADStructuralModel(BaseModel):
         result['freq'] = self._params['freq']
 
         success = False if 'ErrorMessage' in result else True
+
+        if success and validate and not optimize:
+            passed = self._validate_model(data=data, hyper_params=self.hyper_params, result=result)
+            if not passed:
+                success = False
+                result['ErrorMessage'] = 'Model validation failed! Check any issues with the input data or the hyper-parameters.'
 
         return success, kwargs['ts_end'], LADStructuralModel(hyper_params=self.hyper_params, **result)
 

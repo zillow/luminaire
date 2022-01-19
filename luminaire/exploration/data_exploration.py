@@ -133,6 +133,9 @@ class DataExploration(object):
 
         import pandas as pd
 
+        # Adding a group by logic for duplicate index
+        df = df.groupby(df.index).mean()
+
         # Create a new Pandas data frame based on the first valid index and
         # current date using the frequency defined by the use
         idx = pd.date_range(start=df.first_valid_index(), end=df.last_valid_index(), freq=freq)
@@ -798,14 +801,19 @@ class DataExploration(object):
         from pykalman import KalmanFilter
 
         kf = KalmanFilter()
-        filtered_state_means, filtered_state_covariance = kf.em(input_series).filter(input_series)
 
-        residuals = input_series - filtered_state_means[:,0]
+        truncated_series = input_series[-(self.min_ts_length * 3):] \
+            if idx_position == len(input_series) - 1 else input_series
+        idx_position = len(truncated_series) - 1
+
+        filtered_state_means, filtered_state_covariance = kf.em(truncated_series).filter(truncated_series)
+
+        residuals = truncated_series - filtered_state_means[:, 0]
 
         is_anomaly = residuals[idx_position] < np.mean(residuals) \
-                     - (2.5 * np.sqrt(filtered_state_covariance)[idx_position][0][0]) \
+                     - (1 * np.sqrt(filtered_state_covariance)[idx_position][0][0]) \
                      or residuals[idx_position] > np.mean(residuals) \
-                     + (2.5 * np.sqrt(filtered_state_covariance)[idx_position][0][0])
+                     + (1 * np.sqrt(filtered_state_covariance)[idx_position][0][0])
 
         return is_anomaly
 
@@ -881,6 +889,9 @@ class DataExploration(object):
         if not streaming:
             df = df.iloc[-min(max_ts_length, len(df)):]
             df = self._truncate_by_data_gaps(df=df, target_metric=target_metric)
+
+            if len(df) < min_ts_length:
+                raise ValueError("Due to a recent data gap, training is waiting for more data to populate")
 
         if not streaming and len(df) < min_ts_length:
             raise ValueError("The training data observed continuous missing data near the end. Require more stable "

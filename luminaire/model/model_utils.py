@@ -58,6 +58,8 @@ class LADHolidays(pandas.tseries.holiday.AbstractHolidayCalendar):
                             offset=_DateOffset(weekday=_H.SU(1)))
     Easter = _H.Holiday('Easter', month=1, day=1, offset=[_H.Easter(), _H.Day(0)])
 
+    USThanksgivingWednesday = _H.Holiday('Thanksgiving Wednesday', month=11, day=1,
+                                   offset=[_DateOffset(weekday=_H.TH(4)), _DateOffset(days=-1)])
     USThanksgivingDay = _H.Holiday('Thanksgiving', month=11, day=1,
                                 offset=_DateOffset(weekday=_H.TH(4)))
     USThanksgivingFriday = _H.Holiday('Thanksgiving Friday', month=11, day=1,
@@ -67,6 +69,7 @@ class LADHolidays(pandas.tseries.holiday.AbstractHolidayCalendar):
     USThanksgivingSunday = _H.Holiday('Thanksgiving Sunday', month=11, day=1,
                                    offset=[_DateOffset(weekday=_H.TH(4)), _DateOffset(days=3)])
 
+    Dec23 = _H.Holiday('December 23', month=12, day=23)
     ChristmasEve = _H.Holiday('Christmas Eve', month=12, day=24)
     ChristmasDay = _H.Holiday('Christmas Day', month=12, day=25)
     ChristmasDayObserved = _H.Holiday('Christmas Day Observed', month=12, day=25, observance=_H.nearest_workday)
@@ -79,6 +82,8 @@ class LADHolidays(pandas.tseries.holiday.AbstractHolidayCalendar):
 
     NewYearsDay = _H.Holiday('New Years Day', month=1, day=1)
     NewYearsDayObserved = _H.Holiday('New Years Day Observed', month=1, day=1, observance=_H.nearest_workday)
+    Jan2 = _H.Holiday('January 2', month=1, day=2)
+    Jan3 = _H.Holiday('January 3', month=1, day=3)
 
     rules = [
         USMemorialDay,
@@ -105,10 +110,12 @@ class LADHolidays(pandas.tseries.holiday.AbstractHolidayCalendar):
         Superbowl,
         Easter,
 
+        USThanksgivingWednesday,
         USThanksgivingDay,
         USThanksgivingFriday,
         USThanksgivingSaturday,
         USThanksgivingSunday,
+        Dec23,
         ChristmasEve,
         ChristmasDay,
         ChristmasDayObserved,
@@ -120,6 +127,8 @@ class LADHolidays(pandas.tseries.holiday.AbstractHolidayCalendar):
         Dec31,
         NewYearsDay,
         NewYearsDayObserved,
+        Jan2,
+        Jan3,
     ]
 
     def __init__(self, name=None, holiday_rules=None):
