@@ -237,7 +237,7 @@ class LADStructuralModel(BaseModel):
         """
 
         import numpy as np
-        import statsmodels.tsa.arima_model as arima
+        import statsmodels.tsa.arima.model as arima
 
         # Extract the exogenous variable generated based on (imodels * 2) number of most significant
         # frequencies
@@ -257,13 +257,7 @@ class LADStructuralModel(BaseModel):
 
         try:
             stepwise_fit.append(arima.ARIMA(endog=endog, exog=exog,
-                                            order=(p, d, q)).fit(seasonal=False, trace=False,
-                                                                 method='css',
-                                                                 solver='bfgs',
-                                                                 error_action='ignore',
-                                                                 stepwise_fit=True,
-                                                                 warn_convergence=False,
-                                                                 disp=False))
+                                            order=(p, d, q)).fit(method='statespace'))
         except Exception as e:
             raise LADStructuralError(message=str(e))
 
@@ -635,7 +629,11 @@ class LADStructuralModel(BaseModel):
                 else:
                     pred_exog['fourier_feature'] = seasonal_feature_scoring[:forecast_ndays]
 
-            forecast = list(model.forecast(steps=forecast_ndays, alpha=alpha, exog=pred_exog))
+            forecast = []
+            forecast_obj = model.get_forecast(steps=forecast_ndays, alpha=alpha, exog=pred_exog)
+            forecast.append(np.real(forecast_obj.predicted_mean).tolist())      # adding prediction mean to forecast
+            forecast.append(np.real(forecast_obj.se_mean).tolist())         # adding prediction standard error to forecast
+            forecast.append(np.real(forecast_obj.conf_int()).tolist())      # adding predictions ci's to forecast
             interpolated_training_data = list(zip(*training_tail))[1]
 
             for order in list(reversed(range(order_of_diff))):
