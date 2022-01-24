@@ -1,4 +1,4 @@
-bayesian-changepoint-detection>=0.2.dev1
+bayesian-changepoint-detection -e git+https://github.com/hildensia/bayesian_changepoint_detection#egg={bayesian-changepoint-detection}
 changepy>=0.3.1
 hyperopt>=0.1.2
 numpy>=1.17.5

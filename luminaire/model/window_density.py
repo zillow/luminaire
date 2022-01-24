@@ -102,14 +102,16 @@ class WindowDensityModel(BaseModel):
         :rtype: int
         """
         import numpy as np
-        from bayesian_changepoint_detection import offline_changepoint_detection as offcd
+        from bayesian_changepoint_detection.priors import const_prior
+        from bayesian_changepoint_detection.bayesian_models import offline_changepoint_detection
+        import bayesian_changepoint_detection.offline_likelihoods as offline_ll
         from functools import partial
 
         # Volume shift detection over the means of the training window
-        q, p, pcp = offcd.offline_changepoint_detection(
+        q, p, pcp = offline_changepoint_detection(
             data=np.array(mean_list),
-            prior_func=partial(offcd.const_prior, l=(len(mean_list) + 1)),
-            observation_log_likelihood_function=offcd.gaussian_obs_log_likelihood,
+            prior_function=partial(const_prior, p=1/(len(mean_list) + 1)),
+            log_likelihood_class=offline_ll.StudentT(),
             truncate=-10)
 
         mask_mean = np.append(0, np.exp(pcp).sum(0)) > probability_threshold
@@ -118,10 +120,10 @@ class WindowDensityModel(BaseModel):
         change_points = np.array(mask_mean).nonzero()
         last_mean_cp = change_points[0][-1] if len(change_points[0]) > 0 else []
 
-        q, p, pcp = offcd.offline_changepoint_detection(
+        q, p, pcp = offline_changepoint_detection(
             data=np.array(sd_list),
-            prior_func=partial(offcd.const_prior, l=(len(sd_list) + 1)),
-            observation_log_likelihood_function=offcd.gaussian_obs_log_likelihood,
+            prior_function=partial(const_prior, p=1/(len(sd_list) + 1)),
+            log_likelihood_class=offline_ll.StudentT(),
             truncate=-10)
 
         mask_sd = np.append(0, np.exp(pcp).sum(0)) > probability_threshold
