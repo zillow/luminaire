@@ -443,7 +443,8 @@ class LADStructuralModel(BaseModel):
         :param pandas.DataFrame data: Input time series data
         :param dict hyper_params: Hyperparameters for model training
         :param dict result: Training outputs
-        :return: A validation flag for model to publish
+        :return: A validation flag for model to publish. The function returns True when the validation is successful,
+        False otherwise.
 
         :rtype: bool
         """
@@ -472,6 +473,9 @@ class LADStructuralModel(BaseModel):
             if result['Success']:
                 predictions.append(result['Prediction'])
 
+        # We perform Levene test, Mann-Whitney U test, and Grubb test between the predictions and the baseline
+        # to understand if the are widely different. The two arrays need to be of the same length in order to
+        # perform these tests.
         if len(predictions) == len(baseline):
             N = len(predictions)
 
@@ -547,6 +551,7 @@ class LADStructuralModel(BaseModel):
 
         success = False if 'ErrorMessage' in result else True
 
+        # Model validation step to check underfit due to misspecification of hyperparameters to some other reasons.
         if success and validate and not optimize:
             passed = self._validate_model(data=data, hyper_params=self.hyper_params, result=result)
             if not passed:

@@ -810,6 +810,7 @@ class DataExploration(object):
 
         residuals = truncated_series - filtered_state_means[:, 0]
 
+        # Catching marginal anomalies to avoid during training
         is_anomaly = residuals[idx_position] < np.mean(residuals) \
                      - (1 * np.sqrt(filtered_state_covariance)[idx_position][0][0]) \
                      or residuals[idx_position] > np.mean(residuals) \
