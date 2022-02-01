@@ -438,7 +438,8 @@ class LADStructuralModel(BaseModel):
 
     def _validate_model(self, data, hyper_params, result):
         """
-        This function validates a newly trained model before publishing
+        This function validates a newly trained model before publishing. This valudation checks for underfit due to
+        misspecification of hyperparameters or nonstationarity.
 
         :param pandas.DataFrame data: Input time series data
         :param dict hyper_params: Hyperparameters for model training
