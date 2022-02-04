@@ -1,6 +1,4 @@
-# installing latest changes for bayesian-changepoint-detection since the scipy support is not available in pypi yet
-git+https://github.com/hildensia/bayesian_changepoint_detection@2dd95f5c1d028116899a842ccb3baa173f9d5be9
-
+bayesian-changepoint-detection @ git+https://github.com/hildensia/bayesian_changepoint_detection@2dd95f5c1d028116899a842ccb3baa173f9d5be9
 changepy>=0.3.1
 hyperopt>=0.1.2
 numpy>=1.17.5
