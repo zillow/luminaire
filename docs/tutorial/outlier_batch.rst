@@ -34,6 +34,13 @@ These *preprocessing_parameters* are used for training the structural model.
 >>> print(success, model_date, model)
 (True, '2020-06-07 00:00:00', <luminaire_models.model.lad_structural.LADStructuralModel object at 0x7f97e127d320>)
 
+.. NOTE::
+    Luminaire allows to run model validation during the training process. This validation is a check for any underfit
+    that might have occurred due to any misspecification of the model hyperparameters or due to nonstationarity.
+    Validation flag is set to false by default but that can be turned on by simply setting *validation = True* during
+    training. This option is only available for the *LADStructuralModel* class. Refer to the API reference for more
+    information.
+
 The trained model works as a data-driven source of truth to evaluate any future time series values to be monitored. The *score* method is used to check whether new data points are anomalous.
 
 >>> model.score(2000, '2020-06-08')

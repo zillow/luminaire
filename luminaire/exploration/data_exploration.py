@@ -130,6 +130,18 @@ class DataExploration(object):
         self.tc_max_window_length = 24
 
     def add_missing_index(self, df=None, freq=None):
+        """
+        This function reindexes a pandas dataframe with missing dates for a given time series frequency.
+
+        Note: If duplicate dates dates are present in the dataframe, this function takes average of the duplicate
+        data dates and merges them as a single data date.
+
+        :param pandas.DataFrame df: Input pandas dataframe containing the time series
+        :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'
+        :return: pandas dataframe after reindexing missing data dates
+
+        :rtype: pandas.DataFrame
+        """
 
         import pandas as pd
 
