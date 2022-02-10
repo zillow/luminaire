@@ -157,8 +157,8 @@ class WindowDensityModel(BaseModel):
         if called_for == "training":
             distance = []
             for i in range(0, len(data) - 1):
-                q = stats.kde.gaussian_kde(data[i])
-                p = stats.kde.gaussian_kde(data[i + 1])
+                q = stats.gaussian_kde(data[i])
+                p = stats.gaussian_kde(data[i + 1])
 
                 ts_min = min(np.min(data[i]), np.min(data[i + 1]))
                 ts_max = max(np.max(data[i]), np.max(data[i + 1]))
@@ -178,8 +178,8 @@ class WindowDensityModel(BaseModel):
 
         # If called for scoring, Kl divergence is performed between the scoring window and the baseline
         elif called_for == "scoring":
-            q = stats.kde.gaussian_kde(baseline)
-            p = stats.kde.gaussian_kde(data)
+            q = stats.gaussian_kde(baseline)
+            p = stats.gaussian_kde(data)
 
             ts_min = min(np.min(baseline), np.min(data))
             ts_max = max(np.max(baseline), np.max(data))
