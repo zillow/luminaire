@@ -238,7 +238,7 @@
 <span class=sd >        """</span>
 
         <span class=kn >import</span> <span class=nn >numpy</span> <span class=k >as</span> <span class=nn >np</span>
-        <span class=kn >import</span> <span class=nn >statsmodels.tsa.arima_model</span> <span class=k >as</span> <span class=nn >arima</span>
+        <span class=kn >import</span> <span class=nn >statsmodels.tsa.arima.model</span> <span class=k >as</span> <span class=nn >arima</span>
 
         <span class=c1 ># Extract the exogenous variable generated based on (imodels * 2) number of most significant</span>
         <span class=c1 ># frequencies</span>
@@ -258,13 +258,7 @@
 
         <span class=k >try</span><span class=p >:</span>
             <span class=n >stepwise_fit</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >arima</span><span class=o >.</span><span class=n >ARIMA</span><span class=p >(</span><span class=n >endog</span><span class=o >=</span><span class=n >endog</span><span class=p >,</span> <span class=n >exog</span><span class=o >=</span><span class=n >exog</span><span class=p >,</span>
-                                            <span class=n >order</span><span class=o >=</span><span class=p >(</span><span class=n >p</span><span class=p >,</span> <span class=n >d</span><span class=p >,</span> <span class=n >q</span><span class=p >))</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >seasonal</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >trace</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span>
-                                                                 <span class=n >method</span><span class=o >=</span><span class=s1 >'css'</span><span class=p >,</span>
-                                                                 <span class=n >solver</span><span class=o >=</span><span class=s1 >'bfgs'</span><span class=p >,</span>
-                                                                 <span class=n >error_action</span><span class=o >=</span><span class=s1 >'ignore'</span><span class=p >,</span>
-                                                                 <span class=n >stepwise_fit</span><span class=o >=</span><span class=kc >True</span><span class=p >,</span>
-                                                                 <span class=n >warn_convergence</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span>
-                                                                 <span class=n >disp</span><span class=o >=</span><span class=kc >False</span><span class=p >))</span>
+                                            <span class=n >order</span><span class=o >=</span><span class=p >(</span><span class=n >p</span><span class=p >,</span> <span class=n >d</span><span class=p >,</span> <span class=n >q</span><span class=p >))</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >method</span><span class=o >=</span><span class=s1 >'statespace'</span><span class=p >))</span>
         <span class=k >except</span> <span class=ne >Exception</span> <span class=k >as</span> <span class=n >e</span><span class=p >:</span>
             <span class=k >raise</span> <span class=n >LADStructuralError</span><span class=p >(</span><span class=n >message</span><span class=o >=</span><span class=nb >str</span><span class=p >(</span><span class=n >e</span><span class=p >))</span>
 
@@ -443,12 +437,77 @@
 
         <span class=k >return</span> <span class=n >result</span><span class=p >,</span> <span class=n >order</span>
 
-<div class=viewcode-block  id=LADStructuralModel.train ><a class=viewcode-back  href="../../../api_reference/batch_models.html#luminaire.model.lad_structural.LADStructuralModel.train">[docs]</a>    <span class=k >def</span> <span class=nf >train</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >data</span><span class=p >,</span> <span class=n >optimize</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=o >**</span><span class=n >kwargs</span><span class=p >):</span>
+    <span class=k >def</span> <span class=nf >_validate_model</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >data</span><span class=p >,</span> <span class=n >hyper_params</span><span class=p >,</span> <span class=n >result</span><span class=p >):</span>
+        <span class=sd >"""</span>
+<span class=sd >        This function validates a newly trained model before publishing. This valudation checks for underfit due to</span>
+<span class=sd >        misspecification of hyperparameters or nonstationarity.</span>
+
+<span class=sd >        :param pandas.DataFrame data: Input time series data</span>
+<span class=sd >        :param dict hyper_params: Hyperparameters for model training</span>
+<span class=sd >        :param dict result: Training outputs</span>
+<span class=sd >        :return: A validation flag for model to publish. The function returns True when the validation is successful,</span>
+<span class=sd >        False otherwise.</span>
+
+<span class=sd >        :rtype: bool</span>
+<span class=sd >        """</span>
+
+        <span class=kn >import</span> <span class=nn >numpy</span> <span class=k >as</span> <span class=nn >np</span>
+        <span class=kn >import</span> <span class=nn >scipy.stats</span> <span class=k >as</span> <span class=nn >st</span>
+
+        <span class=n >levene_alpha</span> <span class=o >=</span> <span class=mf >0.05</span>
+        <span class=n >grubb_alpha</span> <span class=o >=</span> <span class=mf >0.001</span>
+        <span class=n >f_test_alpha</span> <span class=o >=</span> <span class=mf >0.05</span>
+        <span class=n >mwu_alpha</span> <span class=o >=</span> <span class=mf >0.0005</span>
+        <span class=n >passed</span> <span class=o >=</span> <span class=kc >True</span>
+
+        <span class=n >model</span> <span class=o >=</span> <span class=n >LADStructuralModel</span><span class=p >(</span><span class=n >hyper_params</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >hyper_params</span><span class=p >,</span> <span class=o >**</span><span class=n >result</span><span class=p >)</span>
+
+        <span class=n >freq</span> <span class=o >=</span> <span class=s2 >"1"</span> <span class=o >+</span> <span class=n >result</span><span class=p >[</span><span class=s1 >'freq'</span><span class=p >]</span> <span class=k >if</span> <span class=ow >not</span> <span class=nb >any</span><span class=p >(</span><span class=n >char</span><span class=o >.</span><span class=n >isdigit</span><span class=p >()</span> <span class=k >for</span> <span class=n >char</span> <span class=ow >in</span> <span class=n >result</span><span class=p >[</span><span class=s1 >'freq'</span><span class=p >])</span> <span class=k >else</span> <span class=n >result</span><span class=p >[</span><span class=s1 >'freq'</span><span class=p >]</span>
+
+        <span class=n >baseline</span> <span class=o >=</span> <span class=n >data</span><span class=p >[</span><span class=bp >self</span><span class=o >.</span><span class=n >_imputed_metric</span><span class=p >][</span><span class=o >-</span><span class=bp >self</span><span class=o >.</span><span class=n >max_scoring_length</span><span class=p >:]</span><span class=o >.</span><span class=n >values</span>
+        <span class=n >baseline</span> <span class=o >=</span> <span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >exp</span><span class=p >(</span><span class=n >baseline</span><span class=p >)</span> <span class=o >-</span> <span class=mi >1</span><span class=p >)</span><span class=o >.</span><span class=n >tolist</span><span class=p >()</span> <span class=k >if</span> <span class=n >hyper_params</span><span class=p >[</span><span class=s1 >'is_log_transformed'</span><span class=p >]</span> <span class=k >else</span> <span class=n >baseline</span><span class=o >.</span><span class=n >tolist</span><span class=p >()</span>
+
+        <span class=n >predictions</span> <span class=o >=</span> <span class=p >[]</span>
+        <span class=n >pred_date</span> <span class=o >=</span> <span class=n >pd</span><span class=o >.</span><span class=n >Timestamp</span><span class=p >(</span><span class=n >result</span><span class=p >[</span><span class=s1 >'training_end_date'</span><span class=p >])</span>
+        <span class=k >for</span> <span class=n >i</span> <span class=ow >in</span> <span class=nb >range</span><span class=p >(</span><span class=nb >len</span><span class=p >(</span><span class=n >baseline</span><span class=p >)):</span>
+            <span class=n >pred_date</span> <span class=o >=</span> <span class=n >pred_date</span> <span class=o >+</span> <span class=n >pd</span><span class=o >.</span><span class=n >Timedelta</span><span class=p >(</span><span class=n >freq</span><span class=p >)</span>
+            <span class=n >result</span> <span class=o >=</span> <span class=n >model</span><span class=o >.</span><span class=n >score</span><span class=p >(</span><span class=n >baseline</span><span class=p >[</span><span class=n >i</span><span class=p >],</span> <span class=n >pred_date</span><span class=p >)</span>
+            <span class=k >if</span> <span class=n >result</span><span class=p >[</span><span class=s1 >'Success'</span><span class=p >]:</span>
+                <span class=n >predictions</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >result</span><span class=p >[</span><span class=s1 >'Prediction'</span><span class=p >])</span>
+
+        <span class=c1 ># We perform Levene test, Mann-Whitney U test, and Grubb test between the predictions and the baseline</span>
+        <span class=c1 ># to understand if the are widely different. The two arrays need to be of the same length in order to</span>
+        <span class=c1 ># perform these tests.</span>
+        <span class=k >if</span> <span class=nb >len</span><span class=p >(</span><span class=n >predictions</span><span class=p >)</span> <span class=o >==</span> <span class=nb >len</span><span class=p >(</span><span class=n >baseline</span><span class=p >):</span>
+            <span class=n >N</span> <span class=o >=</span> <span class=nb >len</span><span class=p >(</span><span class=n >predictions</span><span class=p >)</span>
+
+            <span class=n >pvalue_levene</span> <span class=o >=</span> <span class=n >st</span><span class=o >.</span><span class=n >levene</span><span class=p >(</span><span class=n >predictions</span><span class=p >,</span> <span class=n >baseline</span><span class=p >)[</span><span class=mi >1</span><span class=p >]</span>
+            <span class=n >pvalue_levene_diff</span> <span class=o >=</span> <span class=n >st</span><span class=o >.</span><span class=n >levene</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >diff</span><span class=p >(</span><span class=n >predictions</span><span class=p >),</span> <span class=n >np</span><span class=o >.</span><span class=n >diff</span><span class=p >(</span><span class=n >baseline</span><span class=p >))[</span><span class=mi >1</span><span class=p >]</span>
+            <span class=n >pvalue_mwu</span> <span class=o >=</span> <span class=n >st</span><span class=o >.</span><span class=n >mannwhitneyu</span><span class=p >(</span><span class=n >predictions</span><span class=p >,</span> <span class=n >baseline</span><span class=p >)[</span><span class=mi >1</span><span class=p >]</span> <span class=k >if</span> <span class=n >predictions</span> <span class=o >!=</span> <span class=n >baseline</span> <span class=k >else</span> <span class=mf >1.0</span>
+
+            <span class=n >grubb_test_stat</span> <span class=o >=</span> <span class=nb >max</span><span class=p >(</span><span class=nb >abs</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >array</span><span class=p >(</span><span class=n >predictions</span><span class=p >)</span> <span class=o >-</span> <span class=n >np</span><span class=o >.</span><span class=n >mean</span><span class=p >(</span><span class=n >predictions</span><span class=p >)))</span> <span class=o >/</span> <span class=n >np</span><span class=o >.</span><span class=n >std</span><span class=p >(</span><span class=n >predictions</span><span class=p >,</span> <span class=n >ddof</span><span class=o >=</span><span class=mi >1</span><span class=p >)</span>
+            <span class=n >t_cutoff</span> <span class=o >=</span> <span class=n >st</span><span class=o >.</span><span class=n >t</span><span class=o >.</span><span class=n >ppf</span><span class=p >((</span><span class=n >grubb_alpha</span> <span class=o >/</span> <span class=p >(</span><span class=mi >2</span> <span class=o >*</span> <span class=n >N</span><span class=p >)),</span> <span class=n >df</span><span class=o >=</span><span class=n >N</span> <span class=o >-</span> <span class=mi >2</span><span class=p >)</span>
+            <span class=n >grubb_test</span> <span class=o >=</span> <span class=n >grubb_test_stat</span> <span class=o >&gt;</span> <span class=p >((</span><span class=n >N</span> <span class=o >-</span> <span class=mi >1</span><span class=p >)</span> <span class=o >/</span> <span class=n >np</span><span class=o >.</span><span class=n >sqrt</span><span class=p >(</span><span class=n >N</span><span class=p >))</span> <span class=o >*</span> <span class=n >np</span><span class=o >.</span><span class=n >sqrt</span><span class=p >((</span><span class=n >t_cutoff</span><span class=o >**</span><span class=mi >2</span><span class=p >)</span> <span class=o >/</span> <span class=p >(</span><span class=n >N</span> <span class=o >-</span> <span class=mi >2</span> <span class=o >+</span> <span class=p >(</span><span class=n >t_cutoff</span><span class=o >**</span><span class=mi >2</span><span class=p >)))</span>
+
+            <span class=k >if</span> <span class=n >grubb_test</span><span class=p >:</span>
+                <span class=n >passed</span> <span class=o >=</span> <span class=kc >False</span>
+            <span class=k >if</span> <span class=n >np</span><span class=o >.</span><span class=n >std</span><span class=p >(</span><span class=n >baseline</span><span class=p >,</span> <span class=n >ddof</span><span class=o >=</span><span class=mi >1</span><span class=p >)</span> <span class=o >&gt;</span> <span class=mi >0</span><span class=p >:</span>
+                <span class=k >if</span> <span class=p >(</span><span class=ow >not</span> <span class=n >np</span><span class=o >.</span><span class=n >isnan</span><span class=p >(</span><span class=n >pvalue_levene</span><span class=p >)</span> <span class=ow >and</span> <span class=ow >not</span> <span class=n >np</span><span class=o >.</span><span class=n >isnan</span><span class=p >(</span><span class=n >pvalue_levene_diff</span><span class=p >)</span> <span class=ow >and</span> <span class=ow >not</span> <span class=n >np</span><span class=o >.</span><span class=n >isnan</span><span class=p >(</span><span class=n >pvalue_mwu</span><span class=p >))</span> <span class=ow >and</span> \
+                        <span class=p >(</span><span class=n >pvalue_levene</span> <span class=o >&lt;</span> <span class=n >levene_alpha</span> <span class=ow >or</span> <span class=n >pvalue_levene_diff</span> <span class=o >&lt;</span> <span class=n >levene_alpha</span><span class=p >):</span>
+                    <span class=n >F</span> <span class=o >=</span> <span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >std</span><span class=p >(</span><span class=n >predictions</span><span class=p >,</span> <span class=n >ddof</span><span class=o >=</span><span class=mi >1</span><span class=p >)</span> <span class=o >**</span> <span class=mi >2</span><span class=p >)</span> <span class=o >/</span> <span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >std</span><span class=p >(</span><span class=n >baseline</span><span class=p >,</span> <span class=n >ddof</span><span class=o >=</span><span class=mi >1</span><span class=p >)</span> <span class=o >**</span> <span class=mi >2</span><span class=p >)</span>
+                    <span class=n >f_test_pval</span> <span class=o >=</span> <span class=mi >1</span> <span class=o >-</span> <span class=n >st</span><span class=o >.</span><span class=n >f</span><span class=o >.</span><span class=n >cdf</span><span class=p >(</span><span class=n >F</span><span class=p >,</span> <span class=n >N</span> <span class=o >-</span> <span class=mi >1</span><span class=p >,</span> <span class=nb >len</span><span class=p >(</span><span class=n >baseline</span><span class=p >)</span> <span class=o >-</span> <span class=mi >1</span><span class=p >)</span>
+                    <span class=k >if</span> <span class=n >f_test_pval</span> <span class=o >&lt;</span> <span class=n >f_test_alpha</span> <span class=ow >and</span> <span class=n >pvalue_mwu</span> <span class=o >&lt;</span> <span class=n >mwu_alpha</span><span class=p >:</span>
+                        <span class=n >passed</span> <span class=o >=</span> <span class=kc >False</span>
+
+        <span class=k >return</span> <span class=n >passed</span>
+
+<div class=viewcode-block  id=LADStructuralModel.train ><a class=viewcode-back  href="../../../api_reference/batch_models.html#luminaire.model.lad_structural.LADStructuralModel.train">[docs]</a>    <span class=k >def</span> <span class=nf >train</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >data</span><span class=p >,</span> <span class=n >optimize</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >validate</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=o >**</span><span class=n >kwargs</span><span class=p >):</span>
         <span class=sd >"""</span>
 <span class=sd >        This function trains a structural LAD model for a given time series.</span>
 
 <span class=sd >        :param pandas.DataFrame data: Input time series data</span>
 <span class=sd >        :param bool optimize: Flag to identify whether called from hyperparameter optimization</span>
+<span class=sd >        :param bool validate: Flag to identify whether to run model validation after training</span>
 <span class=sd >        :return: success flag, the model date and the trained lad structural model object</span>
 <span class=sd >        :rtype: tuple[bool, str, LADStructuralModel object]</span>
 
@@ -493,6 +552,13 @@
         <span class=n >result</span><span class=p >[</span><span class=s1 >'freq'</span><span class=p >]</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_params</span><span class=p >[</span><span class=s1 >'freq'</span><span class=p >]</span>
 
         <span class=n >success</span> <span class=o >=</span> <span class=kc >False</span> <span class=k >if</span> <span class=s1 >'ErrorMessage'</span> <span class=ow >in</span> <span class=n >result</span> <span class=k >else</span> <span class=kc >True</span>
+
+        <span class=c1 ># Model validation step to check underfit due to misspecification of hyperparameters to some other reasons.</span>
+        <span class=k >if</span> <span class=n >success</span> <span class=ow >and</span> <span class=n >validate</span> <span class=ow >and</span> <span class=ow >not</span> <span class=n >optimize</span><span class=p >:</span>
+            <span class=n >passed</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_validate_model</span><span class=p >(</span><span class=n >data</span><span class=o >=</span><span class=n >data</span><span class=p >,</span> <span class=n >hyper_params</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >hyper_params</span><span class=p >,</span> <span class=n >result</span><span class=o >=</span><span class=n >result</span><span class=p >)</span>
+            <span class=k >if</span> <span class=ow >not</span> <span class=n >passed</span><span class=p >:</span>
+                <span class=n >success</span> <span class=o >=</span> <span class=kc >False</span>
+                <span class=n >result</span><span class=p >[</span><span class=s1 >'ErrorMessage'</span><span class=p >]</span> <span class=o >=</span> <span class=s1 >'Model validation failed! Check any issues with the input data or the hyper-parameters.'</span>
 
         <span class=k >return</span> <span class=n >success</span><span class=p >,</span> <span class=n >kwargs</span><span class=p >[</span><span class=s1 >'ts_end'</span><span class=p >],</span> <span class=n >LADStructuralModel</span><span class=p >(</span><span class=n >hyper_params</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >hyper_params</span><span class=p >,</span> <span class=o >**</span><span class=n >result</span><span class=p >)</span></div>
 
@@ -570,7 +636,11 @@
                 <span class=k >else</span><span class=p >:</span>
                     <span class=n >pred_exog</span><span class=p >[</span><span class=s1 >'fourier_feature'</span><span class=p >]</span> <span class=o >=</span> <span class=n >seasonal_feature_scoring</span><span class=p >[:</span><span class=n >forecast_ndays</span><span class=p >]</span>
 
-            <span class=n >forecast</span> <span class=o >=</span> <span class=nb >list</span><span class=p >(</span><span class=n >model</span><span class=o >.</span><span class=n >forecast</span><span class=p >(</span><span class=n >steps</span><span class=o >=</span><span class=n >forecast_ndays</span><span class=p >,</span> <span class=n >alpha</span><span class=o >=</span><span class=n >alpha</span><span class=p >,</span> <span class=n >exog</span><span class=o >=</span><span class=n >pred_exog</span><span class=p >))</span>
+            <span class=n >forecast</span> <span class=o >=</span> <span class=p >[]</span>
+            <span class=n >forecast_obj</span> <span class=o >=</span> <span class=n >model</span><span class=o >.</span><span class=n >get_forecast</span><span class=p >(</span><span class=n >steps</span><span class=o >=</span><span class=n >forecast_ndays</span><span class=p >,</span> <span class=n >alpha</span><span class=o >=</span><span class=n >alpha</span><span class=p >,</span> <span class=n >exog</span><span class=o >=</span><span class=n >pred_exog</span><span class=p >)</span>
+            <span class=n >forecast</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >real</span><span class=p >(</span><span class=n >forecast_obj</span><span class=o >.</span><span class=n >predicted_mean</span><span class=p >)</span><span class=o >.</span><span class=n >tolist</span><span class=p >())</span>      <span class=c1 ># adding prediction mean to forecast</span>
+            <span class=n >forecast</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >real</span><span class=p >(</span><span class=n >forecast_obj</span><span class=o >.</span><span class=n >se_mean</span><span class=p >)</span><span class=o >.</span><span class=n >tolist</span><span class=p >())</span>         <span class=c1 ># adding prediction standard error to forecast</span>
+            <span class=n >forecast</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >np</span><span class=o >.</span><span class=n >real</span><span class=p >(</span><span class=n >forecast_obj</span><span class=o >.</span><span class=n >conf_int</span><span class=p >())</span><span class=o >.</span><span class=n >tolist</span><span class=p >())</span>      <span class=c1 ># adding predictions ci's to forecast</span>
             <span class=n >interpolated_training_data</span> <span class=o >=</span> <span class=nb >list</span><span class=p >(</span><span class=nb >zip</span><span class=p >(</span><span class=o >*</span><span class=n >training_tail</span><span class=p >))[</span><span class=mi >1</span><span class=p >]</span>
 
             <span class=k >for</span> <span class=n >order</span> <span class=ow >in</span> <span class=nb >list</span><span class=p >(</span><span class=nb >reversed</span><span class=p >(</span><span class=nb >range</span><span class=p >(</span><span class=n >order_of_diff</span><span class=p >))):</span>
@@ -761,4 +831,4 @@
                               <span class=n >include_holidays_exog</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_params</span><span class=p >[</span><span class=s1 >'include_holidays_exog'</span><span class=p >])</span>
 
         <span class=k >return</span> <span class=n >result</span></div></div>
-</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2020 Zillow, Inc.. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.3.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2020 Zillow, Inc.. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.4.0. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>

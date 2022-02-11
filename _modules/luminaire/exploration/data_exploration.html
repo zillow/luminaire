@@ -130,15 +130,30 @@
 
         <span class=bp >self</span><span class=o >.</span><span class=n >tc_max_window_length</span> <span class=o >=</span> <span class=mi >24</span>
 
-    <span class=k >def</span> <span class=nf >add_missing_index</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >df</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >freq</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
+<div class=viewcode-block  id=DataExploration.add_missing_index ><a class=viewcode-back  href="../../../api_reference/exploration.html#luminaire.exploration.data_exploration.DataExploration.add_missing_index">[docs]</a>    <span class=k >def</span> <span class=nf >add_missing_index</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >df</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >freq</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
+        <span class=sd >"""</span>
+<span class=sd >        This function reindexes a pandas dataframe with missing dates for a given time series frequency.</span>
+
+<span class=sd >        Note: If duplicate dates dates are present in the dataframe, this function takes average of the duplicate</span>
+<span class=sd >        data dates and merges them as a single data date.</span>
+
+<span class=sd >        :param pandas.DataFrame df: Input pandas dataframe containing the time series</span>
+<span class=sd >        :param str freq: The frequency of the time-series. A `Pandas offset`_ such as 'D', 'H', or 'M'</span>
+<span class=sd >        :return: pandas dataframe after reindexing missing data dates</span>
+
+<span class=sd >        :rtype: pandas.DataFrame</span>
+<span class=sd >        """</span>
 
         <span class=kn >import</span> <span class=nn >pandas</span> <span class=k >as</span> <span class=nn >pd</span>
+
+        <span class=c1 ># Adding a group by logic for duplicate index</span>
+        <span class=n >df</span> <span class=o >=</span> <span class=n >df</span><span class=o >.</span><span class=n >groupby</span><span class=p >(</span><span class=n >df</span><span class=o >.</span><span class=n >index</span><span class=p >)</span><span class=o >.</span><span class=n >mean</span><span class=p >()</span>
 
         <span class=c1 ># Create a new Pandas data frame based on the first valid index and</span>
         <span class=c1 ># current date using the frequency defined by the use</span>
         <span class=n >idx</span> <span class=o >=</span> <span class=n >pd</span><span class=o >.</span><span class=n >date_range</span><span class=p >(</span><span class=n >start</span><span class=o >=</span><span class=n >df</span><span class=o >.</span><span class=n >first_valid_index</span><span class=p >(),</span> <span class=n >end</span><span class=o >=</span><span class=n >df</span><span class=o >.</span><span class=n >last_valid_index</span><span class=p >(),</span> <span class=n >freq</span><span class=o >=</span><span class=n >freq</span><span class=p >)</span>
         <span class=n >df_reindexed</span> <span class=o >=</span> <span class=n >df</span><span class=o >.</span><span class=n >reindex</span><span class=p >(</span><span class=n >idx</span><span class=p >)</span>
-        <span class=k >return</span> <span class=n >df_reindexed</span>
+        <span class=k >return</span> <span class=n >df_reindexed</span></div>
 
     <span class=k >def</span> <span class=nf >_kalman_smoothing_imputation</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >df</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >target_metric</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >imputed_metric</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >impute_only</span><span class=o >=</span><span class=kc >False</span><span class=p >):</span>
         <span class=sd >"""</span>
@@ -799,14 +814,20 @@
         <span class=kn >from</span> <span class=nn >pykalman</span> <span class=kn >import</span> <span class=n >KalmanFilter</span>
 
         <span class=n >kf</span> <span class=o >=</span> <span class=n >KalmanFilter</span><span class=p >()</span>
-        <span class=n >filtered_state_means</span><span class=p >,</span> <span class=n >filtered_state_covariance</span> <span class=o >=</span> <span class=n >kf</span><span class=o >.</span><span class=n >em</span><span class=p >(</span><span class=n >input_series</span><span class=p >)</span><span class=o >.</span><span class=n >filter</span><span class=p >(</span><span class=n >input_series</span><span class=p >)</span>
 
-        <span class=n >residuals</span> <span class=o >=</span> <span class=n >input_series</span> <span class=o >-</span> <span class=n >filtered_state_means</span><span class=p >[:,</span><span class=mi >0</span><span class=p >]</span>
+        <span class=n >truncated_series</span> <span class=o >=</span> <span class=n >input_series</span><span class=p >[</span><span class=o >-</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >min_ts_length</span> <span class=o >*</span> <span class=mi >3</span><span class=p >):]</span> \
+            <span class=k >if</span> <span class=n >idx_position</span> <span class=o >==</span> <span class=nb >len</span><span class=p >(</span><span class=n >input_series</span><span class=p >)</span> <span class=o >-</span> <span class=mi >1</span> <span class=k >else</span> <span class=n >input_series</span>
+        <span class=n >idx_position</span> <span class=o >=</span> <span class=nb >len</span><span class=p >(</span><span class=n >truncated_series</span><span class=p >)</span> <span class=o >-</span> <span class=mi >1</span>
 
+        <span class=n >filtered_state_means</span><span class=p >,</span> <span class=n >filtered_state_covariance</span> <span class=o >=</span> <span class=n >kf</span><span class=o >.</span><span class=n >em</span><span class=p >(</span><span class=n >truncated_series</span><span class=p >)</span><span class=o >.</span><span class=n >filter</span><span class=p >(</span><span class=n >truncated_series</span><span class=p >)</span>
+
+        <span class=n >residuals</span> <span class=o >=</span> <span class=n >truncated_series</span> <span class=o >-</span> <span class=n >filtered_state_means</span><span class=p >[:,</span> <span class=mi >0</span><span class=p >]</span>
+
+        <span class=c1 ># Catching marginal anomalies to avoid during training</span>
         <span class=n >is_anomaly</span> <span class=o >=</span> <span class=n >residuals</span><span class=p >[</span><span class=n >idx_position</span><span class=p >]</span> <span class=o >&lt;</span> <span class=n >np</span><span class=o >.</span><span class=n >mean</span><span class=p >(</span><span class=n >residuals</span><span class=p >)</span> \
-                     <span class=o >-</span> <span class=p >(</span><span class=mf >2.5</span> <span class=o >*</span> <span class=n >np</span><span class=o >.</span><span class=n >sqrt</span><span class=p >(</span><span class=n >filtered_state_covariance</span><span class=p >)[</span><span class=n >idx_position</span><span class=p >][</span><span class=mi >0</span><span class=p >][</span><span class=mi >0</span><span class=p >])</span> \
+                     <span class=o >-</span> <span class=p >(</span><span class=mi >1</span> <span class=o >*</span> <span class=n >np</span><span class=o >.</span><span class=n >sqrt</span><span class=p >(</span><span class=n >filtered_state_covariance</span><span class=p >)[</span><span class=n >idx_position</span><span class=p >][</span><span class=mi >0</span><span class=p >][</span><span class=mi >0</span><span class=p >])</span> \
                      <span class=ow >or</span> <span class=n >residuals</span><span class=p >[</span><span class=n >idx_position</span><span class=p >]</span> <span class=o >&gt;</span> <span class=n >np</span><span class=o >.</span><span class=n >mean</span><span class=p >(</span><span class=n >residuals</span><span class=p >)</span> \
-                     <span class=o >+</span> <span class=p >(</span><span class=mf >2.5</span> <span class=o >*</span> <span class=n >np</span><span class=o >.</span><span class=n >sqrt</span><span class=p >(</span><span class=n >filtered_state_covariance</span><span class=p >)[</span><span class=n >idx_position</span><span class=p >][</span><span class=mi >0</span><span class=p >][</span><span class=mi >0</span><span class=p >])</span>
+                     <span class=o >+</span> <span class=p >(</span><span class=mi >1</span> <span class=o >*</span> <span class=n >np</span><span class=o >.</span><span class=n >sqrt</span><span class=p >(</span><span class=n >filtered_state_covariance</span><span class=p >)[</span><span class=n >idx_position</span><span class=p >][</span><span class=mi >0</span><span class=p >][</span><span class=mi >0</span><span class=p >])</span>
 
         <span class=k >return</span> <span class=n >is_anomaly</span></div>
 
@@ -882,6 +903,9 @@
         <span class=k >if</span> <span class=ow >not</span> <span class=n >streaming</span><span class=p >:</span>
             <span class=n >df</span> <span class=o >=</span> <span class=n >df</span><span class=o >.</span><span class=n >iloc</span><span class=p >[</span><span class=o >-</span><span class=nb >min</span><span class=p >(</span><span class=n >max_ts_length</span><span class=p >,</span> <span class=nb >len</span><span class=p >(</span><span class=n >df</span><span class=p >)):]</span>
             <span class=n >df</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_truncate_by_data_gaps</span><span class=p >(</span><span class=n >df</span><span class=o >=</span><span class=n >df</span><span class=p >,</span> <span class=n >target_metric</span><span class=o >=</span><span class=n >target_metric</span><span class=p >)</span>
+
+            <span class=k >if</span> <span class=nb >len</span><span class=p >(</span><span class=n >df</span><span class=p >)</span> <span class=o >&lt;</span> <span class=n >min_ts_length</span><span class=p >:</span>
+                <span class=k >raise</span> <span class=ne >ValueError</span><span class=p >(</span><span class=s2 >"Due to a recent data gap, training is waiting for more data to populate"</span><span class=p >)</span>
 
         <span class=k >if</span> <span class=ow >not</span> <span class=n >streaming</span> <span class=ow >and</span> <span class=nb >len</span><span class=p >(</span><span class=n >df</span><span class=p >)</span> <span class=o >&lt;</span> <span class=n >min_ts_length</span><span class=p >:</span>
             <span class=k >raise</span> <span class=ne >ValueError</span><span class=p >(</span><span class=s2 >"The training data observed continuous missing data near the end. Require more stable "</span>
@@ -1116,4 +1140,4 @@
             <span class=n >trunc_df</span> <span class=o >=</span> <span class=kc >None</span>
 
         <span class=k >return</span> <span class=n >trunc_df</span><span class=p >,</span> <span class=n >summary</span></div></div>
-</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2020 Zillow, Inc.. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.3.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2020 Zillow, Inc.. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.4.0. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
