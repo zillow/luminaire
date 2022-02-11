@@ -14,7 +14,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='luminaire',
-    version='0.3.0',
+    version='0.4.0.dev1',
 
     license='Apache License 2.0',
 
@@ -25,15 +25,17 @@ setup(
     author='Zillow Group A.I. team',
     author_email='luminaire-dev-oss@zillowgroup.com',
 
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     packages=find_packages(),
     install_requires=install_requires,
 
     classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Operating System :: OS Independent',
         'Topic :: Scientific/Engineering :: Information Analysis',
         'Topic :: Software Development :: Libraries :: Python Modules',
