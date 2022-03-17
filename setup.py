@@ -14,7 +14,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='luminaire',
-    version='0.4.0.dev2',
+    version='0.4.0.dev3',
 
     license='Apache License 2.0',
 
