@@ -7,4 +7,3 @@ scipy>=1.6.0
 statsmodels>=0.13.0
 scikit-learn>=0.24.2
 decorator>=5.1.0
-py4j<=0.10.9.3
