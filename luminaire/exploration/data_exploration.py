@@ -124,8 +124,7 @@ class DataExploration(object):
             'D': 7,
         }
 
-        if freq in ['H', 'D']:
-            self.tc_window_length = tc_window_len_dict.get(freq)
+        self.tc_window_length = tc_window_len_dict.get(freq) if freq in ['H', 'D'] else None
 
         self.tc_max_window_length = 24
 
