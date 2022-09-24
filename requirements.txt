@@ -1,3 +1,4 @@
+bayescd==0.4
 changepy>=0.3.1
 hyperopt>=0.1.2
 numpy>=1.17.5, <=1.22.4

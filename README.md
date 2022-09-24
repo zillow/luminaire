@@ -19,8 +19,11 @@
 - [Quick Start](#quick-start)
 - [Time Series Outlier Detection Workflow](#time-series-outlier-detection-workflow)
 - [Anomaly Detection for High Frequency Time Series](#anomaly-detection-for-high-frequency-time-series)
+- [Examples](#examples)
 - [Contributing](#contributing)
-- [Acknowledgements](#acknowledgements)
+- [Citing](#citing)
+- [Other Useful Resources](#other-useful-resources)
+- [Blogs](#blogs)
 - [Development Team](#development-team)
 
 
@@ -35,17 +38,6 @@ Install Luminaire from [PyPI](https://pypi.org/project/luminaire/) using ``pip``
 ```bash
 pip install luminaire
 ```
-
-> **PLEASE READ**
-> 
-> We had to remove `bayesian-changepoint-detection` package from requirements due to deployment issues in pypi 
-> (the latest version of scipy is not supported by `bayesian-changepoint-detection` v0.2.dev1). This is a dependency
-> for Luminaire training and data exploration process. Until a proper resolution is applied, please manually install a 
-> compatible version of the package from github using the following script:
-> 
-> ```bash
-> pip install git+https://github.com/hildensia/bayesian_changepoint_detection@2dd95f5c1d028116899a842ccb3baa173f9d5be9#egg=bayesian-changepoint-detection
-> ```
 
 Import ``luminaire`` module in python 
 ```python
