@@ -193,3 +193,19 @@ class TestLADStructural(object):
         result = window_density_model_hourly_aggregated.score(data)
 
         assert result[0]['Success'] and isinstance(result[0]['AnomalyProbability'], float)
+
+    def test_lad_filtering_scoring_diff_order(self, scoring_test_data, lad_filtering_model):
+        import numpy as np
+        # check to see if scoring yields AdjustedActual with correct order of differences
+        pred_date_normal = scoring_test_data.index[0]
+        value_normal = scoring_test_data['raw'][0]
+        output_normal, lad_filtering_model_update = lad_filtering_model.score(value_normal, pred_date_normal)
+        # collect data
+        diff_order = output_normal["NonStationarityDiffOrder"]
+        adj_actual  = output_normal["AdjustedActual"]
+        last_points = lad_filtering_model._params['last_data_points']
+        last_points.append(value_normal)
+        # diff with model's diff_order
+        diff = np.diff(last_points, diff_order)[-1]
+
+        assert diff == adj_actual, f"AdjustedActual {adj_actual} does not match diff {diff_order} of last_data_points {last_points}"
