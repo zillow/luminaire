@@ -297,7 +297,7 @@ class LADFilteringModel(BaseModel):
                 actual_previous_per_diff = [interpolated_actual_previous[-1]] \
                     if diff_order == 1 else [interpolated_actual_previous[-1], np.diff(interpolated_actual_previous)[0]]
                 seq_tail = interpolated_actual_previous + [interpolated_actual]
-                interpolated_actual = np.diff(seq_tail, 2)[-1]
+                interpolated_actual = np.diff(seq_tail, diff_order)[-1]
 
             post_pred = prior_pred + kalman_gain[0][0] * (interpolated_actual - (observation_matrix[0][0] * prior_pred))
 
