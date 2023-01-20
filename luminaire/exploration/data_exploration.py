@@ -166,7 +166,6 @@ class DataExploration(object):
         length requirement for Kalman smoothing
         """
         import numpy as np
-        np.random.RandomState(42)
         from pykalman import KalmanFilter
         time_series = np.array(df[target_metric], dtype=np.float64)
         missing_idx = np.where(np.isnan(time_series))[0]
@@ -207,7 +206,6 @@ class DataExploration(object):
         :rtype: list
         """
         import numpy as np
-        np.random.RandomState(42)
 
         moving_averages = []
         iter_length = len(series) - window_length
@@ -263,7 +261,6 @@ class DataExploration(object):
         """
 
         import numpy as np
-        np.random.RandomState(42)
         from statsmodels.tsa.stattools import adfuller
 
         endog_diff = np.array(endog)
@@ -345,7 +342,6 @@ class DataExploration(object):
         """
 
         import numpy as np
-        np.random.RandomState(42)
         import pandas as pd
         from itertools import chain
         from statsmodels.tsa.stattools import adfuller
@@ -438,7 +434,6 @@ class DataExploration(object):
         """
 
         import numpy as np
-        np.random.RandomState(42)
 
         moving_averages = []
 
@@ -460,7 +455,6 @@ class DataExploration(object):
         :rtype: int
         """
         import numpy as np
-        np.random.RandomState(42)
 
         n = len(series)
 
@@ -495,8 +489,6 @@ class DataExploration(object):
         :rtype: list
         """
         import numpy as np
-        np.random.RandomState(42)
-
         import collections
 
         ordered_dict = collections.OrderedDict(sorted(input_dict.items()))
@@ -527,7 +519,6 @@ class DataExploration(object):
         :rtype: list
         """
         import numpy as np
-        np.random.RandomState(42)
 
         min_changepoint_padding_length = self.min_changepoint_padding_length
 
@@ -609,8 +600,6 @@ class DataExploration(object):
         [1021 rows x 2 columns], ['2016-12-26 00:00:00', '2018-09-10 00:00:00'])
         """
         import numpy as np
-        np.random.RandomState(42)
-
         import pandas as pd
         from changepy import pelt
         from changepy.costs import normal_var
@@ -709,8 +698,6 @@ class DataExploration(object):
 
         """
         import numpy as np
-        np.random.RandomState(42)
-
         from scipy import stats
         from statsmodels.tsa.stattools import acf
 
@@ -823,8 +810,6 @@ class DataExploration(object):
         False
         """
         import numpy as np
-        np.random.RandomState(42)
-
         from pykalman import KalmanFilter
 
         kf = KalmanFilter()
@@ -856,7 +841,6 @@ class DataExploration(object):
         """
 
         import numpy as np
-        np.random.RandomState(42)
 
         max_data_gap = abs(self.min_ts_length / 3.0)
 
@@ -984,7 +968,6 @@ class DataExploration(object):
         """
 
         import numpy as np
-        np.random.RandomState(42)
 
         min_ts_length = self.min_ts_length
         max_ts_length = self.max_ts_length
@@ -1073,8 +1056,6 @@ class DataExploration(object):
         from random import sample
         import datetime
         import numpy as np
-        np.random.RandomState(42)
-
         import pandas as pd
         from scipy import stats
 

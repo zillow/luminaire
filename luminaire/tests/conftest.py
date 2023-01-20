@@ -3,7 +3,6 @@ from os.path import dirname as up
 import pytest
 import pandas as pd
 import numpy as np
-np.random.RandomState(42)
 
 def get_data_path(path):
     luminaire_test_dir = up(os.path.realpath(path))

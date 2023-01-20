@@ -1,6 +1,5 @@
 from luminaire.exploration.data_exploration import *
 import numpy as np
-np.random.RandomState(42)
 import pandas as pd
 
 class TestDataExploration(object):

@@ -196,7 +196,6 @@ class TestLADStructural(object):
 
     def test_lad_filtering_scoring_diff_order(self, scoring_test_data, lad_filtering_model):
         import numpy as np
-        np.random.RandomState(42)
         # check to see if scoring yields AdjustedActual with correct order of differences
         pred_date_normal = scoring_test_data.index[0]
         value_normal = scoring_test_data['raw'][0]

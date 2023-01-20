@@ -103,7 +103,6 @@ class LADFilteringModel(BaseModel):
         kalman gain
         """
         import numpy as np
-        np.random.RandomState(42)
 
         try:
 
@@ -140,7 +139,6 @@ class LADFilteringModel(BaseModel):
         """
 
         import numpy as np
-        np.random.RandomState(42)
         from pykalman import KalmanFilter
         from numpy.linalg import LinAlgError
 
@@ -266,7 +264,6 @@ class LADFilteringModel(BaseModel):
         """
 
         import numpy as np
-        np.random.RandomState(42)
         import scipy.stats as st
         from numpy.linalg import LinAlgError
         is_anomaly = False
@@ -417,8 +414,7 @@ class LADFilteringModel(BaseModel):
 
         import pandas as pd
         import numpy as np
-        np.random.RandomState(42)
-        
+
         pred_date = pd.Timestamp(pred_date)
 
         result, model = self._scoring(raw_actual=observed_value, synthetic_actual=synthetic_actual,

@@ -102,7 +102,6 @@ class WindowDensityModel(BaseModel):
         :rtype: int
         """
         import numpy as np
-        np.random.RandomState(42)
         from bayesian_changepoint_detection.priors import const_prior
         from bayesian_changepoint_detection.bayesian_models import offline_changepoint_detection
         import bayesian_changepoint_detection.offline_likelihoods as offline_ll
@@ -149,7 +148,6 @@ class WindowDensityModel(BaseModel):
         :rtype: float
         """
         import numpy as np
-        np.random.RandomState(42)
         import scipy.stats as stats
         float_min = 1e-50
         float_max = 1e50
@@ -209,7 +207,6 @@ class WindowDensityModel(BaseModel):
         :rtype: list
         """
         import numpy as np
-        np.random.RandomState(42)
 
         # Change point detection is performed over the means and standard deviations of the sub windows
         window_means = []
@@ -301,7 +298,6 @@ class WindowDensityModel(BaseModel):
         :rtype: tuple(list, float, float, float, int, list, luminaire.model, float)
         """
         import numpy as np
-        np.random.RandomState(42)
         import pandas as pd
         from itertools import chain
         import scipy.stats as st
@@ -407,7 +403,6 @@ class WindowDensityModel(BaseModel):
         (True, "2018-10-10 23:00:00", <luminaire.model.window_density.WindowDensityModel object at 0x7fd7c5a34e80>)
         """
         import numpy as np
-        np.random.RandomState(42)
         import pandas as pd
 
         freq = pd.Timedelta(self._params['freq']) if self._params['freq'] not in ['S', 'T', '15T', 'H', 'D'] \
@@ -530,7 +525,6 @@ class WindowDensityModel(BaseModel):
         """
 
         import numpy as np
-        np.random.RandomState(42)
         import pandas as pd
         import copy
         import scipy.stats as st
@@ -683,7 +677,6 @@ class WindowDensityModel(BaseModel):
         """
 
         import numpy as np
-        np.random.RandomState(42)
         import pandas as pd
 
         is_log_transformed = self._params['is_log_transformed']
