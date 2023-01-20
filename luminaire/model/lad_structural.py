@@ -124,6 +124,7 @@ class LADStructuralModel(BaseModel):
         :return: A numpy array containing the sinusoids corresponding to the significant frequencies
         """
         import numpy as np
+        np.random.RandomState(42)
         signal = []
 
         # Generating all the frequencies from a time series of length n
@@ -150,6 +151,7 @@ class LADStructuralModel(BaseModel):
         time series
         """
         import numpy as np
+        np.random.RandomState(42)
         ts = []
         for i in range(0, n_extp):
             # Sinusoid for the ith frequency
@@ -173,6 +175,7 @@ class LADStructuralModel(BaseModel):
         many frequencies
         """
         import numpy as np
+        np.random.RandomState(42)
         import copy
         n = len(series)
 
@@ -237,6 +240,7 @@ class LADStructuralModel(BaseModel):
         """
 
         import numpy as np
+        np.random.RandomState(42)
         import statsmodels.tsa.arima.model as arima
 
         # Extract the exogenous variable generated based on (imodels * 2) number of most significant
@@ -290,6 +294,7 @@ class LADStructuralModel(BaseModel):
         lower and upper bound of the confidence interval, flag whether holidays are included in the model as exogenous
         """
         import numpy as np
+        np.random.RandomState(42)
         from pykalman import KalmanFilter
         import warnings
         warnings.filterwarnings('ignore')
@@ -451,6 +456,7 @@ class LADStructuralModel(BaseModel):
         """
 
         import numpy as np
+        np.random.RandomState(42)
         import scipy.stats as st
 
         levene_alpha = 0.05
@@ -588,6 +594,7 @@ class LADStructuralModel(BaseModel):
         """
 
         import numpy as np
+        np.random.RandomState(42)
         import pandas as pd
         import scipy.stats as st
         from numpy.linalg import LinAlgError
@@ -773,7 +780,8 @@ class LADStructuralModel(BaseModel):
 
         import pandas as pd
         import numpy as np
-
+        np.random.RandomState(42)
+        
         # Date to predict
         pred_date = pd.Timestamp(pred_date)
 

@@ -59,6 +59,7 @@ class HyperparameterOptimization(object):
         :rtype: numpy.nanmean
         """
         import numpy as np
+        np.random.RandomState(42)
 
         actuals = np.array(actuals)
         predictions = np.array(predictions)
@@ -85,6 +86,7 @@ class HyperparameterOptimization(object):
         """
 
         import numpy as np
+        np.random.RandomState(42)
         import scipy.stats as st
         float_min = 1e-10
 
@@ -137,6 +139,7 @@ class HyperparameterOptimization(object):
         """
 
         import numpy as np
+        np.random.RandomState(42)
         import pandas as pd
         from sklearn.metrics import log_loss
         import copy
