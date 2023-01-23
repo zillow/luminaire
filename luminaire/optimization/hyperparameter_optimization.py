@@ -305,7 +305,7 @@ class HyperparameterOptimization(object):
             raise ValueError('Only `detection_type=OutlierDetection` is supported in hyperparameter optimization right now')
 
         # Calling the optimization function
-        hyper_param = fmin(objective, space=space, algo=algo, max_evals=max_evals, show_progressbar=True)
+        hyper_param = fmin(objective, space=space, algo=algo, max_evals=max_evals, show_progressbar=True, rstate=self.random_state)
         hyper_param['LuminaireModel'] = hyper_param_list[hyper_param['LuminaireModel']]['model']
         if 'max_ft_freq' in hyper_param:
             hyper_param['max_ft_freq'] = hyper_param['max_ft_freq'] + 2
