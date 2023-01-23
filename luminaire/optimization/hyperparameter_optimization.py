@@ -4,6 +4,7 @@ from luminaire.exploration.data_exploration import DataExploration
 import warnings
 warnings.filterwarnings('ignore')
 
+from ..utils import check_random_state
 
 class HyperparameterOptimization(object):
     """
@@ -31,6 +32,7 @@ class HyperparameterOptimization(object):
                  max_ts_length=None,
                  min_ts_length=None,
                  scoring_length=None,
+                 random_state=None,
                  **kwargs):
         self._target_metric = 'raw'
         self.freq = freq
@@ -47,6 +49,8 @@ class HyperparameterOptimization(object):
         }
         self.scoring_length = scoring_length or (scoring_length_dict.get(freq)
                                                  if freq in scoring_length_dict.keys() else 30)
+
+        self.random_state = random_state
 
     def _mape(self, actuals, predictions):
         """
@@ -93,7 +97,8 @@ class HyperparameterOptimization(object):
 
         # Anomaly detection based on synthetic anomalies generated through a given intensity list
         for prop in self.anomaly_intensity_list:
-            trial_prob = np.random.uniform(0, 1, 1)
+            rnd = check_random_state(self.random_state)
+            trial_prob = rnd.uniform(0, 1, 1)
             if trial_prob < 0.4:
                 synthetic_value = observation + (prop * observation)
                 anomaly_flags.append(1)
@@ -227,7 +232,8 @@ class HyperparameterOptimization(object):
                     anomaly_probabilities_list = []
                     local_model = copy.deepcopy(stable_model)
                     for i, row in scoring_data.iterrows():
-                        trial_prob = np.random.uniform(0, 1, 1)
+                        rnd = check_random_state(self.random_state)
+                        trial_prob = rnd.random.uniform(0, 1, 1)
                         observed_value = row.raw
                         synthetic_actual = observed_value
                         if trial_prob < 0.4:
@@ -288,7 +294,7 @@ class HyperparameterOptimization(object):
 
             try:
                 series = data[self._target_metric].values
-                kf = KalmanFilter()
+                kf = KalmanFilter(random_state=self.random_state)
                 smoothed_series, cov_series = kf.em(series).smooth(series)
             except:
                 raise ValueError('Kalman Smoothing requires more than one data point')
