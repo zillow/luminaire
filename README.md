@@ -18,8 +18,13 @@
 - [What is Luminaire](#what-is-luminaire)
 - [Quick Start](#quick-start)
 - [Time Series Outlier Detection Workflow](#time-series-outlier-detection-workflow)
+  - [Data Preprocessing and Profiling Component](#data-preprocessing-and-profiling-component)
+  - [Modeling Component](#modeling-component)
+  - [Configuration Optimization Component](#configuration-optimization-component)
 - [Anomaly Detection for High Frequency Time Series](#anomaly-detection-for-high-frequency-time-series)
 - [Examples](#examples)
+  - [Batch Time Series Monitoring](#batch-time-series-monitoring)
+  - [Streaming Time Series Monitoring](#streaming-time-series-monitoring)
 - [Contributing](#contributing)
 - [Citing](#citing)
 - [Other Useful Resources](#other-useful-resources)
@@ -67,7 +72,7 @@ The Luminaire modeling step can be called after the data preprocessing and profi
 ### Configuration Optimization Component
  
 Luminaire's integration with configuration optimization enables a hands-off anomaly detection process where
-the user needs to provide very minimal configuration for monitoring any type of time series data. This step can be combined with the preprocessing and modeling for any auto-configured anomaly detection use case. See [fully automatic outlier detection](https://zillow.github.io/luminaire/tutorial/optimization.html#fully-automatic-outlier-detection) for a detailed walkthrough. 
+the user needs to provide very minimal configuration for monitoring any type of time series data. This step can be combined with the preprocessing and modeling for any auto-configured anomaly detection use-case. See [fully automatic outlier detection](https://zillow.github.io/luminaire/tutorial/optimization.html#fully-automatic-outlier-detection) for a detailed walkthrough. 
 
 ## Anomaly Detection for High Frequency Time Series
 
