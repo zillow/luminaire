@@ -1,10 +1,9 @@
 from hyperopt import fmin, tpe, hp, STATUS_OK
 from luminaire.model import LADStructuralModel, LADStructuralHyperParams, LADFilteringModel, LADFilteringHyperParams
 from luminaire.exploration.data_exploration import DataExploration
+from luminaire.utils.random_state_validation import check_random_state
 import warnings
 warnings.filterwarnings('ignore')
-
-from ..utils import check_random_state
 
 class HyperparameterOptimization(object):
     """
@@ -21,6 +20,7 @@ class HyperparameterOptimization(object):
     :param int min_ts_length: The minimum required length of the time series for training. The input time series will be
         truncated if the length is greater than this value.
     :param int scoring_length: Number of innovations to be scored after training window with respect to the frequency.
+    :param int random_state: Turn seed into a np.random.RandomState instance
 
     .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
     """
