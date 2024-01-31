@@ -1,9 +1,9 @@
 from hyperopt import fmin, tpe, hp, STATUS_OK
 from luminaire.model import LADStructuralModel, LADStructuralHyperParams, LADFilteringModel, LADFilteringHyperParams
 from luminaire.exploration.data_exploration import DataExploration
+from luminaire.utils.random_state_validation import check_random_state
 import warnings
 warnings.filterwarnings('ignore')
-
 
 class HyperparameterOptimization(object):
     """
@@ -20,6 +20,7 @@ class HyperparameterOptimization(object):
     :param int min_ts_length: The minimum required length of the time series for training. The input time series will be
         truncated if the length is greater than this value.
     :param int scoring_length: Number of innovations to be scored after training window with respect to the frequency.
+    :param int random_state: Turn seed into a np.random.RandomState instance
 
     .. _Pandas offset: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
     """
@@ -31,6 +32,7 @@ class HyperparameterOptimization(object):
                  max_ts_length=None,
                  min_ts_length=None,
                  scoring_length=None,
+                 random_state=None,
                  **kwargs):
         self._target_metric = 'raw'
         self.freq = freq
@@ -47,6 +49,8 @@ class HyperparameterOptimization(object):
         }
         self.scoring_length = scoring_length or (scoring_length_dict.get(freq)
                                                  if freq in scoring_length_dict.keys() else 30)
+
+        self.random_state = random_state
 
     def _mape(self, actuals, predictions):
         """
@@ -93,7 +97,8 @@ class HyperparameterOptimization(object):
 
         # Anomaly detection based on synthetic anomalies generated through a given intensity list
         for prop in self.anomaly_intensity_list:
-            trial_prob = np.random.uniform(0, 1, 1)
+            rnd = check_random_state(self.random_state)
+            trial_prob = rnd.uniform(0, 1, 1)
             if trial_prob < 0.4:
                 synthetic_value = observation + (prop * observation)
                 anomaly_flags.append(1)
@@ -227,7 +232,8 @@ class HyperparameterOptimization(object):
                     anomaly_probabilities_list = []
                     local_model = copy.deepcopy(stable_model)
                     for i, row in scoring_data.iterrows():
-                        trial_prob = np.random.uniform(0, 1, 1)
+                        rnd = check_random_state(self.random_state)
+                        trial_prob = rnd.random.uniform(0, 1, 1)
                         observed_value = row.raw
                         synthetic_actual = observed_value
                         if trial_prob < 0.4:
@@ -263,7 +269,7 @@ class HyperparameterOptimization(object):
         :return: Optimal hyperparameters
         :rtype: dict
         """
-
+        import numpy as np
         from functools import partial
         from pykalman import KalmanFilter
 
@@ -288,7 +294,7 @@ class HyperparameterOptimization(object):
 
             try:
                 series = data[self._target_metric].values
-                kf = KalmanFilter()
+                kf = KalmanFilter(random_state=self.random_state)
                 smoothed_series, cov_series = kf.em(series).smooth(series)
             except:
                 raise ValueError('Kalman Smoothing requires more than one data point')
@@ -299,7 +305,7 @@ class HyperparameterOptimization(object):
             raise ValueError('Only `detection_type=OutlierDetection` is supported in hyperparameter optimization right now')
 
         # Calling the optimization function
-        hyper_param = fmin(objective, space=space, algo=algo, max_evals=max_evals, show_progressbar=True)
+        hyper_param = fmin(objective, space=space, algo=algo, max_evals=max_evals, show_progressbar=True, rstate=np.random.default_rng(self.random_state))
         hyper_param['LuminaireModel'] = hyper_param_list[hyper_param['LuminaireModel']]['model']
         if 'max_ft_freq' in hyper_param:
             hyper_param['max_ft_freq'] = hyper_param['max_ft_freq'] + 2

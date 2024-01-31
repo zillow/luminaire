@@ -2,9 +2,9 @@ bayescd>=0.4
 changepy>=0.3.1
 hyperopt>=0.1.2
 numpy>=1.17.5, <=1.22.4
-pandas>=0.25.3
+pandas>=0.25.3, <=2.0.3
 pykalman>=0.9.5
 scipy>=1.6.0
-statsmodels>=0.13.0
+statsmodels>=0.13.0, <=0.13.5
 scikit-learn>=0.24.2
 decorator>=5.1.0
