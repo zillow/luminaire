@@ -143,6 +143,7 @@ def lad_filtering_model():
     Model to test lad filtering model result
     """
     import pickle
+    import pdb;pdb.set_trace()
 
     model_file = open(get_model_path('lad_filtering_model'), 'rb')
     model = pickle.load(model_file)
@@ -157,6 +158,7 @@ def lad_structural_model_log_seasonal():
     Model to test lad structural result
     """
     import pickle
+    import pdb;pdb.set_trace()
 
     model_file = open(get_model_path('lad_structural_model_log_seasonal'), 'rb')
     model = pickle.load(model_file)
