@@ -20,7 +20,7 @@ jobs:
 
     - name: Cache Dependencies
       id: cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         # This path is specific to Ubuntu
         path: ~/.cache/pip
