@@ -157,7 +157,7 @@ class LADStructuralModel(BaseModel):
 
             # Computing the inverse Fouries transformation term for the significant coefficients obtained from the
             # spectral density
-            ts.append(np.sum(a * s_array) // n)
+            ts.append(np.sum(a * s_array) / n)
         return np.array(ts)
 
     @classmethod
