@@ -145,6 +145,7 @@ class DataExploration(object):
 
         import pandas as pd
 
+        import pdb;pdb.set_trace()
         # Adding a group by logic for duplicate index
         df = df.groupby(df.index).mean()
 
@@ -896,7 +897,7 @@ class DataExploration(object):
             freq = self.freq
 
         freq_delta = pd.Timedelta("1" + freq) if not any(char.isdigit() for char in str(freq)) else pd.Timedelta(freq)
-        df['index'] = pd.DatetimeIndex(df['index'])
+        df.index = pd.DatetimeIndex(df.index)
         df = self.add_missing_index(df=df, freq=freq_delta)
 
         if not streaming:
