@@ -146,7 +146,7 @@ class DataExploration(object):
         import pandas as pd
 
         # Adding a group by logic for duplicate index
-        df = df.groupby(df['index']).mean()
+        df = df.groupby(df.index).mean()
 
         # Create a new Pandas data frame based on the first valid index and
         # current date using the frequency defined by the use
