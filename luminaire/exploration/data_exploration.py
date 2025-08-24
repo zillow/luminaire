@@ -1,4 +1,6 @@
 from luminaire.model.model_utils import LADHolidays
+import logging
+LOG = logging.getLogger(__name__)
 
 class DataExplorationError(Exception):
     """
@@ -143,9 +145,9 @@ class DataExploration(object):
         :rtype: pandas.DataFrame
         """
 
+        LOG.debug("add_missing_index")
         import pandas as pd
 
-        import pdb;pdb.set_trace()
         # Adding a group by logic for duplicate index
         df = df.groupby(df.index).mean()
 
@@ -166,6 +168,9 @@ class DataExploration(object):
         .. Note: missing data are imputed using moving average if position of the missing data does not satisfy the minimum
         length requirement for Kalman smoothing
         """
+
+        LOG.debug("_kalman_smoothing_imputation")
+
         import numpy as np
         from pykalman import KalmanFilter
         time_series = np.array(df[target_metric], dtype=np.float64)
@@ -206,6 +211,8 @@ class DataExploration(object):
         :return: Smoothed input series using moving averages
         :rtype: list
         """
+        LOG.debug("_moving_average")
+
         import numpy as np
 
         moving_averages = []
@@ -234,6 +241,7 @@ class DataExploration(object):
         :return: Exogenous data for the given list of index
         :rtype: pandas.DataFrame
         """
+        LOG.debug("_get_exog_data")
         import pandas as pd
 
         holiday_calendar = LADHolidays()
@@ -260,6 +268,7 @@ class DataExploration(object):
         raw actuals in every differencing step (for prediction adjustment in the actual
         :rtype: tuple(numpy.array, int, list)
         """
+        LOG.debug("_stationarizer")
 
         import numpy as np
         from statsmodels.tsa.stattools import adfuller
@@ -301,6 +310,7 @@ class DataExploration(object):
         :return: Sliced lists of input time series and aggregated timestamps
         :rtype: tuple
         """
+        LOG.debug("_partition")
         import collections
         import operator
 
@@ -341,6 +351,7 @@ class DataExploration(object):
         :return: Difference time series and the order of differencing based on the stationarity test.
         :rtype: tuple(list, int)
         """
+        LOG.debug("_detrender")
 
         import numpy as np
         import pandas as pd
@@ -433,6 +444,7 @@ class DataExploration(object):
         :return: Returns 'series' after removing the trend
         :rtype: list
         """
+        LOG.debug("_ma_detrender")
 
         import numpy as np
 
@@ -455,6 +467,7 @@ class DataExploration(object):
         :return: An int containing the optimal window size
         :rtype: int
         """
+        LOG.debug("_detect_window_size")
         import numpy as np
 
         n = len(series)
@@ -489,6 +502,7 @@ class DataExploration(object):
         :return: List of local minimas
         :rtype: list
         """
+        LOG.debug("_local_minima")
         import numpy as np
         import collections
 
@@ -519,6 +533,7 @@ class DataExploration(object):
         :return: A list containing the magnitude of changes for every corresponding change points
         :rtype: list
         """
+        LOG.debug("_shift_intensity")
         import numpy as np
 
         min_changepoint_padding_length = self.min_changepoint_padding_length
@@ -600,6 +615,7 @@ class DataExploration(object):
         2018-10-18  1738657.0     14.368624
         [1021 rows x 2 columns], ['2016-12-26 00:00:00', '2018-09-10 00:00:00'])
         """
+        LOG.debug("_pelt_change_point_detection")
         import numpy as np
         import pandas as pd
         from changepy import pelt
