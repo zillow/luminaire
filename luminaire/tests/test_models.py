@@ -30,8 +30,8 @@ class TestLADStructural(object):
 
     def test_lad_structural_scoring(self, scoring_test_data, lad_structural_model):
 
-        pred_date_normal = scoring_test_data.index[0]
-        value_normal = scoring_test_data['raw'][0]
+        pred_date_normal = scoring_test_data.index.iloc[0]
+        value_normal = scoring_test_data['raw'].iloc[0]
         output_normal = lad_structural_model.score(value_normal, pred_date_normal)
 
         pred_date_anomalous = scoring_test_data.index[1]
@@ -55,11 +55,11 @@ class TestLADStructural(object):
     def test_lad_filtering_scoring(self, scoring_test_data, lad_filtering_model):
 
         pred_date_normal = scoring_test_data.index[0]
-        value_normal = scoring_test_data['raw'][0]
+        value_normal = scoring_test_data['raw'].iloc[0]
         output_normal, lad_filtering_model_update = lad_filtering_model.score(value_normal, pred_date_normal)
 
         pred_date_anomalous = scoring_test_data.index[1]
-        value_anomalous = scoring_test_data['raw'][1]
+        value_anomalous = scoring_test_data['raw'].iloc[1]
         output_anomalous, lad_filtering_model_update = lad_filtering_model_update.score(value_anomalous, pred_date_anomalous)
 
         assert output_normal['Success'] and not output_normal['IsAnomaly']
@@ -80,11 +80,11 @@ class TestLADStructural(object):
     def test_lad_structural_scoring_log(self, scoring_test_data_log, lad_structural_model_log_seasonal):
 
         pred_date_normal = scoring_test_data_log.index[0]
-        value_normal = scoring_test_data_log['raw'][0]
+        value_normal = scoring_test_data_log['raw'].iloc[0]
         output_normal = lad_structural_model_log_seasonal.score(value_normal, pred_date_normal)
 
         pred_date_anomalous = scoring_test_data_log.index[1]
-        value_anomalous = scoring_test_data_log['raw'][1]
+        value_anomalous = scoring_test_data_log['raw'].iloc[1]
         output_anomalous = lad_structural_model_log_seasonal.score(value_anomalous, pred_date_anomalous)
 
         assert output_normal['Success'] and output_normal['IsAnomaly']
@@ -104,11 +104,11 @@ class TestLADStructural(object):
     def test_lad_filtering_scoring_log(self, scoring_test_data_log, lad_filtering_model_log_seasonal):
 
         pred_date_normal = scoring_test_data_log.index[0]
-        value_normal = scoring_test_data_log['raw'][0]
+        value_normal = scoring_test_data_log['raw'].iloc[0]
         output_normal, lad_filtering_model_update = lad_filtering_model_log_seasonal.score(value_normal, pred_date_normal)
 
         pred_date_anomalous = scoring_test_data_log.index[1]
-        value_anomalous = scoring_test_data_log['raw'][1]
+        value_anomalous = scoring_test_data_log['raw'].iloc[1]
         output_anomalous, lad_filtering_model_update = lad_filtering_model_update.score(value_anomalous, pred_date_anomalous)
 
         assert output_normal['Success'] and not output_normal['IsAnomaly']
@@ -198,7 +198,7 @@ class TestLADStructural(object):
         import numpy as np
         # check to see if scoring yields AdjustedActual with correct order of differences
         pred_date_normal = scoring_test_data.index[0]
-        value_normal = scoring_test_data['raw'][0]
+        value_normal = scoring_test_data['raw'].iloc[0]
         output_normal, lad_filtering_model_update = lad_filtering_model.score(value_normal, pred_date_normal)
         # collect data
         diff_order = output_normal["NonStationarityDiffOrder"]
