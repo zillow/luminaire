@@ -30,12 +30,12 @@ class TestLADStructural(object):
 
     def test_lad_structural_scoring(self, scoring_test_data, lad_structural_model):
 
-        pred_date_normal = scoring_test_data.index.iloc[0]
+        pred_date_normal = scoring_test_data.index[0]
         value_normal = scoring_test_data['raw'].iloc[0]
         output_normal = lad_structural_model.score(value_normal, pred_date_normal)
 
         pred_date_anomalous = scoring_test_data.index[1]
-        value_anomalous = scoring_test_data['raw'][1]
+        value_anomalous = scoring_test_data['raw'].iloc[1]
         output_anomalous = lad_structural_model.score(value_anomalous, pred_date_anomalous)
 
         assert output_normal['Success'] and not output_normal['IsAnomaly']
