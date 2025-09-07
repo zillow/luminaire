@@ -1,4 +1,6 @@
 from luminaire.model.model_utils import LADHolidays
+import logging
+LOG = logging.getLogger(__name__)
 
 class DataExplorationError(Exception):
     """
@@ -129,6 +131,29 @@ class DataExploration(object):
 
         self.tc_max_window_length = 24
 
+        LOG.info("DataExploration configuration")
+        LOG.info(f"tc_max_window_length={self.tc_max_window_length}")
+        LOG.info(f"tc_window_length={self.tc_window_length}")
+        LOG.info(f"min_changepoint_padding_length={self.min_changepoint_padding_length}")
+        LOG.info(f"window_length={self.window_length}")
+        LOG.info(f"min_num_train_windows={self.min_num_train_windows}")
+        LOG.info(f"max_num_train_windows={self.max_num_train_windows}")
+        LOG.info(f"min_window_length={self.min_window_length}")
+        LOG.info(f"max_window_length={self.max_window_length}")
+        LOG.info(f"change_point_threshold={self.change_point_threshold}")
+
+        LOG.info(f"data_shift_truncate={self.data_shift_truncate}")
+        LOG.info(f"is_log_transformed={self.is_log_transformed}")
+        LOG.info(f"sig_level={self.sig_level}")
+        LOG.info(f"fill_rate={self.fill_rate}")
+        LOG.info(f"min_ts_mean={self.min_ts_mean}")
+        LOG.info(f"freq={self.freq}")
+
+        LOG.info(f"min_ts_length={self.min_ts_length}")
+        LOG.info(f"max_ts_length={self.max_ts_length}")
+        LOG.info(f"_target_index={self._target_index}")
+        LOG.info(f"_target_metric={self._target_metric}")
+
     def add_missing_index(self, df=None, freq=None):
         """
         This function reindexes a pandas dataframe with missing dates for a given time series frequency.
@@ -142,11 +167,12 @@ class DataExploration(object):
 
         :rtype: pandas.DataFrame
         """
+        LOG.debug(f"add_missing_index(freq={freq})")
 
         import pandas as pd
 
         # Adding a group by logic for duplicate index
-        df = df.groupby(df.index).mean()
+        df = df.groupby(df.index).mean(numeric_only=True)
 
         # Create a new Pandas data frame based on the first valid index and
         # current date using the frequency defined by the use
@@ -165,6 +191,9 @@ class DataExploration(object):
         .. Note: missing data are imputed using moving average if position of the missing data does not satisfy the minimum
         length requirement for Kalman smoothing
         """
+
+        LOG.debug(f"_kalman_smoothing_imputation(df={df}, target_metric{target_metric}, imputed_metric={imputed_metric}, impute_only={impute_only})")
+
         import numpy as np
         from pykalman import KalmanFilter
         time_series = np.array(df[target_metric], dtype=np.float64)
@@ -205,6 +234,8 @@ class DataExploration(object):
         :return: Smoothed input series using moving averages
         :rtype: list
         """
+        LOG.debug("_moving_average(series={series}, window_length={window_length}, train_subwindow_len={train_subwindow_len}):")
+
         import numpy as np
 
         moving_averages = []
@@ -233,6 +264,7 @@ class DataExploration(object):
         :return: Exogenous data for the given list of index
         :rtype: pandas.DataFrame
         """
+        LOG.debug(f"_get_exog_data(exog_start={exog_start}, exog_end={exog_end}, index={index})")
         import pandas as pd
 
         holiday_calendar = LADHolidays()
@@ -259,6 +291,7 @@ class DataExploration(object):
         raw actuals in every differencing step (for prediction adjustment in the actual
         :rtype: tuple(numpy.array, int, list)
         """
+        LOG.debug("_stationarizer endog={endog} diff_min={diff_min} diff_max={diff_max} significance_level={significance_level} obs_incl={obs_incl}")
 
         import numpy as np
         from statsmodels.tsa.stattools import adfuller
@@ -300,6 +333,7 @@ class DataExploration(object):
         :return: Sliced lists of input time series and aggregated timestamps
         :rtype: tuple
         """
+        LOG.debug(f"_partition window_length={window_length} value_column={value_column}")
         import collections
         import operator
 
@@ -340,6 +374,7 @@ class DataExploration(object):
         :return: Difference time series and the order of differencing based on the stationarity test.
         :rtype: tuple(list, int)
         """
+        LOG.debug("_detrender training_data_sliced={training_data_sliced} detrend_order_max={detrend_order_max} significance_level={significance_levely} detrend_method={detrend_method} agg_datetime={agg_datetime} past_model={past_model}")
 
         import numpy as np
         import pandas as pd
@@ -432,6 +467,7 @@ class DataExploration(object):
         :return: Returns 'series' after removing the trend
         :rtype: list
         """
+        LOG.debug(f"_ma_detrender series={series} padded_series={padded_series} ma_window_length={ma_window_length}")
 
         import numpy as np
 
@@ -454,6 +490,7 @@ class DataExploration(object):
         :return: An int containing the optimal window size
         :rtype: int
         """
+        LOG.debug(f"_detect_window_size series={series} streaming={streaming}")
         import numpy as np
 
         n = len(series)
@@ -488,6 +525,7 @@ class DataExploration(object):
         :return: List of local minimas
         :rtype: list
         """
+        LOG.debug(f"_local_minima input_dict={input_dict} window_length={window_length}")
         import numpy as np
         import collections
 
@@ -518,6 +556,7 @@ class DataExploration(object):
         :return: A list containing the magnitude of changes for every corresponding change points
         :rtype: list
         """
+        LOG.debug(f"_shift_intensity change_points={change_points} min_tmetrics_length={metric}")
         import numpy as np
 
         min_changepoint_padding_length = self.min_changepoint_padding_length
@@ -599,6 +638,7 @@ class DataExploration(object):
         2018-10-18  1738657.0     14.368624
         [1021 rows x 2 columns], ['2016-12-26 00:00:00', '2018-09-10 00:00:00'])
         """
+        LOG.debug(f"_pelt_change_point_detection metric={metric} min_ts_length={min_ts_length} max_ts_length={max_ts_length}")
         import numpy as np
         import pandas as pd
         from changepy import pelt
@@ -697,6 +737,7 @@ class DataExploration(object):
         '2018-06-30 00:00:00', '2018-09-08 00:00:00']
 
         """
+        LOG.debug(f"_trend_changes value_column={value_column}")
         import numpy as np
         from scipy import stats
         from statsmodels.tsa.stattools import acf
@@ -809,6 +850,7 @@ class DataExploration(object):
         >>> self.kf_naive_outlier_detection(input_series, 6)
         False
         """
+        LOG.debug(f"kf_naive_outlier_detection idx_position={idx_position}")
         import numpy as np
         from pykalman import KalmanFilter
 
@@ -840,6 +882,7 @@ class DataExploration(object):
         :rtype: pandas.DataFrame
         """
 
+        LOG.debug(f"_truncate_by_data_gaps target_metric={target_metric}")
         import numpy as np
 
         max_data_gap = abs(self.min_ts_length / 3.0)
@@ -872,6 +915,7 @@ class DataExploration(object):
         :rtype: tuple
         """
 
+        LOG.debug(f"_prepare impute_only={impute_only} streaming={streaming} kwargs={kwargs}")
         import pandas as pd
 
         min_ts_length = self.min_ts_length
@@ -967,6 +1011,7 @@ class DataExploration(object):
 
         """
 
+        LOG.debug(f"profile impute_only={impute_only} kwargs={kwargs}")
         import numpy as np
 
         min_ts_length = self.min_ts_length
@@ -1053,6 +1098,7 @@ class DataExploration(object):
         :rtype: tuple[pandas.dataFrame, dict]
         """
 
+        LOG.debug(f"stream_profile impute_only={impute_only} kwargs={kwargs}")
         from random import sample
         import datetime
         import numpy as np

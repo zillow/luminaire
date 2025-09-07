@@ -5,6 +5,9 @@ from luminaire.utils.random_state_validation import check_random_state
 import warnings
 warnings.filterwarnings('ignore')
 
+import logging
+LOG = logging.getLogger(__name__)
+
 class HyperparameterOptimization(object):
     """
     Hyperparameter optimization for LAD outlier detection configuration for batch data.
@@ -349,4 +352,5 @@ class HyperparameterOptimization(object):
         if summary['success']:
             return self._optimize(data=data, objective_part=self._objective_part, max_evals=max_evals)
         else:
+            LOG.error(f'Data exploration profiling failed: {summary}')
             return None
