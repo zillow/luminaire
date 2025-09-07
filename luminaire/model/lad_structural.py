@@ -3,6 +3,10 @@ from luminaire.exploration.data_exploration import DataExploration
 from luminaire.model.model_utils import LADHolidays
 from typing import Dict, Tuple
 import pandas as pd
+
+import logging
+LOG = logging.getLogger(__name__)
+
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -551,6 +555,9 @@ class LADStructuralModel(BaseModel):
         result['freq'] = self._params['freq']
 
         success = False if 'ErrorMessage' in result else True
+
+        if not success:
+            LOG.error(f"Model training failed: {result['ErrorMessage']}")
 
         # Model validation step to check underfit due to misspecification of hyperparameters to some other reasons.
         if success and validate and not optimize:
