@@ -2,6 +2,9 @@ from luminaire.model.lad_structural import *
 from luminaire.model.lad_filtering import *
 from luminaire.model.window_density import *
 from datetime import datetime
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 class TestLADStructural(object):
 
@@ -17,7 +20,6 @@ class TestLADStructural(object):
         assert success and isinstance(model, LADStructuralModel)
 
     def test_lad_structural_training_zeroes(self, training_test_data_zeroes):
-
         hyper_params = LADStructuralHyperParams(is_log_transformed=False, p=4, q=0).params
         lad_struct_obj = LADStructuralModel(hyper_params, freq='D')
         data_summary = {'ts_start': training_test_data_zeroes.first_valid_index(),
@@ -53,7 +55,6 @@ class TestLADStructural(object):
         assert success and isinstance(model, LADFilteringModel)
 
     def test_lad_filtering_scoring(self, scoring_test_data, lad_filtering_model):
-
         pred_date_normal = scoring_test_data.index[0]
         value_normal = scoring_test_data['raw'].iloc[0]
         output_normal, lad_filtering_model_update = lad_filtering_model.score(value_normal, pred_date_normal)

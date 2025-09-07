@@ -226,7 +226,6 @@ class DataExploration(object):
         return df
 
     def _moving_average(self, series=None, window_length=None, train_subwindow_len=None):
-        LOG.debug("_moving_average(series={series}, window_length={window_length}, train_subwindow_len={train_subwindow_len}):")
         """
         This function calculates the moving average of a series based on a given window length.
 
@@ -235,7 +234,7 @@ class DataExploration(object):
         :return: Smoothed input series using moving averages
         :rtype: list
         """
-        LOG.debug("_moving_average")
+        LOG.debug("_moving_average(series={series}, window_length={window_length}, train_subwindow_len={train_subwindow_len}):")
 
         import numpy as np
 
@@ -257,7 +256,6 @@ class DataExploration(object):
 
     @classmethod
     def _get_exog_data(cls, exog_start, exog_end, index):
-        LOG.debug(f"_get_exog_data(exog_start={exog_start}, exog_end={exog_end}, index={index})")
         """
         This function gets the exogenous data for the specified index.
         :param pandas.Timestamp exog_start: Start date for the exogenous data
@@ -266,7 +264,7 @@ class DataExploration(object):
         :return: Exogenous data for the given list of index
         :rtype: pandas.DataFrame
         """
-        LOG.debug("_get_exog_data")
+        LOG.debug(f"_get_exog_data(exog_start={exog_start}, exog_end={exog_end}, index={index})")
         import pandas as pd
 
         holiday_calendar = LADHolidays()
@@ -325,7 +323,6 @@ class DataExploration(object):
         return endog_diff, diff_order, actual_previous_per_diff
 
     def _partition(self, training_data, window_length, value_column=None):
-        LOG.debug(f"_partition window_length={window_length} value_column={value_column}")
         """
         This function slices a list from the end of the list based on the size of the slice. Any remainder part of the
         list from the beginning is ignored
@@ -336,7 +333,7 @@ class DataExploration(object):
         :return: Sliced lists of input time series and aggregated timestamps
         :rtype: tuple
         """
-        LOG.debug("_partition")
+        LOG.debug(f"_partition window_length={window_length} value_column={value_column}")
         import collections
         import operator
 
@@ -461,7 +458,6 @@ class DataExploration(object):
                agg_data_model, avg_series_df.reset_index().values.tolist()
 
     def _ma_detrender(self, series=None, padded_series=None, ma_window_length=None):
-        LOG.debug(f"_ma_detrender series={series} padded_series={padded_series} ma_window_length={ma_window_length}")
         """
         This function detrends a the values from a target time window w.r.t a padding around the target window.
         Note: This function is only been used for detrending the scoring window.
@@ -471,7 +467,7 @@ class DataExploration(object):
         :return: Returns 'series' after removing the trend
         :rtype: list
         """
-        LOG.debug("_ma_detrender")
+        LOG.debug(f"_ma_detrender series={series} padded_series={padded_series} ma_window_length={ma_window_length}")
 
         import numpy as np
 
@@ -487,7 +483,6 @@ class DataExploration(object):
         return stationarized_series
 
     def _detect_window_size(self, series=None, streaming=False):
-        LOG.debug(f"_detect_window_size series={series} streaming={streaming}")
         """
         This function detects the ideal window size based on the seasonality pattern of the data
         :param pandas.DataFrame series: The input sequence of data.
@@ -495,7 +490,7 @@ class DataExploration(object):
         :return: An int containing the optimal window size
         :rtype: int
         """
-        LOG.debug("_detect_window_size")
+        LOG.debug(f"_detect_window_size series={series} streaming={streaming}")
         import numpy as np
 
         n = len(series)
@@ -522,7 +517,6 @@ class DataExploration(object):
                        int(np.rint(float(n) / max(1, sig_freq_idx[-2] + 1)))))
 
     def _local_minima(self, input_dict=None, window_length=None):
-        LOG.debug(f"_local_minima input_dict={input_dict} window_length={window_length}")
         """
         This function finds the index corresponding to the local minimas for detected consecutive trend changes
         :param dict input_dict: A dictionary containing the timestamps as keys for potential trend changes
@@ -531,7 +525,7 @@ class DataExploration(object):
         :return: List of local minimas
         :rtype: list
         """
-        LOG.debug("_local_minima")
+        LOG.debug(f"_local_minima input_dict={input_dict} window_length={window_length}")
         import numpy as np
         import collections
 
@@ -552,7 +546,6 @@ class DataExploration(object):
         return min_keys
 
     def _shift_intensity(self, change_points=None, df=None, metric=None):
-        LOG.debug(f"_shift_intensity change_points={change_points} min_tmetrics_length={metric}")
         """
         This function computes the Kullback_Leibler divergence of the the time series around a changepoint detected by the
         pelt_change_point_detection() function. This considers Gaussian assumption on the underlying data distribution.
@@ -563,7 +556,7 @@ class DataExploration(object):
         :return: A list containing the magnitude of changes for every corresponding change points
         :rtype: list
         """
-        LOG.debug("_shift_intensity")
+        LOG.debug(f"_shift_intensity change_points={change_points} min_tmetrics_length={metric}")
         import numpy as np
 
         min_changepoint_padding_length = self.min_changepoint_padding_length
@@ -605,7 +598,6 @@ class DataExploration(object):
         return mag_change
 
     def _pelt_change_point_detection(self, df=None, metric=None, min_ts_length=None, max_ts_length=None):
-        LOG.debug(f"_pelt_change_point_detection metric={metric} min_ts_length={min_ts_length} max_ts_length={max_ts_length}")
         """
         This function computes the significant change points based on PELT and the Kullback-Leibler divergence method.
         :param pandas.dataframe df: A pandas dataframe containing the time series
@@ -646,7 +638,7 @@ class DataExploration(object):
         2018-10-18  1738657.0     14.368624
         [1021 rows x 2 columns], ['2016-12-26 00:00:00', '2018-09-10 00:00:00'])
         """
-        LOG.debug("_pelt_change_point_detection")
+        LOG.debug(f"_pelt_change_point_detection metric={metric} min_ts_length={min_ts_length} max_ts_length={max_ts_length}")
         import numpy as np
         import pandas as pd
         from changepy import pelt
@@ -716,7 +708,6 @@ class DataExploration(object):
         return copy_df, change_point_list
 
     def _trend_changes(self, input_df=None, value_column=None):
-        LOG.debug(f"_trend_changes value_column={value_column}")
         """
         This function detects the trend changes of the input time series
         :param pandas.DataFrame input_df: The input sequence of data.
@@ -746,6 +737,7 @@ class DataExploration(object):
         '2018-06-30 00:00:00', '2018-09-08 00:00:00']
 
         """
+        LOG.debug(f"_trend_changes value_column={value_column}")
         import numpy as np
         from scipy import stats
         from statsmodels.tsa.stattools import acf
@@ -846,7 +838,6 @@ class DataExploration(object):
         return global_trend_changes
 
     def kf_naive_outlier_detection(self, input_series, idx_position):
-        LOG.debug(f"kf_naive_outlier_detection idx_position={idx_position}")
         """
         This function detects outlier for the specified index position of the series.
 
@@ -859,6 +850,7 @@ class DataExploration(object):
         >>> self.kf_naive_outlier_detection(input_series, 6)
         False
         """
+        LOG.debug(f"kf_naive_outlier_detection idx_position={idx_position}")
         import numpy as np
         from pykalman import KalmanFilter
 
@@ -881,7 +873,6 @@ class DataExploration(object):
         return is_anomaly
 
     def _truncate_by_data_gaps(self, df, target_metric):
-        LOG.debug(f"_truncate_by_data_gaps target_metric={target_metric}")
         """
         This function truncates time series after large data gaps.
 
@@ -891,6 +882,7 @@ class DataExploration(object):
         :rtype: pandas.DataFrame
         """
 
+        LOG.debug(f"_truncate_by_data_gaps target_metric={target_metric}")
         import numpy as np
 
         max_data_gap = abs(self.min_ts_length / 3.0)
@@ -912,7 +904,6 @@ class DataExploration(object):
 
 
     def _prepare(self, df, impute_only, streaming=False, **kwargs):
-        LOG.debug(f"_prepare impute_only={impute_only} streaming={streaming} kwargs={kwargs}")
         """
         This function performs a basic data preparation before performing a full profiling
 
@@ -923,7 +914,8 @@ class DataExploration(object):
         :return: Pandas dataframe with prepared data (with identified frequency for streaming)
         :rtype: tuple
         """
-        import pdb;pdb.set_trace()
+
+        LOG.debug(f"_prepare impute_only={impute_only} streaming={streaming} kwargs={kwargs}")
         import pandas as pd
 
         min_ts_length = self.min_ts_length
@@ -975,7 +967,6 @@ class DataExploration(object):
 
 
     def profile(self, df, impute_only=False, **kwargs):
-        LOG.debug(f"profile impute_only={impute_only} kwargs={kwargs}")
         """
         This function performs required data profiling and pre-processing before hyperparameter optimization or time
         series model training.
@@ -1020,6 +1011,7 @@ class DataExploration(object):
 
         """
 
+        LOG.debug(f"profile impute_only={impute_only} kwargs={kwargs}")
         import numpy as np
 
         min_ts_length = self.min_ts_length
@@ -1096,7 +1088,6 @@ class DataExploration(object):
         return data, summary
 
     def stream_profile(self, df, impute_only=False, **kwargs):
-        LOG.debug(f"stream_profile impute_only={impute_only} kwargs={kwargs}")
         """
         This function performs data preparation for streaming data.
 
@@ -1107,6 +1098,7 @@ class DataExploration(object):
         :rtype: tuple[pandas.dataFrame, dict]
         """
 
+        LOG.debug(f"stream_profile impute_only={impute_only} kwargs={kwargs}")
         from random import sample
         import datetime
         import numpy as np

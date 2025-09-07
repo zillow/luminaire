@@ -3,11 +3,15 @@ import pandas as pd
 from pathlib import Path
 from luminaire.optimization.hyperparameter_optimization import HyperparameterOptimization
 from luminaire.model.window_density import WindowDensityHyperParams, WindowDensityModel
+from luminaire.model.lad_filtering import LADFilteringHyperParams, LADFilteringModel
+from luminaire.model.lad_structural import LADStructuralHyperParams, LADStructuralModel
 from luminaire.exploration.data_exploration import DataExploration
 import logging
 import json
 
 logging.basicConfig(level=logging.DEBUG)
+
+LOG = logging.getLogger(__name__)
 
 def get_paths(input_file, output_file):
     input_folder =Path(__file__).parent.joinpath('luminaire', 'tests','datasets')
@@ -32,7 +36,6 @@ def save_window_density(input_file, output_file):
 
     # Input data should have a time column set as the index column of the dataframe and a value column named as 'raw'
     data = reindex(data, format='%Y-%m-%d %H:%M:%S')
-    import pdb;pdb.set_trace()
     # Optimization
     config = WindowDensityHyperParams().params
 
@@ -64,9 +67,29 @@ def save_window_density(input_file, output_file):
     with open(output_path, 'wb') as output:
         pickle.dump(trained_model, output)
 
-
 def save_structural(input_file, output_file):
 
+    input_path, output_path = get_paths(input_file, output_file)
+    data = pd.read_csv(input_path)
+
+    # Input data should have a time column set as the index column of the dataframe and a value column named as 'raw'
+    data = reindex(data, format='%Y-%m-%d')
+
+    hyper = {"is_log_transformed": 1}
+
+    # Profiling
+    de_obj = DataExploration(freq='D', **hyper)
+    training_data, pre_prc = de_obj.profile(data)
+
+    # Training
+    model_object = LADFilteringModel(hyper_params=hyper, freq='D')
+    success, model_date, trained_model = model_object.train(data=training_data, **pre_prc)
+
+    with open(output_path, 'wb') as output:
+        pickle.dump(trained_model, output)
+
+def save_filtering(input_file, output_file):
+    LOG.info(f"save_filtering {input_file} {output_file}")
     input_path, output_path = get_paths(input_file, output_file)
     data = pd.read_csv(input_path)
 
@@ -96,10 +119,10 @@ def save_structural(input_file, output_file):
 
     with open(output_path, 'wb') as output:
         pickle.dump(trained_model, output)
+
 if __name__ == '__main__':
-    import pdb;pdb.set_trace()
-    save_structural('daily_test_time_series.csv', 'lad_filtering_model')
-    save_structural('daily_test_time_series_seasonal.csv', 'lad_filtering_model_log_seasonal')
+    save_filtering('daily_test_time_series.csv', 'lad_filtering_model')
+    save_filtering('daily_test_time_series_seasonal.csv', 'lad_filtering_model_log_seasonal')
     save_structural('daily_test_time_series.csv', 'lad_structural_model')
     save_structural('daily_test_time_series_seasonal.csv', 'lad_structural_model_log_seasonal')
     save_window_density('window_density_test_hourly.csv', 'window_density_model')
