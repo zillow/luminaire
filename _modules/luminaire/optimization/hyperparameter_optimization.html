@@ -6,6 +6,7 @@
 <span class=kn >import</span><span class=w > </span><span class=nn >warnings</span>
 <span class=n >warnings</span><span class=o >.</span><span class=n >filterwarnings</span><span class=p >(</span><span class=s1 >'ignore'</span><span class=p >)</span>
 
+
 <div class=viewcode-block  id=HyperparameterOptimization >
 <a class=viewcode-back  href="../../../api_reference/optimization.html#luminaire.optimization.hyperparameter_optimization.HyperparameterOptimization">[docs]</a>
 <span class=k >class</span><span class=w > </span><span class=nc >HyperparameterOptimization</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
@@ -17,11 +18,11 @@
 <span class=sd >        'W-FRI', 'W-SAT'.</span>
 <span class=sd >    :param str detection_type: Luminaire anomaly detection type. Only Outlier detection for batch data is currently</span>
 <span class=sd >        supported.</span>
-<span class=sd >    :param float min_ts_mean: Minimum average values in the most recent window of the time series. This optional parameter</span>
-<span class=sd >        can be used to avoid over-alerting from noisy low volume time series.</span>
+<span class=sd >    :param float min_ts_mean: Minimum average values in the most recent window of the time series. This optional</span>
+<span class=sd >        parameter can be used to avoid over-alerting from noisy low volume time series.</span>
 <span class=sd >    :param int max_ts_length: The maximum required length of the time series for training.</span>
-<span class=sd >    :param int min_ts_length: The minimum required length of the time series for training. The input time series will be</span>
-<span class=sd >        truncated if the length is greater than this value.</span>
+<span class=sd >    :param int min_ts_length: The minimum required length of the time series for training. The input time series will</span>
+<span class=sd >        be truncated if the length is greater than this value.</span>
 <span class=sd >    :param int scoring_length: Number of innovations to be scored after training window with respect to the frequency.</span>
 <span class=sd >    :param int random_state: Turn seed into a np.random.RandomState instance</span>
 
